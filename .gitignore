@@ -1,0 +1,27 @@
+# Windows:
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# MDK-Project
+*.d
+*.o
+*.crf
+*.plg
+*.htm
+*.zhiyi
+*.Administrator
+*.赵萌
+*.bak
+
+# Source Insight
+*.IAB
+*.IAD
+*.IMB
+*.IMD
+*.PFI
+*.PO
+*.PS
+*.PRI
+*.PR
+*.WK3
