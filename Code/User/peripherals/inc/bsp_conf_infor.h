@@ -89,7 +89,53 @@ struct JlyConfDataStr
      */
     uint8_t recmode;  //记录方式
 	
+	/** yyyy-MM-dd  hh-mm[BCD]
+	 * 1 定时启动的启动时间点
+	 * 2 延时启动的延时时间(默认0，即立即启动)
+	 * 3 时间点定点启停的启动时间点
+	 */
+	uint8_t mixboot_min;      //启动时间-分
+	uint8_t mixboot_hour;     //启动时间-时
+	uint8_t mixboot_day;      //启动时间-日
+	uint8_t mixboot_month;    //启动时间-月
+	uint8_t mixboot_year;     //启动时间-年
+	uint8_t mixboot_cen;      //启动时间-
+	//定点停止时间 yyyy-MM-dd hh-mm[BCD]
+	uint8_t fixedstop_min;
+	uint8_t fixedstop_hour;
+	uint8_t fixedstop_day;
+	uint8_t fixedstop_month;
+	uint8_t fixedstop_year;
+	uint8_t fixedstop_cen;
+    
+	//正常记录间隔 dd-hh-mm[BCD]:ms
+	uint16_t normalrec_interval;
+	uint8_t  normalrec_sec;
+	uint8_t  normalrec_min;
+	uint8_t  normalrec_hour;
+	uint8_t  normalrec_day;
 	
+	//异常记录间隔 dd-hh-mm[BCD]:ms
+	uint16_t exceptionrec_interval;
+	uint8_t  exceptionrec_sec;
+	uint8_t  exceptionrec_min;
+	uint8_t  exceptionrec_hour;
+	uint8_t  exceptionrec_day;
+	
+	//采集间隔 ms
+	uint16_t sample_interval;
+	uint16_t :16;
+	uint16_t :16;
+	
+	//仪器时钟的实时时间
+	uint8_t time_sec;
+	uint8_t time_min;
+	uint8_t time_week;
+	uint8_t time_hour;
+	uint8_t time_day;
+	uint8_t time_month;
+	uint8_t time_year;
+	uint8_t time_cen;
 };
 //单精度浮点型
 union FISI2CH4
@@ -162,9 +208,7 @@ struct SYSPEIZHI
     uint8_t     recgap_sec;         //记录间隔时间-秒    
     
     
-    uint8_t     delayboot_hour;     //延时启动时间-时
-    uint8_t     delayboot_min;      //延时启动时间-分
-    uint8_t     delayboot_sec;      //延时启动时间-秒
+
     
     
     uint16_t    recframaddr_low:8;     //fram中记录数据指针低位(2字节)
