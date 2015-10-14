@@ -3,7 +3,7 @@
   * @file    Project/STM32L1xx_StdPeriph_Templates/main.c 
   * @author  MCD Application Team
   * @version V1.2.0
-  * @date    16-May-2014
+  * @date    16-May-2015
   * @brief   Main program body
   ******************************************************************************
   * @attention
