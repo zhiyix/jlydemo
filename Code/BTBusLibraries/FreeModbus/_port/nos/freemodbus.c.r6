@@ -1,0 +1,676 @@
+///
+/// Ver 5
+#include "stm32f10x.h"
+#include <stdio.h>
+#include <string.h>
+
+#include ".\freemodbus.h"
+// #include "mb.h"
+// #include "mbutils.h"
+
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+//输入寄存器起始地址
+#define REG_INPUT_START       0x0000
+//输入寄存器数量
+#define REG_INPUT_NREGS       100
+//保持寄存器起始地址
+#define REG_HOLDING_START     0x0000
+//保持寄存器数量
+#define REG_HOLDING_NREGS     100
+
+//线圈起始地址
+#define REG_COILS_START       0x0000
+//线圈数量
+#define REG_COILS_SIZE        16
+
+//开关寄存器起始地址
+#define REG_DISCRETE_START    0x0000
+//开关寄存器数量
+#define REG_DISCRETE_SIZE     16
+
+/* Private macro -------------------------------------------------------------*/
+//LED控制
+#define LED1_OFF()          GPIO_SetBits(GPIOF,GPIO_Pin_9)
+#define LED1_ON()           GPIO_ResetBits(GPIOF,GPIO_Pin_9)
+
+#define LED2_OFF()          GPIO_SetBits(GPIOF,GPIO_Pin_8)
+#define LED2_ON()           GPIO_ResetBits(GPIOF,GPIO_Pin_8)
+
+#define LED3_OFF()          GPIO_SetBits(GPIOF,GPIO_Pin_7)
+#define LED3_ON()           GPIO_ResetBits(GPIOF,GPIO_Pin_7)
+
+#define LED4_OFF()          GPIO_SetBits(GPIOF,GPIO_Pin_6)
+#define LED4_ON()           GPIO_ResetBits(GPIOF,GPIO_Pin_6)
+
+//拨码开关控制
+#define BUTTON1_READ()      GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)
+#define BUTTON2_READ()      GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_13)
+#define BUTTON3_READ()      GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8)
+#define BUTTON4_READ()      GPIO_ReadInputDataBit(GPIOD,GPIO_Pin_3)
+#define BUTTON5_READ()      GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_12)
+#define BUTTON6_READ()      GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_13)
+#define BUTTON7_READ()      GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_14)
+#define BUTTON8_READ()      GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_15)
+
+//继电器控制
+#define Relay1_ON()         GPIO_SetBits(GPIOC,GPIO_Pin_0)
+#define Relay1_OFF()        GPIO_ResetBits(GPIOC,GPIO_Pin_0)
+
+#define Relay2_ON()         GPIO_SetBits(GPIOC,GPIO_Pin_1)
+#define Relay2_OFF()        GPIO_ResetBits(GPIOC,GPIO_Pin_1)
+
+#define Relay3_ON()         GPIO_SetBits(GPIOC,GPIO_Pin_2)
+#define Relay3_OFF()        GPIO_ResetBits(GPIOC,GPIO_Pin_2)
+
+#define Relay4_ON()         GPIO_SetBits(GPIOC,GPIO_Pin_3)
+#define Relay4_OFF()        GPIO_ResetBits(GPIOC,GPIO_Pin_3)
+
+
+/* Private variables ---------------------------------------------------------*/
+//输入寄存器内容
+uint16_t usRegInputBuf[REG_INPUT_NREGS] =
+{0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,};
+
+//寄存器起始地址
+uint16_t usRegInputStart = REG_INPUT_START;
+
+//保持寄存器内容
+uint16_t usRegHoldingBuf[REG_HOLDING_NREGS] =
+{0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ 0x0000, 0x0000, 0x0000, 0x0000, };
+
+//保持寄存器起始地址
+uint16_t usRegHoldingStart = REG_HOLDING_START;
+
+//线圈状态
+uint8_t ucRegCoilsBuf[REG_COILS_SIZE / 8] = {0x01, 0x02};
+//开关输入状态
+uint8_t ucRegDiscreteBuf[REG_DISCRETE_SIZE / 8] = {0x01, 0x02};
+
+/* Private function prototypes -----------------------------------------------*/
+void RCC_Config(void);
+void LED_Config(void);
+void LED_Poll(void);
+void Button_Config(void);
+void Button_Poll(void);
+void Relay_Config(void);
+void Relay_Poll(void);
+BOOL
+xMBPortSerialPutByteWithTxe( CHAR ucByte );
+
+
+#define YIQI_DATAERROR 		0xFFFF
+#define YIQI_NUMBER 		50
+#define YIQI_TIMEOUT_MS		(int32_t)(6)
+int32_t YIQI_Timer[YIQI_NUMBER];
+/* Private functions ---------------------------------------------------------*/
+void Pro_Zigbee_Adapter(uint32_t wUID, uint16_t dwTemp, uint8_t cvol, uint8_t celse)
+{
+#define HW_Exchange(x)	((((x) << 8) & 0xFF00) | (((x) >> 8) & 0xFF))
+#define DW_Exchange(x)	((((x) << 16) ) | (((x) >> 16) & 0xFFFF))
+#define HW_Combine(x,y)	((((uint16_t)(x) << 8) & 0xFF00) | (((y)) & 0xFF))
+    struct zigbee_config
+    {
+        uint16_t UID0;	// ARRAY[0]
+        uint16_t UID1;	// ARRAY[1]
+    };
+    union WORD_DATA
+    {
+        uint32_t dw;
+        struct DWORD
+        {
+            uint16_t hwl;
+            uint16_t hwh;
+        } hw;
+    } __wUID;
+    uint8_t idx, isize = 2;
+    wUID = (((uint32_t)HW_Exchange((wUID & 0xFFFF)) << 16) | (HW_Exchange((wUID >> 16) & 0xFFFF)));
+    for (idx = 0; idx < YIQI_NUMBER; idx ++)
+    {
+        struct zigbee_config *pcfg;
+		CORE_SR          core_sr;
+		CORE_CRITICAL_ENTER();
+		pcfg = (struct zigbee_config *) & (usRegHoldingBuf[idx * isize]);
+        __wUID.hw.hwh = pcfg->UID0;
+        __wUID.hw.hwl = pcfg->UID1;
+        if (__wUID.dw == wUID)
+        {
+            //<!
+            usRegInputBuf[idx * 2 + 0] = HW_Exchange(dwTemp);
+            usRegInputBuf[idx * 2 + 1] = HW_Combine(cvol, celse);
+            YIQI_Timer[idx] = YIQI_TIMEOUT_MS;
+        }
+		CORE_CRITICAL_EXIT();
+    }
+}
+
+typedef union
+{
+	float 	flt;	
+	long   	ulg;
+	uint8_t	arr[4];
+} FLOAT_Typedef;
+
+char Buffer[5 + 24 + (2) * 4 * 2] = 
+{
+		0x23, 0xF2, 
+		48, // 数据长度
+		// SN
+		0x07, 0xDD, 0x00, 0x00, 0xFF, 0xAA, 
+		// Ver.
+		0x01, 0x01,
+		// Resev
+		0x00, 0x00, 0x00, 0x00,
+		// Config
+		0x14, 0x00, 0x01, 0x04,
+		// DataType
+		0x13, 0x13, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		// Data1(Temp)
+		0x00, 0x00, 0x00, 0x00,
+		// Data1(Bat)
+		0x00, 0x00, 0x00, 0x00,
+		// Data2(Temp)
+		0x00, 0x00, 0x00, 0x00,
+		// Data2(Bat)
+		0x00, 0x00, 0x00, 0x00,/*
+		// Date
+		0x00, 0x00, 0x00, 0x00,
+		// Time
+		0x00, 0x00, 0x00, 0x00,*/
+		// Xor
+		0xFF,
+		0x66, 
+};
+		
+void MB_XingRuan_SendData()
+{
+	FLOAT_Typedef data;
+	uint8_t *p = (uint8_t*)&usRegHoldingBuf[8];
+	uint8_t crc = 0, i;
+	
+	Buffer[2] = sizeof(Buffer) - 5;
+	memcpy(&Buffer[3], p, 24);
+	
+	if ((Buffer[15] & 0xF0) == 0x10)
+	{
+		char DATETIME[8] = 
+		{
+			// Date
+			0x00, 0x00, 0x00, 0x00,
+			// Time
+			0x00, 0x00, 0x00, 0x00,
+		};
+		p = (uint8_t*)&usRegHoldingBuf[20];
+		memcpy(&DATETIME[0], p, 8);
+		
+		if (usRegInputBuf[0] == YIQI_DATAERROR)
+		{
+		memset(&Buffer[27], 0xFF, 4);
+		memset(&Buffer[31], 0xFF, 4);
+		}
+		else 
+		{
+		data.flt = (usRegInputBuf[0] - 500)/10.0;
+		memcpy(&Buffer[27], data.arr, 4);
+		data.flt = ((usRegInputBuf[1] >> 8) * 3.3)/256;
+		memcpy(&Buffer[31], data.arr, 4);
+		}
+		if (usRegInputBuf[2] == YIQI_DATAERROR)
+		{
+		memset(&Buffer[35], 0xFF, 4);
+		memset(&Buffer[39], 0xFF, 4);
+		}
+		else 
+		{
+		data.flt = (usRegInputBuf[2] - 500)/10.0;
+		memcpy(&Buffer[35], data.arr, 4);
+		data.flt = ((usRegInputBuf[3] >> 8) * 3.3)/256;
+		memcpy(&Buffer[39], data.arr, 4);
+		}
+		for (i = 0; i < sizeof(Buffer) - 2; i ++)
+		{
+			crc ^= Buffer[i];
+		}
+		Buffer[51 - 8] = crc;
+		for (i = 0; i < sizeof(Buffer); i ++)
+		{
+			xMBPortSerialPutByteWithTxe(Buffer[i]);
+		}
+	}
+}
+void MB_Timeout(void)
+{
+    int32_t idx;
+	for (idx = 0; idx < YIQI_NUMBER; idx ++)
+	{
+        if ((-- (YIQI_Timer[idx])) < 0)
+        {
+            //<!
+            usRegInputBuf[idx * 2 + 0] = YIQI_DATAERROR;
+            usRegInputBuf[idx * 2 + 1] = YIQI_DATAERROR;
+        }
+    }
+}
+/**
+  * @brief  主循环
+  * @param  None
+  * @retval None
+  */
+int freemodbus_init(void)
+{
+    //LED_Config();
+    //Button_Config();
+    //Relay_Config();
+    //初始化 RTU模式 从机地址为'1' USART1 9600 无校验
+	eMBInit(MB_RTU, 0x01, 0x01, 9600, MB_PAR_NONE);
+    //启动FreeModbus
+	eMBEnable();
+    //
+	CPAL_Init((uint8_t *)&usRegHoldingBuf[0],
+                       usRegHoldingStart, REG_HOLDING_NREGS);
+	return 0;
+}
+int freemodbus_main(void)
+{
+    do
+    {
+        //不断循环
+        eMBPoll();
+        //LED 控制循环
+        //LED_Poll();
+        //
+        //Button_Poll();
+        //
+        //Relay_Poll();
+    }
+    while (0);
+	return 0;
+}
+
+/**
+  * @brief  输入寄存器处理函数，输入寄存器可读，但不可写。
+  * @param  pucRegBuffer  返回数据指针
+  *         usAddress     寄存器起始地址
+  *         usNRegs       寄存器长度
+  * @retval eStatus       寄存器状态
+  */
+eMBErrorCode
+eMBRegInputCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
+{
+    eMBErrorCode    eStatus = MB_ENOERR;
+    int16_t         iRegIndex;
+
+    //查询是否在寄存器范围内
+    //为了避免警告，修改为有符号整数
+    if( ( (int16_t)usAddress >= REG_INPUT_START ) \
+            && ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) )
+    {
+        //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
+        iRegIndex = ( int16_t )( usAddress - usRegInputStart );
+        //逐个赋值
+        while( usNRegs > 0 )
+        {
+            //赋值高字节
+            *pucRegBuffer++ = ( uint8_t )( usRegInputBuf[iRegIndex] >> 8 );
+            //赋值低字节
+            *pucRegBuffer++ = ( uint8_t )( usRegInputBuf[iRegIndex] & 0xFF );
+            //偏移量增加
+            iRegIndex++;
+            //被操作寄存器数量递减
+            usNRegs--;
+        }
+    }
+    else
+    {
+        //返回错误状态，无寄存器
+        eStatus = MB_ENOREG;
+    }
+
+    return eStatus;
+}
+
+/**
+  * @brief  保持寄存器处理函数，保持寄存器可读，可读可写
+  * @param  pucRegBuffer  读操作时--返回数据指针，写操作时--输入数据指针
+  *         usAddress     寄存器起始地址
+  *         usNRegs       寄存器长度
+  *         eMode         操作方式，读或者写
+  * @retval eStatus       寄存器状态
+  */
+eMBErrorCode
+eMBRegHoldingCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs,
+                 eMBRegisterMode eMode )
+{
+    //错误状态
+    eMBErrorCode    eStatus = MB_ENOERR;
+    //偏移量
+    int16_t         iRegIndex;
+    //数据长度
+    int16_t         iRegLength = usNRegs;
+
+    //判断寄存器是不是在范围内
+    if( ( (int16_t)usAddress >= REG_HOLDING_START ) \
+            && ( usAddress + usNRegs <= REG_HOLDING_START + REG_HOLDING_NREGS ) )
+    {
+        //计算偏移量
+        iRegIndex = ( int16_t )( usAddress - usRegHoldingStart );
+
+        switch ( eMode )
+        {
+            //读处理函数
+        case MB_REG_READ:
+            CPAL_Read((uint8_t *)&usRegHoldingBuf[usAddress - usRegHoldingStart],
+                      usAddress, iRegLength);
+            while( usNRegs > 0 )
+            {
+                *pucRegBuffer++ = ( uint8_t )( usRegHoldingBuf[iRegIndex] >> 8 );
+                *pucRegBuffer++ = ( uint8_t )( usRegHoldingBuf[iRegIndex] & 0xFF );
+                iRegIndex++;
+                usNRegs--;
+            }
+            break;
+
+            //写处理函数
+        case MB_REG_WRITE:
+            while( usNRegs > 0 )
+            {
+                usRegHoldingBuf[iRegIndex] = *pucRegBuffer++ << 8;
+                usRegHoldingBuf[iRegIndex] |= *pucRegBuffer++;
+                iRegIndex++;
+                usNRegs--;
+            }
+            CPAL_Write((uint8_t *)&usRegHoldingBuf[usAddress - usRegHoldingStart],
+                       usAddress, iRegLength);
+            break;
+        }
+    }
+    else
+    {
+        //返回错误状态
+        eStatus = MB_ENOREG;
+    }
+
+    return eStatus;
+}
+
+
+/**
+  * @brief  线圈寄存器处理函数，线圈寄存器可读，可读可写
+  * @param  pucRegBuffer  读操作---返回数据指针，写操作--返回数据指针
+  *         usAddress     寄存器起始地址
+  *         usNRegs       寄存器长度
+  *         eMode         操作方式，读或者写
+  * @retval eStatus       寄存器状态
+  */
+eMBErrorCode
+eMBRegCoilsCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNCoils,
+               eMBRegisterMode eMode )
+{
+    //错误状态
+    eMBErrorCode    eStatus = MB_ENOERR;
+    //寄存器个数
+    int16_t         iNCoils = ( int16_t )usNCoils;
+    //寄存器偏移量
+    int16_t         usBitOffset;
+
+    //检查寄存器是否在指定范围内
+    if( ( (int16_t)usAddress >= REG_COILS_START ) &&
+            ( usAddress + usNCoils <= REG_COILS_START + REG_COILS_SIZE ) )
+    {
+        //计算寄存器偏移量
+        usBitOffset = ( int16_t )( usAddress - REG_COILS_START );
+        switch ( eMode )
+        {
+            //读操作
+        case MB_REG_READ:
+            while( iNCoils > 0 )
+            {
+                *pucRegBuffer++ = xMBUtilGetBits( ucRegCoilsBuf, usBitOffset,
+                                                  ( uint8_t )( iNCoils > 8 ? 8 : iNCoils ) );
+                iNCoils -= 8;
+                usBitOffset += 8;
+            }
+            break;
+
+            //写操作
+        case MB_REG_WRITE:
+            while( iNCoils > 0 )
+            {
+                xMBUtilSetBits( ucRegCoilsBuf, usBitOffset,
+                                ( uint8_t )( iNCoils > 8 ? 8 : iNCoils ),
+                                *pucRegBuffer++ );
+                iNCoils -= 8;
+            }
+            break;
+        }
+
+    }
+    else
+    {
+        eStatus = MB_ENOREG;
+    }
+    return eStatus;
+}
+
+eMBErrorCode
+eMBRegDiscreteCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
+{
+    //错误状态
+    eMBErrorCode    eStatus = MB_ENOERR;
+    //操作寄存器个数
+    int16_t         iNDiscrete = ( int16_t )usNDiscrete;
+    //偏移量
+    uint16_t        usBitOffset;
+
+    //判断寄存器时候再制定范围内
+    if( ( (int16_t)usAddress >= REG_DISCRETE_START ) &&
+            ( usAddress + usNDiscrete <= REG_DISCRETE_START + REG_DISCRETE_SIZE ) )
+    {
+        //获得偏移量
+        usBitOffset = ( uint16_t )( usAddress - REG_DISCRETE_START );
+
+        while( iNDiscrete > 0 )
+        {
+            *pucRegBuffer++ = xMBUtilGetBits( ucRegDiscreteBuf, usBitOffset,
+                                              ( uint8_t)( iNDiscrete > 8 ? 8 : iNDiscrete ) );
+            iNDiscrete -= 8;
+            usBitOffset += 8;
+        }
+
+    }
+    else
+    {
+        eStatus = MB_ENOREG;
+    }
+    return eStatus;
+}
+
+/**
+  * @brief  LED初始化
+  * @param  None
+  * @retval None
+  */
+void LED_Config(void)
+{
+    //定义一个GPIO结构体
+    GPIO_InitTypeDef  GPIO_InitStructure;
+
+    //初始化GPIOB时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOF, ENABLE);
+    //GPIOB
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 ;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOF, &GPIO_InitStructure);
+}
+
+/**
+  * @brief  LED循环检测
+  * @param  None
+  * @retval None
+  */
+void LED_Poll(void)
+{
+    uint8_t LED_Status = ucRegCoilsBuf[0];
+
+    if(LED_Status & 0x01)
+    {
+        LED1_ON();
+    }
+    else
+    {
+        LED1_OFF();
+    }
+    if(LED_Status & 0x02)
+    {
+        LED2_ON();
+    }
+    else
+    {
+        LED2_OFF();
+    }
+    if(LED_Status & 0x04)
+    {
+        LED3_ON();
+    }
+    else
+    {
+        LED3_OFF();
+    }
+    if(LED_Status & 0x08)
+    {
+        LED4_ON();
+    }
+    else
+    {
+        LED4_OFF();
+    }
+}
+
+/**
+  * @brief  拨码开关初始化
+  * @param  None
+  * @retval None
+  */
+void Button_Config(void)
+{
+    //定义一个GPIO结构体
+    GPIO_InitTypeDef  GPIO_InitStructure;
+
+    //初始化GPIOB时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD , ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO , ENABLE);
+    //GPIOA
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_8;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;   //上拉输入
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    //GPIOC
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    //GPIOD
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+}
+
+/**
+  * @brief  拨码开关检测循环
+  * @param  None
+  * @retval None
+  */
+void Button_Poll(void)
+{
+    //if(BUTTON1_READ()) {ucRegDiscreteBuf[0] |= 0x01;} else {ucRegDiscreteBuf[0] &=~ 0x01;}
+    uint8_t Button_Status = 0x00;
+
+    BUTTON1_READ() ? (Button_Status &= ~ 0x01) : (Button_Status |= 0x01);
+    BUTTON2_READ() ? (Button_Status &= ~ 0x02) : (Button_Status |= 0x02);
+    BUTTON3_READ() ? (Button_Status &= ~ 0x04) : (Button_Status |= 0x04);
+    BUTTON4_READ() ? (Button_Status &= ~ 0x08) : (Button_Status |= 0x08);
+
+    ucRegDiscreteBuf[0] = Button_Status;
+}
+
+
+void Relay_Config(void)
+{
+    //定义一个GPIO结构体
+    GPIO_InitTypeDef  GPIO_InitStructure;
+
+    //初始化GPIOB时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
+    //GPIOB
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 ;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+}
+
+
+void Relay_Poll(void)
+{
+
+    uint8_t Relay_Status = ucRegCoilsBuf[0];
+
+    if(Relay_Status & 0x01)
+    {
+        Relay1_ON();
+    }
+    else
+    {
+        Relay1_OFF();
+    }
+    if(Relay_Status & 0x02)
+    {
+        Relay2_ON();
+    }
+    else
+    {
+        Relay2_OFF();
+    }
+    if(Relay_Status & 0x04)
+    {
+        Relay3_ON();
+    }
+    else
+    {
+        Relay3_OFF();
+    }
+    if(Relay_Status & 0x08)
+    {
+        Relay4_ON();
+    }
+    else
+    {
+        Relay4_OFF();
+    }
+}
+/******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
