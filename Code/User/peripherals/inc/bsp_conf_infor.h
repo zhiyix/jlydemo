@@ -55,18 +55,16 @@ union BasicConfDataTable
 {
 	struct BasicConfDataStr
 	{
-		uint16_t Sn_Low;	/*!< 序列号 SN号 */
-		uint16_t Sn_Mid;
-		uint16_t Sn_High;
+		uint8_t Sn[6];	/*!< 序列号 SN号 */
 		uint16_t :16;
 		
 		uint16_t SoftVerml;		/*!< 软件版本 MID LOW */
+		uint16_t SoftVermain:8;	/*!< 软件版本 Main */
 		uint8_t	 :8;			/*!< 保留 */
-		uint16_t SoftVermain;	/*!< 软件版本 Main */
 		
 		uint16_t HardVerml;		/*!< 硬件版本 MID LOW */
+		uint16_t HardVermain:8;	/*!< 硬件版本 Main */
 		uint8_t	 :8;			/*!< 保留 */
-		uint16_t HardVermain;	/*!< 硬件版本 Main */
 		
 		uint16_t CommuMode;		/*!< 通讯方式 */
 		/*后备电池状态说明
@@ -81,6 +79,7 @@ union BasicConfDataTable
 		uint16_t :16;
 		uint16_t :16;
 		uint16_t :16;
+		//...
 	} BasicConfData;
 	
 	uint8_t BasicConfBuf[256];
@@ -155,6 +154,7 @@ union JlyConfDataTable
 										0x01：低功耗模式(省电模式) */								
 		uint32_t StorageCapacity;  /*!< flash存储容量 */										 
 		uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
+		//...
 	} JlyConfData;
 	
 	uint8_t JlyConfBuf[256];
@@ -188,7 +188,7 @@ union AlarmConfDataTable
 		
 		uint16_t :16;	/*!< Reserv */
 		uint16_t :16;
-		uint16_t rsrv[0x65];
+		//...
 	} AlarmConfData;
 	
 	uint8_t AlarmConfBuf[256];	/*!< 大小！！！！！！！！！！！！！！！！！ */
@@ -209,6 +209,7 @@ struct SensorChanelConfDataStr
 	
 	union FISI2CH4 SensorAlarm_High;  /*!< 报警上限 [IEEE-754_1二进制浮点操作数] 0x0000 0000*/ 
     union FISI2CH4 SensorAlarm_Low;   /*!< 报警下限 [IEEE-754_1二进制浮点操作数]0x0000 0000*/
+	//...
 };
 union xxxx 
 {
@@ -220,7 +221,7 @@ union xxxx
 	struct SensorChanelConfDataStr sensor[32];
 	// ...
 	};
-	uint8_t buf[1024];
+	uint8_t buf[3069];
 } XXXXX;
 //! \brief温湿度传感器校准配置数据地址表(Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
 struct TempHumiAdjustConfDataStr
