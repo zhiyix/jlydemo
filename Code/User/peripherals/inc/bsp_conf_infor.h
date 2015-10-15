@@ -188,6 +188,7 @@ union AlarmConfDataTable
 		
 		uint16_t :16;	/*!< Reserv */
 		uint16_t :16;
+		uint16_t rsrv[0x65];
 	} AlarmConfData;
 	
 	uint8_t AlarmConfBuf[256];	/*!< 大小！！！！！！！！！！！！！！！！！ */
@@ -209,6 +210,18 @@ struct SensorChanelConfDataStr
 	union FISI2CH4 SensorAlarm_High;  /*!< 报警上限 [IEEE-754_1二进制浮点操作数] 0x0000 0000*/ 
     union FISI2CH4 SensorAlarm_Low;   /*!< 报警下限 [IEEE-754_1二进制浮点操作数]0x0000 0000*/
 };
+union xxxx 
+{
+	struct 
+	{
+	struct BasicConfDataStr basic;
+	// ...
+	struct AlarmConfDataStr alarm;
+	struct SensorChanelConfDataStr sensor[32];
+	// ...
+	};
+	uint8_t buf[1024];
+} XXXXX;
 //! \brief温湿度传感器校准配置数据地址表(Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
 struct TempHumiAdjustConfDataStr
 {
