@@ -633,6 +633,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\peripherals\src\bsp_rtc.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_serial_deal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_serial_deal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

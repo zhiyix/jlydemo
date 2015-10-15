@@ -50,156 +50,139 @@ union FISI2CH4
     short int hwd[2];
     char      byte[4];
 };
-//! \brief基本配置数据地址表 (Display="Hex",ADDRESS_OFFSET=0x0000):
-union BasicConfDataTable
+//! \brief基本配置数据地址表 1 (Display="Hex",ADDRESS_OFFSET=0x0000):
+/*!< 总共32个byte */
+struct BasicConfDataStr
 {
-	struct BasicConfDataStr
-	{
-		uint8_t Sn[6];	/*!< 序列号 SN号 */
-		uint16_t :16;
-		
-		uint16_t SoftVerml;		/*!< 软件版本 MID LOW */
-		uint16_t SoftVermain:8;	/*!< 软件版本 Main */
-		uint8_t	 :8;			/*!< 保留 */
-		
-		uint16_t HardVerml;		/*!< 硬件版本 MID LOW */
-		uint16_t HardVermain:8;	/*!< 硬件版本 Main */
-		uint8_t	 :8;			/*!< 保留 */
-		
-		uint16_t CommuMode;		/*!< 通讯方式 */
-		/*后备电池状态说明
-		 *@1Bit[1:0]:充电状态
-		 *@2Bit[6:4]:电池电量状态
-		 */
-		uint16_t BatteryState;	/*!< 后备电池状态 */
-		
-		uint16_t :16;			/*!< Reserv */
-		uint16_t :16;
-		uint16_t :16;
-		uint16_t :16;
-		uint16_t :16;
-		uint16_t :16;
-		//...
-	} BasicConfData;
+	uint8_t  Sn[6];	/*!< 序列号 SN号 */
+	uint16_t :16;	/*!< 保留 */
 	
-	uint8_t BasicConfBuf[256];
-} Basic;
-//! \brief记录仪配置数据地址表(Display="Hex" ,ADDRESS_OFFSET=0x0100):
-union JlyConfDataTable
+	uint16_t SoftVerml;		/*!< 软件版本 MID LOW */
+	uint8_t  SoftVermain;	/*!< 软件版本 Main */
+	uint8_t	 :8;			/*!< 保留 */
+	
+	uint16_t HardVerml;		/*!< 硬件版本 MID LOW */
+	uint8_t  HardVermain;	/*!< 硬件版本 Main */
+	uint8_t	 :8;			/*!< 保留 */
+	
+	uint16_t CommuMode;		/*!< 通讯方式 */
+	/*后备电池状态说明
+	 *@1Bit[1:0]:充电状态
+	 *@2Bit[6:4]:电池电量状态
+	 */
+	uint16_t BatteryState;	/*!< 后备电池状态 */
+	
+	uint8_t Reserv[12];		/*!< Reserv */
+};
+//! \brief记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
+/*!< 总共62个byte */
+struct JlyConfDataStr
 {
-	struct JlyConfDataStr
-	{
-		uint8_t RecBootMode;   /*!< 启动方式说明
-									@0x00:延时启动(Default)
-									@0x01:时间点定时启动
-									@0x02:时间点定点启停
-									@0x10:异常条件启动 */
-		uint8_t RecMode;	/*!< 记录方式说明
-								 @0x00:先进先出(Default)
-								 @0x01:计满停止
-								 @0x02:立即停止 */  
-		
-		/*!< yyyy-MM-dd  hh-mm[BCD]
-			 1 定时启动的启动时间点
-			 2 延时启动的延时时间(默认0，即立即启动)
-			 3 时间点定点启停的启动时间点 */
-		uint8_t MixMoot_Min;      /*!< 启动时间-分 */ 
-		uint8_t MixMoot_Hour;     /*!< 启动时间-时 */ 
-		uint8_t MixMoot_Day;      /*!< 启动时间-日 */ 
-		uint8_t MixMoot_Month;    /*!< 启动时间-月 */ 
-		uint8_t MixMoot_Year;     /*!< 启动时间-年 */ 
-		uint8_t MixMoot_Cen;      /*!< 启动时间- */ 
-		/*!< 定点停止时间 yyyy-MM-dd hh-mm[BCD] */ 
-		uint8_t FixedStop_Min;	
-		uint8_t FixedStop_Hour;
-		uint8_t FixedStop_Day;
-		uint8_t FixedStop_Month;
-		uint8_t FixedStop_Year;
-		uint8_t FixedStop_Cen;
-		
-		/*!< 正常记录间隔 dd-hh-mm[BCD]:ms */
-		uint16_t NormalRecInterval;
-		uint8_t  NormalRec_Sec;
-		uint8_t  NormalRec_Min;
-		uint8_t  NormalRec_Hour;
-		uint8_t  NormalRec_Day;
-		
-		/*!< 异常记录间隔 dd-hh-mm[BCD]:ms */
-		uint16_t ExceptionRecInterval;
-		uint8_t  ExceptionRec_Sec;
-		uint8_t  ExceptionRec_Min;
-		uint8_t  ExceptionRec_Hour;
-		uint8_t  ExceptionRec_Day;
-		
-		/*!< 采集间隔 ms */
-		uint16_t SampleInterval;
-		uint16_t :16;	/*!< Reserv */
-		uint16_t :16;
-		
-		/*!< 仪器时钟的实时时间 */
-		uint8_t Time_Sec;
-		uint8_t Time_Min;
-		uint8_t Time_Week;
-		uint8_t Time_Hour;
-		uint8_t Time_Day;
-		uint8_t Time_Month;
-		uint8_t Time_Year;
-		uint8_t Time_Cen;
-		 
-		uint8_t WorkStatueIsStop;  /*!< 记录仪工作状态
-										0x00：停止记录 
-										0x01：正在记录 */
-		uint8_t PowerMode;         /*!< 记录仪功耗模式 
-										0x00：正常模式 
-										0x01：低功耗模式(省电模式) */								
-		uint32_t StorageCapacity;  /*!< flash存储容量 */										 
-		uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
-		//...
-	} JlyConfData;
+	uint8_t RecBootMode;   /*!< 启动方式说明
+								@0x00:延时启动(Default)
+								@0x01:时间点定时启动
+								@0x02:时间点定点启停
+								@0x10:异常条件启动 */
+	uint8_t RecMode;	/*!< 记录方式说明
+							 @0x00:先进先出(Default)
+							 @0x01:计满停止
+							 @0x02:立即停止 */  
 	
-	uint8_t JlyConfBuf[256];
-} Jly;
-//! \brief报警配置数据地址表(Display="Hex" ,ADDRESS_OFFSET=0x0200):
-union AlarmConfDataTable
+	/*!< yyyy-MM-dd  hh-mm[BCD]
+		 1 定时启动的启动时间点
+		 2 延时启动的延时时间(默认0，即立即启动)
+		 3 时间点定点启停的启动时间点 */
+	uint8_t MixMoot_Min;      /*!< 启动时间-分 */ 
+	uint8_t MixMoot_Hour;     /*!< 启动时间-时 */ 
+	uint8_t MixMoot_Day;      /*!< 启动时间-日 */ 
+	uint8_t MixMoot_Month;    /*!< 启动时间-月 */ 
+	uint8_t MixMoot_Year;     /*!< 启动时间-年 */ 
+	uint8_t MixMoot_Cen;      /*!< 启动时间- */ 
+	/*!< 定点停止时间 yyyy-MM-dd hh-mm[BCD] */ 
+	uint8_t FixedStop_Min;	
+	uint8_t FixedStop_Hour;
+	uint8_t FixedStop_Day;
+	uint8_t FixedStop_Month;
+	uint8_t FixedStop_Year;
+	uint8_t FixedStop_Cen; /*!< 14个byte */
+	
+	/*!< 正常记录间隔 dd-hh-mm[BCD]:ms */
+	uint16_t NormalRecInterval;
+	uint8_t  NormalRec_Sec;
+	uint8_t  NormalRec_Min;
+	uint8_t  NormalRec_Hour;
+	uint8_t  NormalRec_Day;
+	
+	/*!< 异常记录间隔 dd-hh-mm[BCD]:ms */
+	uint16_t ExceptionRecInterval;
+	uint8_t  ExceptionRec_Sec;
+	uint8_t  ExceptionRec_Min;
+	uint8_t  ExceptionRec_Hour;
+	uint8_t  ExceptionRec_Day;
+	
+	/*!< 采集间隔 ms */
+	uint16_t SampleInterval;
+	uint16_t :16;			/*!< Reserv */
+	uint16_t :16;
+	/*!< 仪器时钟的实时时间 */
+	uint8_t Time_Sec;
+	uint8_t Time_Min;
+	uint8_t Time_Week;
+	uint8_t Time_Hour;
+	uint8_t Time_Day;
+	uint8_t Time_Month;
+	uint8_t Time_Year;
+	uint8_t Time_Cen;
+	 
+	uint8_t WorkStatueIsStop;  /*!< 记录仪工作状态
+									0x00：停止记录 
+									0x01：正在记录 */
+	uint8_t PowerMode;         /*!< 记录仪功耗模式 
+									0x00：正常模式 
+									0x01：低功耗模式(省电模式) */
+    /*!< 42个byte */								
+	uint32_t StorageCapacity;  /*!< flash存储容量 */										 
+	uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
+	uint8_t	 Reserv[12];
+};
+//! \brief报警配置数据地址表 3 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
+/*!< 总共20个byte */	
+struct AlarmConfDataStr
 {
-	struct AlarmConfDataStr
-	{
-		uint16_t AlarmSwitch;	/*!< 报警开关
-									 Bit0：声音开关
-									 Bit1：显示开关
-									 Bit2：短信开关 */
-		uint8_t  AlarmTime_Mode;	/*!< 报警时间模式
-										 Bit0：上班时间
-										 Bit1：下班时间 */
-		uint8_t  AlarmTime_Conf;	/*!< 报警时间配置
-										 Bit0：Monday
-										 Bit1：Tuesday
-										 Bit2：Wednesday
-										 Bit3：Thursday
-										 Bit4：Friday
-										 Bit5：Weekend */
-		uint8_t  OnWork_Min;	/*!< hh-mm[BCD] 上班时间点 */
-		uint8_t  OnWork_Hour;
-		
-		uint8_t  OffWork_Min;	/*!< hh-mm[BCD] 下班时间点 */
-		uint8_t  OffWork_Hour;
-		uint16_t SoundLightAlarmDelay;	/*!< 声光报警延时 单位秒钟*/
-		uint16_t SmsAlarmDelay;			/*!< 短信报警延时 范围从1s到18小时可选*/
-		
-		uint16_t :16;	/*!< Reserv */
-		uint16_t :16;
-		//...
-	} AlarmConfData;
+	uint16_t AlarmSwitch;	/*!< 报警开关
+								 Bit0：声音开关
+								 Bit1：显示开关
+								 Bit2：短信开关 */
+	uint8_t  AlarmTime_Mode;	/*!< 报警时间模式
+									 Bit0：上班时间
+									 Bit1：下班时间 */
+	uint8_t  AlarmTime_Conf;	/*!< 报警时间配置
+									 Bit0：Monday
+									 Bit1：Tuesday
+									 Bit2：Wednesday
+									 Bit3：Thursday
+									 Bit4：Friday
+									 Bit5：Weekend */
+	uint8_t  OnWork_Min;	/*!< hh-mm[BCD] 上班时间点 */
+	uint8_t  OnWork_Hour;
 	
-	uint8_t AlarmConfBuf[256];	/*!< 大小！！！！！！！！！！！！！！！！！ */
-} Alarm;
-//! \brief传感器通道配置数据地址表(Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+	uint8_t  OffWork_Min;	/*!< hh-mm[BCD] 下班时间点 */
+	uint8_t  OffWork_Hour;
+	uint16_t SoundLightAlarmDelay;	/*!< 声光报警延时 单位秒钟*/
+	uint16_t SmsAlarmDelay;			/*!< 短信报警延时 范围从1s到18小时可选*/
+	
+	uint8_t	 Reserv[8];	/*!< Reserv */	
+};
+//! \brief传感器通道配置数据地址表 4 (Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+/*!< 总共28个byte */	
 struct SensorChanelConfDataStr
 {
 	uint8_t  SensorType;	/*!< 传感器类型
 								 0x00：NULL
 								 0x01：温度
 								 0x02：湿度 */
+	uint8_t  SensorInterfaceType;	/*!< 传感器接口类型 */
+	uint8_t  :8;			/*!< Reserv */
 	uint8_t  AlarmSwitch;	/*!< 报警开关 */
     uint16_t AlarmStatus;	/*!< 报警状态
 								 Bit0：上限报警
@@ -209,21 +192,11 @@ struct SensorChanelConfDataStr
 	
 	union FISI2CH4 SensorAlarm_High;  /*!< 报警上限 [IEEE-754_1二进制浮点操作数] 0x0000 0000*/ 
     union FISI2CH4 SensorAlarm_Low;   /*!< 报警下限 [IEEE-754_1二进制浮点操作数]0x0000 0000*/
-	//...
+	uint8_t Reserv[10];	/*!< Reserv */
 };
-union xxxx 
-{
-	struct 
-	{
-	struct BasicConfDataStr basic;
-	// ...
-	struct AlarmConfDataStr alarm;
-	struct SensorChanelConfDataStr sensor[32];
-	// ...
-	};
-	uint8_t buf[3069];
-} XXXXX;
-//! \brief温湿度传感器校准配置数据地址表(Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+//! \brief温湿度传感器校准配置数据地址表 5 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+
+/*!< 总共60个byte */
 struct TempHumiAdjustConfDataStr
 {
 	uint16_t DataPoint0;	/*!< 默认显示值：-80℃ / 0%RH*/
@@ -250,7 +223,35 @@ struct TempHumiAdjustConfDataStr
 	uint16_t DataPoint21;	/*!< 默认显示值：130℃ */
 	uint16_t DataPoint22;	/*!< 默认显示值：140℃ */
 	uint16_t DataPoint23;	/*!< 默认显示值：150℃ */
+	uint8_t Reserv[12];	/*!< Reserv */
 };
+//! \brief 配置表
+/*!< 基本配置数据地址表   1 (Display="Hex",ADDRESS_OFFSET=0x0000):
+	 记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
+	 报警配置数据地址表   3 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
+	 传感器通道配置数据地址表       4 (Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+	 温湿度传感器校准配置数据地址表 5 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):  
+	 表 1 在Fram中 起始地址0x0000，结束地址(0x0040-1) 大小 64byte
+     表 2 在Fram中 起始地址0x0040，结束地址(0x0080-1) 大小 64byte
+     表 3 在Fram中 起始地址0x0080，结束地址(0x00A0-1) 大小 64byte
+	 表 4 在Fram中 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte,AADDRESS_OFFSET=0x00A0 + Sensor_Channel * 0x1C,其中Sensor_Channel取值为0~31):
+	 表 5 在Fram中 起始地址0x04A0，结束地址(0x00A0-1) 大小 2048byte,AADDRESS_OFFSET=0x04A0 + Sensor_Channel * 0x3C,其中Sensor_Channel取值为0~31):*/
+
+union ConfDataTable 
+{
+	#pragma anon_unions
+	struct 
+	{
+		struct BasicConfDataStr Basic;	/*!< 总共32个byte */
+		struct JlyConfDataStr Jly;		/*!< 总共62个byte */
+		struct AlarmConfDataStr Alarm;	/*!< 总共20个byte */	
+		struct SensorChanelConfDataStr Sensor[32];		/*!< 每一通道总共28个byte */	
+		struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共60个byte */
+	};
+	uint8_t Buf[3072];
+};
+
+
 //传感器通道信息结构
 struct SENSORINFOR
 {

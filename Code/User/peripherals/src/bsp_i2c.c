@@ -444,7 +444,99 @@ bool RTC8025_Read(uint8_t *pData, uint16_t addr, uint16_t count)
 	return true;
 }
 
+/**
+  * @brief  Description "模拟I2C写函数"
+  * @param  pdata  		写入的数据缓冲区指针
+  * @param  addr		写入的器件内存地址
+  * @param  count		写入的器件数据大小
+  * @retval bool		I2C写函数是否成功
+  */
+bool Fram_Write(uint8_t *pData, uint16_t addr, uint16_t count)
+{
+    
+	uint8_t		device_addr = 0;
+	uint8_t 	addr_msb = 0, addr_lsb = 0;
+    uint16_t 	i;
+	uAddress = AI2C_FRAM_ADDRESS;
+//    CAI2C		theAI2C(0xA0);
+	/*            从机ID   + 器件选择 + 读写选择  */
+	device_addr = uAddress + 0x0		+ 0;
+    addr_msb = ((addr / 256)&0X3F);
+    addr_lsb = (addr % 256);
 
+    if (count == 0)
+    {
+        return true;
+    }
+
+    if (!Start())
+        return false;
+    SendByte(device_addr);	// I2C_WRITE
+    if (!WaitAck())
+    {
+        Stop();
+        return false;
+    }
+    SendByte(addr_msb);
+    WaitAck();
+    SendByte(addr_lsb);
+    WaitAck();
+    for (i = 0; i < count; i ++)
+    {
+        SendByte(*(pData + i));
+        WaitAck();
+    }
+    Stop();
+    return true;
+}
+
+/**
+  * @brief  Description "模拟I2C读函数"
+  * @param  pdata  		读取的数据缓冲区指针
+  * @param  addr		读取的器件内存地址
+  * @param  count		读取的器件数据大小
+  * @retval bool		I2C读函数是否成功
+  */
+bool Fram_Read(uint8_t *pData, uint16_t addr, uint16_t count)
+{
+	uint8_t		device_addr = 0;
+	uint8_t 	addr_msb = 0, addr_lsb = 0;
+    uint16_t 	i;
+	uAddress = AI2C_FRAM_ADDRESS;
+//    CAI2C		theAI2C(0xA0);
+	/*            从机ID   + 器件选择 + 读写选择  */
+	device_addr = uAddress + 0x0		+ 0;
+    addr_msb = ((addr / 256)&0X3F);
+    addr_lsb = (addr % 256);
+    if (count == 0)
+    {
+        return true;
+    }
+    if (!Start())
+        return false;
+    SendByte(device_addr);
+    if (!WaitAck())
+    {
+        Stop();
+        return false;
+    }
+    SendByte(addr_msb);
+    WaitAck();
+    SendByte(addr_lsb);
+    WaitAck();
+    Start();
+    SendByte(device_addr|0X01);
+    WaitAck();
+    for (i = 0; i < count - 1; i ++)
+    {
+        RecvByte((pData + i));
+        Ack(false);
+    }
+    RecvByte(pData + count - 1);
+    Ack(true);//接收结束,发送非应答信号
+    Stop();
+	return true;
+}
 /**
   * @brief  Description "RTC8025状态位复位函数"
   * @param  None

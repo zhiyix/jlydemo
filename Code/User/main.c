@@ -85,6 +85,7 @@ int main(void)
 //	  Fram_Test();
 //	  Delay_ms(1000);
       
+	  JlySerialDeal();
 	  
       JlySecDeal();
 	  if(Flag.SysTickSec ==1)//模拟10s保存数据
@@ -103,7 +104,6 @@ int main(void)
 	  freemodbus_main();
   }
 }
-
 
 #ifdef  USE_FULL_ASSERT
 

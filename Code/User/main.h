@@ -34,6 +34,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
+
+#include "porttype.h"
+
 #include "config.h"
 #include "bsp_class.h"
 #include "bsp_init.h"
@@ -53,6 +56,7 @@
 #include "bsp_datadeal.h"
 #include "bsp_i2c_fram.h"
 #include "bsp_sensor_deal.h"
+#include "bsp_serial_deal.h"
 
 
 /* Exported macro ------------------------------------------------------------*/

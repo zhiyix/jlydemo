@@ -40,7 +40,6 @@ void I2C_GPIO_Config(void)
 	/* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
 //	i2c_Stop();
 }
-
 /**
   * @brief  Description 通道数据处理
   * @param  channelnum  通道数		

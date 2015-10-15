@@ -201,16 +201,26 @@ const char NewLCDCtrlWord[32] =
   0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
 };
 
-#define MSP430_Curver1_ADDRESS  (unsigned char*)0x00
-#define MSP430_Curver2_ADDRESS  (unsigned char*)0x01
-#define MSP430_Curver3_ADDRESS  (unsigned char*)0x02
-#define MSP430_Curver4_ADDRESS  (unsigned char*)0x03
+#define Curver1_ADDRESS  (unsigned char*)0x00
+#define Curver2_ADDRESS  (unsigned char*)0x01
+#define Curver3_ADDRESS  (unsigned char*)0x02
+#define Curver4_ADDRESS  (unsigned char*)0x03
 
 const unsigned char *AdjustCurveFirAddress[]=
 {
-    MSP430_Curver1_ADDRESS,MSP430_Curver2_ADDRESS,
-    MSP430_Curver3_ADDRESS,MSP430_Curver4_ADDRESS,
+    Curver1_ADDRESS,Curver2_ADDRESS,
+    Curver3_ADDRESS,Curver4_ADDRESS,
     RESET_ADJUST_CURVE1,RESET_ADJUST_CURVE2,
     RESET_ADJUST_CURVE3,RESET_ADJUST_CURVE4,
 //    adcjust1.adcadjust_infor,
+};
+
+//! \brief 配置信息表地址映射
+const uint32_t ConfMap_Address[5][2]=
+{
+	{VirtBasicConfAddr, 		 FRAM_BasicConfAddr},
+	{VirtJlyConfAddr, 			 FRAM_JlyConfAddr},
+	{VirtAlarmConfAddr, 		 FRAM_AlarmConfAddr},
+	{VirtSensorChanelConfAddr, 	 FRAM_SensorChanelConfAddr},
+	{VirtTempHumiAdjustConfAddr, FRAM_TempHumiAdjustConfAddr},
 };

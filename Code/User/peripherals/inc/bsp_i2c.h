@@ -28,6 +28,7 @@
 //! @{
 #include "stm32l1xx.h"
 
+#include "stdbool.h"
 //#include "stm32glibc_type.h"
 
 //#include "stm32glibc_rcc.h"
@@ -72,11 +73,11 @@
 
 /*============================ TYPES =========================================*/
 //!
-typedef enum
-{
-  false = 0, true  = !false
-}
-bool;
+//typedef enum
+//{
+//  false = 0, true  = !false
+//}
+//bool;
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/
@@ -96,6 +97,9 @@ bool AI2C_Read(uint8_t *pData, uint16_t addr, uint16_t count);
 
 bool RTC8025_Write(uint8_t *pData, uint16_t addr, uint16_t count);
 bool RTC8025_Read(uint8_t *pData, uint16_t addr, uint16_t count);
+
+bool Fram_Write(uint8_t *pData, uint16_t addr, uint16_t count);
+bool Fram_Read(uint8_t *pData, uint16_t addr, uint16_t count);
 //#ifdef __cplusplus
 //}
 //#endif

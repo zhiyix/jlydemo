@@ -67,16 +67,33 @@
 
 //! \brief
 #define ADJUST_TABLE_HEAD_LENGTH    0x08
+
+//! \brief 协议中对应的虚拟地址
+#define VirtBasicConfAddr			0x0000
+#define VirtJlyConfAddr				0x0100
+#define VirtAlarmConfAddr			0x0200
+#define VirtSensorChanelConfAddr	0x1000
+#define VirtTempHumiAdjustConfAddr	0x2000
+//! \brief 配置信息表在Fram中的地址
+#define FRAM_BasicConfAddr           0x0000	/*!< 起始地址0x0000，结束地址(0x0040-1) 大小 64byte */
+#define FRAM_JlyConfAddr             0x0040	/*!< 起始地址0x0040，结束地址(0x0080-1) 大小 64byte */
+#define FRAM_AlarmConfAddr           0x0080	/*!< 起始地址0x0080，结束地址(0x00A0-1) 大小 64byte */
+#define FRAM_SensorChanelConfAddr    0x00A0	/*!< 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte */
+#define FRAM_TempHumiAdjustConfAddr  0x04A0 /*!< 起始地址0x04A0，结束地址(0x00A0-1) 大小 2048byte */
+
+//! \brief FRAM中存放fram记录指针地址
+#define FRAM_RecAddr_Hchar          0x0CA0      
+#define FRAM_RecAddr_Lchar          0x0CA1
+
+#define FLASH_RecAddr_Lchar          0x0CA2     //存放flash记录指针
+#define FLASH_RecAddr_MidLchar       0x0CA3
+#define FLASH_RecAddr_MidHchar       0x0CA4
+#define FLASH_RecAddr_Hchar          0x0CA5
+
 //! \brief FRAM中地址定义
-#define FRAM_RecFirstAddr           0x0600      //Fram中存放数据的首地址
+#define FRAM_RecFirstAddr           0x1000      //Fram中存放历史数据的首地址
 
-#define FRAM_RecAddr_Hchar          0x0000      //存放fram记录指针
-#define FRAM_RecAddr_Lchar          0x0001
 
-#define FLASH_RecAddr_Lchar          0x0002     //存放flash记录指针
-#define FLASH_RecAddr_MidLchar       0x0003
-#define FLASH_RecAddr_MidHchar       0x0004
-#define FLASH_RecAddr_Hchar          0x0005
 //----------------------------------------------------------
 //! \brief
 #define FLASH_PAGE_NUM              32768   //flash总的页数
@@ -181,6 +198,7 @@ extern struct       BATTERY         Bat;
 extern struct       JLYPARAMETER    JlyParam;
 extern const char RESET_CHANNEL_SETUP_TABLE[104];
 extern const unsigned char *AdjustCurveFirAddress[];
+extern const uint32_t ConfMap_Address[5][2];
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/
