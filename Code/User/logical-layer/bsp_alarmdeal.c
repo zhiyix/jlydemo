@@ -79,15 +79,12 @@ void BellNn_longer(uint8_t n)
     }
 }
 /**
-  * @brief  Description 记录仪报警处理函数
+  * @brief  Description 记录仪报警处理函数,需要完善
   * @param  无  		
   * @retval 无		
   */
 void AlarmDeal(uint8_t channel)
 {
-    uint8_t channel_BITx;
-    
-    channel_BITx = 1<<(channel-1);
 	if(Conf.Alarm.AlarmSwitch ==1)	/*!< 报警总开关 */
 	{
 		if((ChannelDataFloat[channel-1] >= Conf.Sensor[channel-1].SensorAlarm_High.ft)||(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.ft))
@@ -102,12 +99,12 @@ void AlarmDeal(uint8_t channel)
 			}
 			if(Conf.Sensor[channel-1].AlarmSwitch & 0x01)
 			{
-				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}; 
+				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
 				showJINBAO;
 				LCD_UpdateDisplayRequest();  	/*!< 显示喇叭符号 */
 			}
 			else{
-				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){};
+				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
 				clearJINBAO;
 				LCD_UpdateDisplayRequest();	/*!< 清除喇叭符号 */	
 			}
@@ -121,7 +118,7 @@ void AlarmDeal(uint8_t channel)
         }
         else
         {
-            while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){};
+            while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
 			clearJINBAO;
 			LCD_UpdateDisplayRequest();	/*!< 清除喇叭符号 */	
             BEEP(OFF);
@@ -130,11 +127,11 @@ void AlarmDeal(uint8_t channel)
 	}
     else
     {
-        while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){};
+        while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
 		clearJINBAO;
 		LCD_UpdateDisplayRequest();	/*!< 清除喇叭符号 */	
         BEEP(OFF);
-        //Alarmflag = Alarmflag&(~channel_BITx);//????????
+        //Alarmflag = Alarmflag&(~channel_BITx);
     }
     
 }

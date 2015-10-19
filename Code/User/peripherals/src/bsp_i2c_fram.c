@@ -344,7 +344,7 @@ static void HisData_Tidy(uint16_t RecorderPoint_Begin,uint16_t RecorderPoint)
 {   
     uint8_t Buf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
     uint8_t BufTemp[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
-    uint8_t i=0,j=0,PagLen;
+    uint8_t i=0;
     uint16_t  down_hisdata_count,down_eeOffset,Temp;
     
     for(down_hisdata_count=RecorderPoint_Begin;down_hisdata_count<RecorderPoint;down_hisdata_count++)
@@ -423,7 +423,7 @@ void ReadFlashHisData(uint32_t RecorderPoint_Begin,uint32_t RecorderPoint)
 {
 	uint8_t Buf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
     uint8_t BufTemp[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
-    uint8_t i=0,j=0,PagLen;
+    uint8_t i=0;
 	uint16_t Temp;
     uint32_t down_hisdata_count,down_eeOffset;
     

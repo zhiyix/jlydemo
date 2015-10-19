@@ -74,7 +74,30 @@
 //LCD 信号显示
 #define showS1      LCD->RAM[0]|=D_BIT1
 #define showS12     LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1
-#define showS123    LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1
+#define showS123    LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1;LCD->RAM[0]|=D_BIT2
+#define showS1234   LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1;LCD->RAM[0]|=D_BIT2;LCD->RAM[0]|=D_BIT4
+#define showS12345  LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1;LCD->RAM[0]|=D_BIT2;LCD->RAM[0]|=D_BIT4;LCD->RAM[0]|=D_BIT6
+
+#define show_NFC		LCD->RAM[0]|=D_BIT8
+#define clear_NFC		LCD->RAM[0]&=~D_BIT8
+//! \brief 保温箱 s6 s7 s8
+#define show_BOX_open	LCD->RAM[0]|=D_BIT10;LCD->RAM[2]&=~D_BIT10;LCD->RAM[4]|=D_BIT10
+#define show_BOX_close  LCD->RAM[0]&=~D_BIT10;LCD->RAM[2]|=D_BIT10;LCD->RAM[4]|=D_BIT10
+//! \brief k1 s9
+#define show_GPRS     LCD->RAM[0]|=D_BIT11;LCD->RAM[2]|=D_BIT11		/*!< E表示 GPRS符号 */
+#define clear_GPRS    LCD->RAM[0]&=~D_BIT11;LCD->RAM[2]&=~D_BIT11
+//! \brief k2 s10
+#define show_GPS      LCD->RAM[4]|=D_BIT11;LCD->RAM[6]|=D_BIT11	/*!< GPS符号 */
+#define clear_GPS     LCD->RAM[4]&=~D_BIT11;LCD->RAM[6]&=~D_BIT11
+
+//! \brief 显示Flash 存储 N5 N6 N7 N8 N9 N10
+#define clearFlashMEM	LCD->RAM[0]&=~D_BIT24;LCD->RAM[2]&=~D_BIT24;LCD->RAM[4]&=~D_BIT24;LCD->RAM[4]&=~D_BIT22;LCD->RAM[2]&=~D_BIT22
+#define showFlashMEM1   clearFlashMEM;LCD->RAM[0]|=D_BIT24
+#define showFlashMEM2   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24
+#define showFlashMEM3   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24
+#define showFlashMEM4   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24;LCD->RAM[4]|=D_BIT22
+#define showFlashMEM5   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24;LCD->RAM[4]|=D_BIT22;LCD->RAM[2]|=D_BIT22
+
 //显示负号 s12
 #define showFUHAO	LCD->RAM[6]|=D_BIT29
 //!
@@ -104,9 +127,28 @@
 //! \brief  显示时钟 : S16
 #define showCOL     LCD->RAM[6]|=D_BIT18
 #define clearCOL    LCD->RAM[6]&=~D_BIT18
+
+
+#define showtongdao   
+#define cleartongdao  
 //! \brief  显示报警符号 s11
 #define showJINBAO	LCD->RAM[6]|=D_BIT30
 #define clearJINBAO LCD->RAM[6]&=~D_BIT30
+//! \brief  显示报警状态 
+#define showAlarmStatus   LCD->RAM[6]|=D_BIT1
+#define clearAlarmStatus  LCD->RAM[6]&=~D_BIT1
+//! \brief  显示 设置上限
+#define showshangxian   LCD->RAM[7]|=D_BIT2
+#define clearshangxian  LCD->RAM[7]&=~D_BIT2
+//! \brief  显示 设置下限
+#define showxiaxian     LCD->RAM[6]|=D_BIT32
+#define clearxiaxian    LCD->RAM[6]&=~D_BIT32
+
+
+
+
+//! \brief  显示报警状态
+
 //! @}
 
 

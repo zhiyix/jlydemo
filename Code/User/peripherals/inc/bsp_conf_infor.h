@@ -145,7 +145,9 @@ struct JlyConfDataStr
     /*!< 44个byte */								
 	uint32_t StorageCapacity;  /*!< flash存储容量 */										 
 	uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
-	uint8_t	 Reserv[12];
+	
+	uint8_t	 ChannelNum;	   /*!< 通道数 */
+	uint8_t	 Reserv[11];
 };
 //! \brief报警配置数据地址表 3 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
 /*!< 总共32个byte */	
@@ -183,7 +185,9 @@ struct SensorChanelConfDataStr
 								 0x00：NULL
 								 0x01：温度
 								 0x02：湿度 */
-	uint8_t  SensorInterfaceType;	/*!< 传感器接口类型 */
+	uint8_t  SensorInterfaceType;	/*!< 传感器接口类型 
+								 0x00：模拟
+								 0x01：数字*/
 	uint8_t  :8;			/*!< Reserv */
 	uint8_t  AlarmSwitch;	/*!< 报警开关 */
     uint16_t AlarmStatus;	/*!< 报警状态
@@ -260,7 +264,6 @@ union ConfDataTable
 	};
 	uint8_t Buf[3232];
 };
-
 
 //传感器通道信息结构
 struct SENSORINFOR

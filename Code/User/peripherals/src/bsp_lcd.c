@@ -1294,7 +1294,7 @@ void displayTIME(uint8_t hour,uint8_t min)
 void Display_SN(void)
 {
 //    unsigned char year,month;
-    unsigned int value,num_H,num_L;
+    uint16_t value;
     
 //    year = *((char*)JLY_SN_ADDR);
 //    month = *((char*)JLY_SN_ADDR+1);
@@ -1308,7 +1308,7 @@ void Display_SN(void)
     //LCDMEM[2]=digit[year%16];
 //    LCDMEM[2]|=digit[month/16];
     /*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){} 
     
     showID;
 //    LCDMEM[3]|=digit[month%16];

@@ -219,23 +219,11 @@ void DoGatherChannelDataFloat(unsigned char ChannelCode)
 {
     uint8_t i;
     uint8_t ChiFang2 = 0x01;
-    for(i=1;i<33;i++)
+    for(i=0;i<Conf.Jly.ChannelNum;i++)
     {
         if(ChannelCode & ChiFang2)
         {
-            switch(i)
-            {
-                case 1:
-                    Sensor_Deal(Sensor1.sensor1_str.sensor_type,1-1);
-                    break;
-                
-                case 2:
-                    Sensor_Deal(2,2-1);//通道2配置信息未定义?????????
-                    break;
-                default:
-                    break;
-            }
-
+			Sensor_Deal(Conf.Sensor[i].SensorType ,i);	/*根据传感器类型进行处理*/
         }
         ChiFang2 = ChiFang2*2;
     }

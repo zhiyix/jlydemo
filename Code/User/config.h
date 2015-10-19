@@ -189,7 +189,7 @@ struct JLYPARAMETER
 };
 
 //----------------------------
-extern uint8_t        rtc_pt;
+extern uint8_t      rtc_pt;
 extern uint8_t      display_ct;
 extern uint16_t     testcount;
 extern uint16_t     adc[32];

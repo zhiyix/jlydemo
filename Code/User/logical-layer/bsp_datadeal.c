@@ -53,16 +53,15 @@
   */
 static void LOWorNomal_Mode(void)
 {
-    if((JlyParam.LowMode == 1)&&(JlyParam.WorkStatueIsStop >= 1))//省电模式
+	uint8_t i=0;
+    if((Conf.Jly.PowerMode == 1)&&(Conf.Jly.WorkStatueIsStop >= 1))//省电模式
     {
         if(Flag.StartSample==1)
         {
             Flag.StartSample=0;
             Flag.EndSample=1;
-            //sht_index=0;
-//            #if WD_TYPE==WD_NTC
-                Dealing_Gather(Started_Channel);
-//            #endif
+			
+            Dealing_Gather(Started_Channel);
             
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
@@ -70,9 +69,19 @@ static void LOWorNomal_Mode(void)
         if(JlyParam.Save_Time == JlyParam.SaveDataTimeOnlyRead-1)
         {
 //            SET_CHANNEL0_POWER_IO;
-            AVCC1_POWER(ON);
-            
-            Flag.StartSample=1;
+			//判断传感器接口类型 模拟/数字
+			for(i=0;i<Conf.Jly.ChannelNum;i++)
+			{
+				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
+				{
+					AVCC1_POWER(ON);
+					Flag.StartSample=1;
+				}
+				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
+				{
+					
+				}
+			}
         }
         if(Flag.EndSample==1)
         {
@@ -84,26 +93,33 @@ static void LOWorNomal_Mode(void)
             }
         }
     }//END 
-    else if(JlyParam.WorkStatueIsStop >= 1)//正常模式
+    else if(Conf.Jly.WorkStatueIsStop >= 1)//正常模式
     {
         if(Flag.StartSample==1)
         {
             Flag.StartSample=0;
             Flag.EndSample=1;
-//            #if WD_TYPE==WD_NTC
-                Dealing_Gather(Started_Channel);
-//            #endif
-//            CLR_CHANNEL0_POWER_IO;
+                
+			Dealing_Gather(Started_Channel);
+
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
-            //sht_index=0;
         }
         if((JlyParam.Save_Time>1) && JlyParam.Save_Time%2==0)
         {
-//            SET_CHANNEL0_POWER_IO;
-            AVCC1_POWER(ON);
-            
-            Flag.StartSample=1;
+			//判断传感器接口类型 模拟/数字
+			for(i=0;i<Conf.Jly.ChannelNum;i++)
+			{
+				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
+				{
+					AVCC1_POWER(ON);
+					Flag.StartSample=1;
+				}
+				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
+				{
+					
+				}
+			}
         }
         if(Flag.EndSample==1)
         {
@@ -123,7 +139,7 @@ static void LOWorNomal_Mode(void)
   */
 static void WorkornotMode(void)
 {
-    if(JlyParam.WorkStatueIsStop <1)//停止工作
+    if(Conf.Jly.WorkStatueIsStop <1)//停止工作
     {
 //        OpenWDT_IE;
 //        CLR_ALL_INPUT_OUTPUT_IO;

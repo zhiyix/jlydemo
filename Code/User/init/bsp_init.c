@@ -121,7 +121,7 @@ void SysInit(void)
     showTIME; 
 	LCD_UpdateDisplayRequest();
     
-	Started_Channel = GetStartChanel(Channel_count);
+	Started_Channel = GetStartChanel(Conf.Jly.ChannelNum); //通道数转换为 启动的通道
 	StartedChannelForDisplay = Started_Channel;
     
     Sensor1.sensor_infor[0] = 4;
