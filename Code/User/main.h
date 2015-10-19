@@ -42,7 +42,6 @@
 #include "bsp_init.h"
 #include "bsp_conf_infor.h"
 
-#include "bsp_led.h"
 #include "bsp_exti_key.h"
 #include "bsp_lcd.h"
 #include "bsp_SysTick.h"
@@ -54,6 +53,7 @@
 #include "bsp_timer.h"
 
 #include "bsp_datadeal.h"
+#include "bsp_alarmdeal.h"
 #include "bsp_i2c_fram.h"
 #include "bsp_sensor_deal.h"
 #include "bsp_serial_deal.h"

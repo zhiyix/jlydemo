@@ -22,6 +22,7 @@ struct CircularQueue  Queue;
 struct JLYPARAMETER   JlyParam;
 union  SENSEPEIZHIINFOR  Sensor1;
 union  ADCADJUSTINFOR    adcjust1;
+union ConfDataTable 	 Conf;
 
 uint8_t        rtc_pt;          //√Îº∆ ˝
 uint8_t        display_ct = 5;  //œ‘ æ

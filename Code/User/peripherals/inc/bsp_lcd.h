@@ -104,6 +104,9 @@
 //! \brief  显示时钟 : S16
 #define showCOL     LCD->RAM[6]|=D_BIT18
 #define clearCOL    LCD->RAM[6]&=~D_BIT18
+//! \brief  显示报警符号 s11
+#define showJINBAO	LCD->RAM[6]|=D_BIT30
+#define clearJINBAO LCD->RAM[6]&=~D_BIT30
 //! @}
 
 

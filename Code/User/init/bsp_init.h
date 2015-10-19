@@ -36,6 +36,11 @@
 					GPIO_SetBits(GPIOD,GPIO_Pin_0);\
 					else		\
 					GPIO_ResetBits(GPIOD,GPIO_Pin_0)					
+/*!< 蜂鸣器开关 */
+#define BEEP(a)	if (a)	\
+					GPIO_SetBits(GPIOF,GPIO_Pin_15);\
+					else		\
+					GPIO_ResetBits(GPIOF,GPIO_Pin_15)
 					
 /* 直接操作寄存器的方法控制IO */
 #define	digitalHi(p,i)			{p->BSRRL=i;}			//设置为高电平		
@@ -52,6 +57,12 @@
 #define LED2_ON				digitalHi(GPIOF,GPIO_Pin_11)
 #define LED2_OFF			digitalLo(GPIOF,GPIO_Pin_11)
 
+/*!< 蜂鸣器 */
+#define BELL            BEEP(ON);Delay_ms(50);BEEP(OFF)
+#define BELL_longer     BEEP(ON);Delay_ms(500);BEEP(OFF)
+
+/*!< 读取延时启动时间 */
+#define ReadDelayStartTime 	Change3BytesTimeToLong(Conf.Jly.MixMoot_Hour ,Conf.Jly.MixMoot_Min,0)
 //
 
 void SysInit(void);

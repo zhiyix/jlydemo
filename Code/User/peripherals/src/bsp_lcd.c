@@ -1301,7 +1301,7 @@ void Display_SN(void)
 //    num_H = *((char*)JLY_SN_ADDR+2);
 //    num_L = *((char*)JLY_SN_ADDR+3);
 //    value = (num_H<<8)+num_L;
-    value = 10086;
+    value = Conf.Basic.Sn[0]+Conf.Basic.Sn[1];
     
     
     

@@ -579,11 +579,6 @@
               <FilePath>..\User\peripherals\src\bsp_lcd.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\peripherals\src\bsp_led.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\peripherals\src\bsp_usart.c</FilePath>
@@ -637,6 +632,11 @@
               <FileName>bsp_serial_deal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\logical-layer\bsp_serial_deal.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_alarmdeal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_alarmdeal.c</FilePath>
             </File>
           </Files>
         </Group>

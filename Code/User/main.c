@@ -61,7 +61,7 @@ int main(void)
     SysInit();
 	
 	printf("\r\n this is a 32bits  demo \r\n");
-    printf("\r\n %d \r\n",Sensor1.sensor1_str.sensor_type);
+	
   /* Add your application code here
      */
 

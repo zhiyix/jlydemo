@@ -180,6 +180,103 @@ static void WorkornotMode(void)
     } 
 }
 /**
+  * @brief  Description 记录仪启动方式处理
+  * @param  无  		
+  * @retval 无		
+  */
+void RecorderBootModeHandle(void)
+{
+    if(JlyParam.LastErrorCode!=0)
+    {
+        if(Conf.Jly.WorkStatueIsStop==1)	/*!< 工作状态 */
+        {
+            
+            Conf.Jly.WorkStatueIsStop = 0;
+            //写入fram
+//            ShowOffCode = 0x09;
+        }
+        return;
+    }
+    if(Conf.Jly.RecBootMode == 0)	/*!< 延时启动(默认延时时间0，即立即启动)*/
+    {
+		if(((JlyParam.delay_start_time--)<=0) && (!Conf.Jly.WorkStatueIsStop))	/*!< 工作 */
+        {
+            JlyParam.delay_start_time = -1;
+            Conf.Jly.WorkStatueIsStop = 1;
+            Conf.Jly.RecBootMode = 0;
+        }
+        if((JlyParam.delay_start_time)>0)
+        {
+            
+            Conf.Jly.WorkStatueIsStop = 0;	/*!< 停止工作 */
+			
+//            ShowOffCode=5;
+        }
+    }
+	else if(Conf.Jly.RecBootMode == 1)	/*!< 时间点定时启动 */
+	{
+		
+	}
+	else if(Conf.Jly.RecBootMode == 2)	/*!< 时间点定点启停 */
+	{
+		
+	}
+	else if((Conf.Jly.RecBootMode == 3) && (Conf.Jly.WorkStatueIsStop))	/*!< 手动启动*/
+    {
+        Conf.Jly.WorkStatueIsStop = 0;	/*!< 停止工作 */
+            //写入fram
+		Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+//		ShowOffCode = 0xFF;
+    }
+    else if(Conf.Jly.RecBootMode == 0x10)	/*!< 异常条件启动 */
+    {
+        
+    }
+}
+/**
+  * @brief  Description 记录仪停止方式处理
+  * @param  无  		
+  * @retval 无		
+  */
+void   RecorderStopModeHandle(void)
+{
+    uint8_t  IsWriteLasestStopTimeToFram;
+    IsWriteLasestStopTimeToFram = 0;
+    
+    if(Conf.Jly.WorkStatueIsStop)
+    {
+        if(Conf.Jly.RecStopMode == 0){};	/*!< 先进先出的记录停止方式 */
+        if(Conf.Jly.RecStopMode ==1)	/*!< 存储器记满的记录停止方式 */
+        {
+            if((Queue.RecorderFlashPoint >= Flash_MAX_NUM)) //&&IsReadingI2c==0,下载数据
+            {
+                
+                Conf.Jly.WorkStatueIsStop = 1;	/*!< 停止工作 */
+				
+				//写Fram
+				Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+                IsWriteLasestStopTimeToFram = 1;
+//                ShowOffCode = 0;
+            }
+        }
+        
+    }
+    if(IsWriteLasestStopTimeToFram)
+    {
+//        Word_to_Char(Current_Year);
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA,word00.high);
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA+1,word00.low);
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA+2,Current_Month);
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA+3,Current_Day);
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA+4,Current_Hour);
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA+5,Current_Min);
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA+6,Current_Sec);
+//        
+//        Write24c02(S_E_A,E2PROM_LastestStopTime_FA+7,ShowOffCode);
+    }
+}
+
+/**
   * @brief  Description 记录仪1s处理
   * @param  无  		
   * @retval 无		

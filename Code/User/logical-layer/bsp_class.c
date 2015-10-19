@@ -119,7 +119,21 @@ int hex_2_ascii(uint8_t *data, uint8_t *buffer, uint16_t len)
     tmp_p[pos] = '\0'; 
     return pos; 
 }
-
+/**
+  * @brief  Description 延时启动时间转换为秒数
+  * @param  hour  		
+  * @param  min         
+  * @param  sec         
+  * @retval 秒数
+  */
+uint32_t  Change3BytesTimeToLong(uint8_t hour,uint8_t min,uint8_t sec)
+{
+    uint32_t save_time;
+    save_time = hour*36;
+    save_time = save_time*100;
+    save_time = save_time+min*60+sec;
+    return save_time;
+}
 #endif /* __BSPCLASS_C */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

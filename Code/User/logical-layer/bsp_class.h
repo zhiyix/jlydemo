@@ -50,6 +50,8 @@ uint16_t ValueFtToU16(float FtTmp);
 uint16_t U16ToValue10(uint8_t high,uint8_t low);
 unsigned int  Char_to_Int(unsigned int high,unsigned int low);
 int hex_2_ascii(uint8_t *data, uint8_t *buffer, uint16_t len);
+
+uint32_t  Change3BytesTimeToLong(uint8_t hour,uint8_t min,uint8_t sec);
 //#ifdef __cplusplus
 //}
 //#endif

@@ -250,7 +250,7 @@ void SaveHisDataToFram(void)
 	AI2C_Read(&Recorderpoint_L,FRAM_RecAddr_Lchar,1);
 	AI2C_Read(&Recorderpoint_H,FRAM_RecAddr_Hchar,1);
     Queue.RecorderPoint=Recorderpoint_L+(Recorderpoint_H<<8);
-    ReadFlashRecAddr();
+    //ReadFlashRecAddr();
     
     eeOffset = Queue.RecorderPoint*HIS_ONE_BYTES; 
 	AI2C_Write(&DataBuf[3], (FRAM_RecFirstAddr+eeOffset), HIS_ONE_BYTES);
@@ -262,20 +262,20 @@ void SaveHisDataToFram(void)
         Queue.RecorderPoint=0;
         Flag.RecordFramOverFlow=1;
         
-        AI2C_Read(TempBuf,FRAM_RecFirstAddr,HIS_MAX_NUM*HIS_ONE_BYTES);
+        //AI2C_Read(TempBuf,FRAM_RecFirstAddr,HIS_MAX_NUM*HIS_ONE_BYTES);
 		
-		if(Queue.FlashSectorPoint%8 ==0)
-		{
-			if(Queue.FlashSectorPoint >= 8*2048)//flash有2048 sector
-			{
-				Queue.FlashSectorPoint = 0;
-			}
-			SPI_FLASH_SectorErase(FLASH_SectorFirstAddr+(Queue.FlashSectorPoint/8)*FLASH_SectorPerSize);//考虑边界问题
-		}
+//		if(Queue.FlashSectorPoint%8 ==0)
+//		{
+//			if(Queue.FlashSectorPoint >= 8*2048)//flash有2048 sector
+//			{
+//				Queue.FlashSectorPoint = 0;
+//			}
+//			SPI_FLASH_SectorErase(FLASH_SectorFirstAddr+(Queue.FlashSectorPoint/8)*FLASH_SectorPerSize);//考虑边界问题
+//		}
 		Queue.FlashSectorPoint++;
 		//SPI_FLASH_SectorErase();
 		//fram第一次存储满，从flash中0地址开始存储,
-        SPI_FLASH_BufferWrite(TempBuf, (FLASH_RecFirstAddr+(Queue.RecorderFlashPoint-HIS_MAX_NUM)*HIS_ONE_BYTES), HIS_MAX_NUM*HIS_ONE_BYTES);
+//        SPI_FLASH_BufferWrite(TempBuf, (FLASH_RecFirstAddr+(Queue.RecorderFlashPoint-HIS_MAX_NUM)*HIS_ONE_BYTES), HIS_MAX_NUM*HIS_ONE_BYTES);
     
         if(Queue.RecorderFlashPoint >=Flash_MAX_NUM)
         {

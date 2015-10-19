@@ -74,13 +74,21 @@
 #define VirtAlarmConfAddr			0x0200
 #define VirtSensorChanelConfAddr	0x1000
 #define VirtTempHumiAdjustConfAddr	0x2000
+#define VirtMax						0x4000
+#define VirtOffset					0x0080	/*!< 传感器通道和校准，每一通道之间的虚拟偏移量 */
 //! \brief 配置信息表在Fram中的地址
 #define FRAM_BasicConfAddr           0x0000	/*!< 起始地址0x0000，结束地址(0x0040-1) 大小 64byte */
 #define FRAM_JlyConfAddr             0x0040	/*!< 起始地址0x0040，结束地址(0x0080-1) 大小 64byte */
-#define FRAM_AlarmConfAddr           0x0080	/*!< 起始地址0x0080，结束地址(0x00A0-1) 大小 64byte */
+#define FRAM_AlarmConfAddr           0x0080	/*!< 起始地址0x0080，结束地址(0x00A0-1) 大小 32byte */
 #define FRAM_SensorChanelConfAddr    0x00A0	/*!< 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte */
-#define FRAM_TempHumiAdjustConfAddr  0x04A0 /*!< 起始地址0x04A0，结束地址(0x00A0-1) 大小 2048byte */
+#define FRAM_TempHumiAdjustConfAddr  0x04A0 /*!< 起始地址0x04A0，结束地址(0x0CA0-1) 大小 2048byte */
 
+#define FRAM_ConfSize			     3232	/*!< 配置信息表大小 */
+#define FRAM_SensorChanelOffset      0x0020	/*!< 传感器通道，32byte,每一通道之间的物理(Fram)偏移量 */
+#define FRAM_TempHumiAdjustOffset    0x0040	/*!< 传感器校准，64byte,每一通道之间的物理(Fram)偏移量 */
+
+//! \brief 配置信息表中成员  在Fram中的地址
+#define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+42
 //! \brief FRAM中存放fram记录指针地址
 #define FRAM_RecAddr_Hchar          0x0CA0      
 #define FRAM_RecAddr_Lchar          0x0CA1
@@ -117,13 +125,6 @@ union MYU32
         uint8_t High;
     } Bss;
     uint8_t Byte[4];
-};
-//! \brief 
-struct CircularQueue
-{
-    uint16_t RecorderPoint;     //fram中记录数据指针
-    uint32_t RecorderFlashPoint;//flash中记录数据指针
-    uint32_t FlashSectorPoint;	//flash中扇区指针
 };
 //! \brief rtc结构
 struct RTCRX8025
@@ -177,10 +178,14 @@ struct JLYPARAMETER
 {
     uint8_t WorkStatueIsStop:1; //记录仪工作状态，0停止工作
     uint8_t LowMode:1;          //功耗模式，1低功耗，0正常功耗
-    
+    uint8_t LastErrorCode:1;	/*!< 错误码 */
+	
     uint32_t Save_Time;
     uint32_t SaveDataTimeOnlyRead;  //采样时间
     uint32_t SaveHisDataTime;       //存储间隔
+	
+	uint32_t delay_start_time;	/*!< 延时启动时间 */
+	
 };
 
 //----------------------------

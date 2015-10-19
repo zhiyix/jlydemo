@@ -27,6 +27,22 @@ static void General_GPIO_Config(void);
 static void General_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
+	//LED和 蜂鸣器GPIO初始化 ，蜂鸣器GPIO_Pin_15
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOF,&GPIO_InitStructure);
+	
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+//	GPIO_Init(GPIOC,&GPIO_InitStructure);
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+//	GPIO_Init(GPIOC,&GPIO_InitStructure);
+
+//	GPIO_SetBits(GPIOB,GPIO_Pin_0);
+	GPIO_ResetBits(GPIOF,GPIO_Pin_11|GPIO_Pin_12|GPIO_Pin_15);//关闭
 	//ADC电源开关
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
@@ -60,6 +76,7 @@ static void General_GPIO_Config(void)
 	GPIO_Init(GPIOD,&GPIO_InitStructure);
     
     GPIO_ResetBits(GPIOD,GPIO_Pin_0);   //关闭model电源
+	
 }
 
 /**
@@ -69,9 +86,23 @@ static void General_GPIO_Config(void)
   */
 static void FirstScanSysData(void)
 {
+	uint8_t num=0;
+	uint8_t buf[20];
+	buf[0]=8;
     JlyParam.SaveDataTimeOnlyRead = 10; //采样时间
     JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
-    JlyParam.SaveHisDataTime = 2;  //保存数据间隔
+    
+	//test
+//	Fram_Write(buf,FRAM_WorkStatueIsStopAddr,1);
+//	num = Fram_Read(buf,FRAM_WorkStatueIsStopAddr,1);
+	
+	Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	/*!< 系统上电读取配置信息表*/
+	
+	JlyParam.delay_start_time = ReadDelayStartTime ;
+	num = Conf.Jly.WorkStatueIsStop;
+	JlyParam.SaveHisDataTime = 2;  //保存数据间隔
+	
+	
 }
 /**
   * @brief  Description 系统初始化
@@ -105,6 +136,9 @@ void SysInit(void)
     JlyParam.WorkStatueIsStop = 1;
 	
 	Queue.FlashSectorPoint = 0;
+	
+	BellNn(1);
+
 }
 /**
   * @brief  Description 外设初始化
@@ -119,7 +153,6 @@ void PeripheralInit(void)
 	
     TIM2_Configuration();
     
-	LED_GPIO_Config();
 	KEY_GPIO_Config();
 	EXTI15_10_Config();
 	

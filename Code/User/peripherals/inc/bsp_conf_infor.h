@@ -51,7 +51,7 @@ union FISI2CH4
     char      byte[4];
 };
 //! \brief基本配置数据地址表 1 (Display="Hex",ADDRESS_OFFSET=0x0000):
-/*!< 总共32个byte */
+/*!< 总共64个byte */
 struct BasicConfDataStr
 {
 	uint8_t  Sn[6];	/*!< 序列号 SN号 */
@@ -59,11 +59,11 @@ struct BasicConfDataStr
 	
 	uint16_t SoftVerml;		/*!< 软件版本 MID LOW */
 	uint8_t  SoftVermain;	/*!< 软件版本 Main */
-	uint8_t	 :8;			/*!< 保留 */
+	uint8_t	 :8;		/*!< 保留 */
 	
 	uint16_t HardVerml;		/*!< 硬件版本 MID LOW */
 	uint8_t  HardVermain;	/*!< 硬件版本 Main */
-	uint8_t	 :8;			/*!< 保留 */
+	uint8_t	 :8;		/*!< 保留 */
 	
 	uint16_t CommuMode;		/*!< 通讯方式 */
 	/*后备电池状态说明
@@ -72,10 +72,10 @@ struct BasicConfDataStr
 	 */
 	uint16_t BatteryState;	/*!< 后备电池状态 */
 	
-	uint8_t Reserv[12];		/*!< Reserv */
+	uint8_t Reserv[44];		/*!< Reserv */
 };
 //! \brief记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
-/*!< 总共62个byte */
+/*!< 总共64个byte */
 struct JlyConfDataStr
 {
 	uint8_t RecBootMode;   /*!< 启动方式说明
@@ -83,7 +83,7 @@ struct JlyConfDataStr
 								@0x01:时间点定时启动
 								@0x02:时间点定点启停
 								@0x10:异常条件启动 */
-	uint8_t RecMode;	/*!< 记录方式说明
+	uint8_t RecStopMode;	/*!< 记录方式说明
 							 @0x00:先进先出(Default)
 							 @0x01:计满停止
 							 @0x02:立即停止 */  
@@ -98,6 +98,7 @@ struct JlyConfDataStr
 	uint8_t MixMoot_Month;    /*!< 启动时间-月 */ 
 	uint8_t MixMoot_Year;     /*!< 启动时间-年 */ 
 	uint8_t MixMoot_Cen;      /*!< 启动时间- */ 
+							  /*!< 8个byte */
 	/*!< 定点停止时间 yyyy-MM-dd hh-mm[BCD] */ 
 	uint8_t FixedStop_Min;	
 	uint8_t FixedStop_Hour;
@@ -106,6 +107,7 @@ struct JlyConfDataStr
 	uint8_t FixedStop_Year;
 	uint8_t FixedStop_Cen; /*!< 14个byte */
 	
+	uint16_t :16;	/*!< Reserv */
 	/*!< 正常记录间隔 dd-hh-mm[BCD]:ms */
 	uint16_t NormalRecInterval;
 	uint8_t  NormalRec_Sec;
@@ -123,7 +125,7 @@ struct JlyConfDataStr
 	/*!< 采集间隔 ms */
 	uint16_t SampleInterval;
 	uint16_t :16;			/*!< Reserv */
-	uint16_t :16;
+	uint16_t :16;			/*!< 34个byte */
 	/*!< 仪器时钟的实时时间 */
 	uint8_t Time_Sec;
 	uint8_t Time_Min;
@@ -140,13 +142,13 @@ struct JlyConfDataStr
 	uint8_t PowerMode;         /*!< 记录仪功耗模式 
 									0x00：正常模式 
 									0x01：低功耗模式(省电模式) */
-    /*!< 42个byte */								
+    /*!< 44个byte */								
 	uint32_t StorageCapacity;  /*!< flash存储容量 */										 
 	uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
 	uint8_t	 Reserv[12];
 };
 //! \brief报警配置数据地址表 3 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
-/*!< 总共20个byte */	
+/*!< 总共32个byte */	
 struct AlarmConfDataStr
 {
 	uint16_t AlarmSwitch;	/*!< 报警开关
@@ -171,10 +173,10 @@ struct AlarmConfDataStr
 	uint16_t SoundLightAlarmDelay;	/*!< 声光报警延时 单位秒钟*/
 	uint16_t SmsAlarmDelay;			/*!< 短信报警延时 范围从1s到18小时可选*/
 	
-	uint8_t	 Reserv[8];	/*!< Reserv */	
+	uint8_t	 Reserv[20];	/*!< Reserv */	
 };
 //! \brief传感器通道配置数据地址表 4 (Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
-/*!< 总共28个byte */	
+/*!< 总共32个byte */	
 struct SensorChanelConfDataStr
 {
 	uint8_t  SensorType;	/*!< 传感器类型
@@ -188,15 +190,16 @@ struct SensorChanelConfDataStr
 								 Bit0：上限报警
 								 Bit1：下限报警 
 								 Bit15：故障报警 */
+	uint16_t :16;	/*!< Reserv */
 	uint32_t SensorAddCode;	/*!< 传感器地址码 */
 	
 	union FISI2CH4 SensorAlarm_High;  /*!< 报警上限 [IEEE-754_1二进制浮点操作数] 0x0000 0000*/ 
     union FISI2CH4 SensorAlarm_Low;   /*!< 报警下限 [IEEE-754_1二进制浮点操作数]0x0000 0000*/
-	uint8_t Reserv[10];	/*!< Reserv */
+	uint8_t Reserv[12];	/*!< Reserv */
 };
 //! \brief温湿度传感器校准配置数据地址表 5 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
 
-/*!< 总共60个byte */
+/*!< 总共64个byte */
 struct TempHumiAdjustConfDataStr
 {
 	uint16_t DataPoint0;	/*!< 默认显示值：-80℃ / 0%RH*/
@@ -223,7 +226,14 @@ struct TempHumiAdjustConfDataStr
 	uint16_t DataPoint21;	/*!< 默认显示值：130℃ */
 	uint16_t DataPoint22;	/*!< 默认显示值：140℃ */
 	uint16_t DataPoint23;	/*!< 默认显示值：150℃ */
-	uint8_t Reserv[12];	/*!< Reserv */
+	uint8_t Reserv[16];	/*!< Reserv */
+};
+//! \brief fram flash存储指针结构
+struct CircularQueue
+{
+    uint16_t RecorderPoint;     //fram中记录数据指针
+    uint32_t RecorderFlashPoint;//flash中记录数据指针
+    uint32_t FlashSectorPoint;	//flash中扇区指针
 };
 //! \brief 配置表
 /*!< 基本配置数据地址表   1 (Display="Hex",ADDRESS_OFFSET=0x0000):
@@ -233,22 +243,22 @@ struct TempHumiAdjustConfDataStr
 	 温湿度传感器校准配置数据地址表 5 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):  
 	 表 1 在Fram中 起始地址0x0000，结束地址(0x0040-1) 大小 64byte
      表 2 在Fram中 起始地址0x0040，结束地址(0x0080-1) 大小 64byte
-     表 3 在Fram中 起始地址0x0080，结束地址(0x00A0-1) 大小 64byte
-	 表 4 在Fram中 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte,AADDRESS_OFFSET=0x00A0 + Sensor_Channel * 0x1C,其中Sensor_Channel取值为0~31):
-	 表 5 在Fram中 起始地址0x04A0，结束地址(0x00A0-1) 大小 2048byte,AADDRESS_OFFSET=0x04A0 + Sensor_Channel * 0x3C,其中Sensor_Channel取值为0~31):*/
+     表 3 在Fram中 起始地址0x0080，结束地址(0x00A0-1) 大小 32byte
+	 表 4 在Fram中 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte,AADDRESS_OFFSET=0x00A0 + Sensor_Channel * 0x20,其中Sensor_Channel取值为0~31):
+	 表 5 在Fram中 起始地址0x04A0，结束地址(0x0CA0-1) 大小 2048byte,AADDRESS_OFFSET=0x04A0 + Sensor_Channel * 0x40,其中Sensor_Channel取值为0~31):*/
 
 union ConfDataTable 
 {
 	#pragma anon_unions
 	struct 
 	{
-		struct BasicConfDataStr Basic;	/*!< 总共32个byte */
-		struct JlyConfDataStr Jly;		/*!< 总共62个byte */
-		struct AlarmConfDataStr Alarm;	/*!< 总共20个byte */	
-		struct SensorChanelConfDataStr Sensor[32];		/*!< 每一通道总共28个byte */	
-		struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共60个byte */
+		struct BasicConfDataStr Basic;	/*!< 总共64个byte */
+		struct JlyConfDataStr Jly;		/*!< 总共64个byte */
+		struct AlarmConfDataStr Alarm;	/*!< 总共32个byte */	
+		struct SensorChanelConfDataStr Sensor[32];		/*!< 每一通道总共32个byte 32*32=1024*/	
+		struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共64个byte 64*32=2048*/
 	};
-	uint8_t Buf[3072];
+	uint8_t Buf[3232];
 };
 
 
@@ -298,15 +308,10 @@ struct SYSPEIZHI
     uint8_t     downlatestdata;       //下载最新数据使能位
     uint32_t    startsample_chanel;   //启动总的采样通道 
 };
-//用到的全局变量
-struct JLY
-{
-    uint32_t    save_time;           //保存数据时间
-    uint32_t    delayboot_time;      //延时启动时间
-    
-};
+
 extern union  SENSEPEIZHIINFOR  Sensor1;
-extern union  ADCADJUSTINFOR    adcjust1;;
+extern union  ADCADJUSTINFOR    adcjust1;
+extern union  ConfDataTable     Conf;
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/
