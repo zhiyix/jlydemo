@@ -1,0 +1,20 @@
+1、原记录仪温湿度校准算法
+
+  每个通道一张adc校准表，校准表中两值的间隔为segoff(例如：10)
+T=T整+((adc-adc1)/(adc2-adc1))*segoff
+
+整数部分计算：
+  1)确定通道量程low_data，top_data
+  2)根据当前通道adc值，查adc校准表确定当前adc位于表中的adc1、adc2区间，并记录偏移x个segoff
+  3)T整=low_data+x*segoff
+通过修改表中adc值达到校准
+
+2、蓝牙记录仪(采用32位校准方法)
+通过写入环境值(校准箱准确温度)达到校准
+Ty=((Ty1-Ty0)/(Tx1-Tx0))(Tx-Tx0)+Ty0
+
+Ty1:校准箱环境值
+Ty0:校准箱环境值
+Tx1:实际值
+Tx0:实际值
+Tx:根据adc表算的值
