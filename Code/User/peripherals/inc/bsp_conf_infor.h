@@ -185,11 +185,14 @@ struct SensorChanelConfDataStr
 								 0x00：NULL
 								 0x01：温度
 								 0x02：湿度 */
+	uint8_t  AlarmSwitch;	/*!< 报警开关 */
 	uint8_t  SensorInterfaceType;	/*!< 传感器接口类型 
 								 0x00：模拟
-								 0x01：数字*/
-	uint8_t  :8;			/*!< Reserv */
-	uint8_t  AlarmSwitch;	/*!< 报警开关 */
+								 0x01：数字 */
+	uint8_t  AdjustSwitch;	/*!< 校准开关 
+								 0x00：未校准 
+								 0x00：校准 */
+	
     uint16_t AlarmStatus;	/*!< 报警状态
 								 Bit0：上限报警
 								 Bit1：下限报警 
@@ -206,31 +209,33 @@ struct SensorChanelConfDataStr
 /*!< 总共64个byte */
 struct TempHumiAdjustConfDataStr
 {
-	uint16_t DataPoint0;	/*!< 默认显示值：-80℃ / 0%RH*/
-	uint16_t DataPoint1;	/*!< 默认显示值：-70℃ /10%RH*/
-	uint16_t DataPoint2;	/*!< 默认显示值：-60℃ /20%RH*/
-	uint16_t DataPoint3;	/*!< 默认显示值：-50℃ /30%RH*/
-	uint16_t DataPoint4;	/*!< 默认显示值：-40℃ /40%RH*/
-	uint16_t DataPoint5;	/*!< 默认显示值：-30℃ /50%RH*/
-	uint16_t DataPoint6;	/*!< 默认显示值：-20℃ /60%RH*/
-	uint16_t DataPoint7;	/*!< 默认显示值：-10℃ /70%RH*/
-	uint16_t DataPoint8;	/*!< 默认显示值：  0℃ /80%RH*/
-	uint16_t DataPoint9;	/*!< 默认显示值： 10℃ /90%RH*/
-	uint16_t DataPoint10;	/*!< 默认显示值： 20℃ /100%RH*/
-	uint16_t DataPoint11;	/*!< 默认显示值： 30℃ */
-	uint16_t DataPoint12;	/*!< 默认显示值： 40℃ */
-	uint16_t DataPoint13;	/*!< 默认显示值： 50℃ */
-	uint16_t DataPoint14;	/*!< 默认显示值： 60℃ */
-	uint16_t DataPoint15;	/*!< 默认显示值： 70℃ */
-	uint16_t DataPoint16;	/*!< 默认显示值： 80℃ */
-	uint16_t DataPoint17;	/*!< 默认显示值： 90℃ */
-	uint16_t DataPoint18;	/*!< 默认显示值：100℃ */
-	uint16_t DataPoint19;	/*!< 默认显示值：110℃ */
-	uint16_t DataPoint20;	/*!< 默认显示值：120℃ */
-	uint16_t DataPoint21;	/*!< 默认显示值：130℃ */
-	uint16_t DataPoint22;	/*!< 默认显示值：140℃ */
-	uint16_t DataPoint23;	/*!< 默认显示值：150℃ */
-	uint8_t Reserv[16];	/*!< Reserv */
+	int16_t buf[24];
+//	int16_t DataPoint0;	/*!< 默认显示值：-80℃ / 0%RH*/
+//	int16_t DataPoint1;	/*!< 默认显示值：-70℃ /10%RH*/
+//	int16_t DataPoint2;	/*!< 默认显示值：-60℃ /20%RH*/
+//	int16_t DataPoint3;	/*!< 默认显示值：-50℃ /30%RH*/
+//	int16_t DataPoint4;	/*!< 默认显示值：-40℃ /40%RH*/
+//	int16_t DataPoint5;	/*!< 默认显示值：-30℃ /50%RH*/
+//	int16_t DataPoint6;	/*!< 默认显示值：-20℃ /60%RH*/
+//	int16_t DataPoint7;	/*!< 默认显示值：-10℃ /70%RH*/
+//	int16_t DataPoint8;	/*!< 默认显示值：  0℃ /80%RH*/
+//	int16_t DataPoint9;	/*!< 默认显示值： 10℃ /90%RH*/
+//	int16_t DataPoint10;	/*!< 默认显示值： 20℃ /100%RH*/
+//	int16_t DataPoint11;	/*!< 默认显示值： 30℃ */
+//	int16_t DataPoint12;	/*!< 默认显示值： 40℃ */
+//	int16_t DataPoint13;	/*!< 默认显示值： 50℃ */
+//	int16_t DataPoint14;	/*!< 默认显示值： 60℃ */
+//	int16_t DataPoint15;	/*!< 默认显示值： 70℃ */
+//	int16_t DataPoint16;	/*!< 默认显示值： 80℃ */
+//	int16_t DataPoint17;	/*!< 默认显示值： 90℃ */
+//	int16_t DataPoint18;	/*!< 默认显示值：100℃ */
+//	int16_t DataPoint19;	/*!< 默认显示值：110℃ */
+//	int16_t DataPoint20;	/*!< 默认显示值：120℃ */
+//	int16_t DataPoint21;	/*!< 默认显示值：130℃ */
+//	int16_t DataPoint22;	/*!< 默认显示值：140℃ */
+//	int16_t DataPoint23;	/*!< 默认显示值：150℃ */
+	
+	int8_t Reserv[16];	/*!< Reserv */
 };
 //! \brief fram flash存储指针结构
 struct CircularQueue
@@ -257,7 +262,7 @@ union ConfDataTable
 	struct 
 	{
 		struct BasicConfDataStr Basic;	/*!< 总共64个byte */
-		struct JlyConfDataStr Jly;		/*!< 总共64个byte */
+		struct JlyConfDataStr 	Jly;	/*!< 总共64个byte */
 		struct AlarmConfDataStr Alarm;	/*!< 总共32个byte */	
 		struct SensorChanelConfDataStr Sensor[32];		/*!< 每一通道总共32个byte 32*32=1024*/	
 		struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共64个byte 64*32=2048*/
@@ -315,6 +320,12 @@ struct SYSPEIZHI
 extern union  SENSEPEIZHIINFOR  Sensor1;
 extern union  ADCADJUSTINFOR    adcjust1;
 extern union  ConfDataTable     Conf;
+
+extern struct BasicConfDataStr Basic;	/*!< 总共64个byte */
+extern struct JlyConfDataStr   Jly;		/*!< 总共64个byte */
+extern struct AlarmConfDataStr Alarm;	/*!< 总共32个byte */	
+extern struct SensorChanelConfDataStr Sensor[32];	/*!< 每一通道总共32个byte 32*32=1024*/	
+extern struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共64个byte 64*32=2048*/
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/

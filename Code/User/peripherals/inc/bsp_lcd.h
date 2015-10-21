@@ -74,15 +74,17 @@
 //LCD 信号显示
 #define showS1      LCD->RAM[0]|=D_BIT1
 #define showS12     LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1
-#define showS123    LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1;LCD->RAM[0]|=D_BIT2
-#define showS1234   LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1;LCD->RAM[0]|=D_BIT2;LCD->RAM[0]|=D_BIT4
-#define showS12345  LCD->RAM[0]|=D_BIT1;LCD->RAM[2]|=D_BIT1;LCD->RAM[0]|=D_BIT2;LCD->RAM[0]|=D_BIT4;LCD->RAM[0]|=D_BIT6
+#define showS123    LCD->RAM[0]|=(D_BIT1+D_BIT2);LCD->RAM[2]|=D_BIT1
+#define showS1234   LCD->RAM[0]|=(D_BIT1+D_BIT2+D_BIT4);LCD->RAM[2]|=D_BIT1
+#define showS12345  LCD->RAM[0]|=(D_BIT1+D_BIT2+D_BIT4+D_BIT6);LCD->RAM[2]|=D_BIT1
+#define clearS12345	LCD->RAM[0]&=~(D_BIT1+D_BIT2+D_BIT4+D_BIT6);LCD->RAM[2]&=~D_BIT1
 
 #define show_NFC		LCD->RAM[0]|=D_BIT8
 #define clear_NFC		LCD->RAM[0]&=~D_BIT8
 //! \brief 保温箱 s6 s7 s8
 #define show_BOX_open	LCD->RAM[0]|=D_BIT10;LCD->RAM[2]&=~D_BIT10;LCD->RAM[4]|=D_BIT10
 #define show_BOX_close  LCD->RAM[0]&=~D_BIT10;LCD->RAM[2]|=D_BIT10;LCD->RAM[4]|=D_BIT10
+#define clear_BOX		LCD->RAM[0]&=~D_BIT10;LCD->RAM[2]&=~D_BIT10;LCD->RAM[4]&=~D_BIT10
 //! \brief k1 s9
 #define show_GPRS     LCD->RAM[0]|=D_BIT11;LCD->RAM[2]|=D_BIT11		/*!< E表示 GPRS符号 */
 #define clear_GPRS    LCD->RAM[0]&=~D_BIT11;LCD->RAM[2]&=~D_BIT11
@@ -90,44 +92,19 @@
 #define show_GPS      LCD->RAM[4]|=D_BIT11;LCD->RAM[6]|=D_BIT11	/*!< GPS符号 */
 #define clear_GPS     LCD->RAM[4]&=~D_BIT11;LCD->RAM[6]&=~D_BIT11
 
-//! \brief 显示Flash 存储 N5 N6 N7 N8 N9 N10
-#define clearFlashMEM	LCD->RAM[0]&=~D_BIT24;LCD->RAM[2]&=~D_BIT24;LCD->RAM[4]&=~D_BIT24;LCD->RAM[4]&=~D_BIT22;LCD->RAM[2]&=~D_BIT22
-#define showFlashMEM1   clearFlashMEM;LCD->RAM[0]|=D_BIT24
-#define showFlashMEM2   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24
-#define showFlashMEM3   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24
-#define showFlashMEM4   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24;LCD->RAM[4]|=D_BIT22
-#define showFlashMEM5   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24;LCD->RAM[4]|=D_BIT22;LCD->RAM[2]|=D_BIT22
-
-//显示负号 s12
-#define showFUHAO	LCD->RAM[6]|=D_BIT29
-//!
-#define showDOTS14	LCD->RAM[7]|=D_BIT6
-//!温度符号显示
-#define showC		LCD->RAM[6]|=D_BIT22
-#define clearC		LCD->RAM[6]&=~D_BIT22
-//!湿度符号显示
-#define showRH	    LCD->RAM[6]|=D_BIT16
-#define clearRH	    LCD->RAM[6]&=~D_BIT16
-
 //! \brief  电池符号显示
 #define showBATT    LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26;LCD->RAM[2]|=D_BIT26;LCD->RAM[0]|=D_BIT26 //满格显示
 #define clearBATT   LCD->RAM[6]&=~D_BIT26;LCD->RAM[4]&=~D_BIT26;LCD->RAM[2]&=~D_BIT26;LCD->RAM[0]&=~D_BIT26
 #define showBATT0   LCD->RAM[6]|=D_BIT26   //空格
 #define showBATT1   LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26  //1格
 #define showBATT2   LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26;LCD->RAM[2]|=D_BIT26 //2格
-//! \brief  显示ID
-#define showID      LCD->RAM[6]|=D_BIT23       
-#define clearID     LCD->RAM[6]&=~D_BIT23       
-//! \brief  显示时间S15符号
-#define showTIME    LCD->RAM[7]|=D_BIT4
-#define clearTIME   LCD->RAM[7]&=~D_BIT4
-//! \brief  显示日期 点S17
-#define showP       LCD->RAM[6]|=D_BIT12
-#define clearP      LCD->RAM[6]&=~D_BIT12
-//! \brief  显示时钟 : S16
-#define showCOL     LCD->RAM[6]|=D_BIT18
-#define clearCOL    LCD->RAM[6]&=~D_BIT18
-
+//! \brief 显示Flash 存储 N5 N6 N7 N8 N9 N10
+#define clearFlashMEM	LCD->RAM[0]&=~D_BIT24;LCD->RAM[2]&=~(D_BIT22+D_BIT24);LCD->RAM[4]&=~(D_BIT22+D_BIT24)
+#define showFlashMEM1   clearFlashMEM;LCD->RAM[0]|=D_BIT24
+#define showFlashMEM2   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24
+#define showFlashMEM3   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24
+#define showFlashMEM4   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=(D_BIT22+D_BIT24)
+#define showFlashMEM5   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=(D_BIT22+D_BIT24);LCD->RAM[4]|=(D_BIT22+D_BIT24)
 
 #define showtongdao   
 #define cleartongdao  
@@ -143,6 +120,34 @@
 //! \brief  显示 设置下限
 #define showxiaxian     LCD->RAM[6]|=D_BIT32
 #define clearxiaxian    LCD->RAM[6]&=~D_BIT32
+//显示负号 s12
+#define showFUHAO	LCD->RAM[6]|=D_BIT29
+#define clearFUHAO	LCD->RAM[6]&=~D_BIT29
+//!第一行左边小数点 S13
+#define showP1		LCD->RAM[7]|=D_BIT8
+#define clearP1		LCD->RAM[7]&=~D_BIT8
+//!第一行右边小数点 S14
+#define showP2		LCD->RAM[7]|=D_BIT6
+#define clearP2		LCD->RAM[7]&=~D_BIT6
+//!温度符号显示
+#define showC		LCD->RAM[6]|=D_BIT22
+#define clearC		LCD->RAM[6]&=~D_BIT22
+//!湿度符号显示
+#define showRH	    LCD->RAM[6]|=D_BIT16
+#define clearRH	    LCD->RAM[6]&=~D_BIT16
+
+//! \brief  显示ID
+#define showID      LCD->RAM[6]|=D_BIT23       
+#define clearID     LCD->RAM[6]&=~D_BIT23       
+//! \brief  显示时间S15符号
+#define showTIME    LCD->RAM[7]|=D_BIT4
+#define clearTIME   LCD->RAM[7]&=~D_BIT4
+//! \brief  显示日期 点S17
+#define showP       LCD->RAM[6]|=D_BIT12
+#define clearP      LCD->RAM[6]&=~D_BIT12
+//! \brief  显示时钟 : S16
+#define showCOL     LCD->RAM[6]|=D_BIT18
+#define clearCOL    LCD->RAM[6]&=~D_BIT18
 
 
 
@@ -175,7 +180,7 @@ extern const uint32_t 		lcd_test[];
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/
-// MCU:STM32F103C(8-B)Tx
+
 /*============================ EXTERN FUNCTIONS ==============================*/
 void RCC_Config(void);
 void LCD_GLASS_Init(void);
@@ -191,7 +196,8 @@ void LCD_GLASS_ClearChar(uint8_t position);
 //void Lcd_Test(void);
 
 void Display_SN(void);
-
+void displayErr(uint8_t Err);
+void lcd_OFF(uint8_t offcode);
 void displayYEAR(unsigned char year);
 void displayDAY(uint8_t month,uint8_t day);
 void displayTIME(uint8_t hour,uint8_t min);

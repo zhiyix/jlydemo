@@ -493,6 +493,15 @@ static void Lcd_Dis3Value(uint8_t value)
         case 0x09:
 			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6+D_BIT7;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT7;
 			break; 
+		case 'E':
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			break;
+		case 'F':
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT6;
+			break;
+		case 'O':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			break; 
         case 0xFF:
             LCD->RAM[0] &= ~D_BIT7;LCD->RAM[2] &= ~(D_BIT6+D_BIT7);LCD->RAM[4] &= ~(D_BIT6+D_BIT7);LCD->RAM[6] &= ~(D_BIT6+D_BIT7);
             break;
@@ -544,6 +553,12 @@ static void Lcd_Dis4Value(uint8_t value)
         case 0x09:
 			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8+D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT9;
 			break; 
+		case 'r':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT8;
+			break; 
+		case 'F':
+			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT8;
+			break;		
         case 0xFF:
             LCD->RAM[0] &= ~D_BIT9;LCD->RAM[2] &= ~(D_BIT8+D_BIT9);LCD->RAM[4] &= ~(D_BIT8+D_BIT9);LCD->RAM[6] &= ~(D_BIT8+D_BIT9);
             break;    
@@ -1111,7 +1126,81 @@ static void Lcd_Dis15Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-
+/**
+  * @brief  Description 显示传感器故障
+  * @param  None
+  * @retval None
+  */
+void displayErr(uint8_t Err)
+{
+	/*!< Wait Until the last LCD RAM update finish */
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+//    if(FlagDownIng==0)
+//    {
+        /* 2[8] 3[8] 4[8]清零 */
+        Lcd_Dis2Value(0XFF);
+        Lcd_Dis3Value(0XFF);
+        Lcd_Dis4Value(0XFF);
+		/* 清报警状态 */
+        clearAlarmStatus;
+		/* 清 "设置上限"，“设置下限" */	
+        clearshangxian;		
+        clearxiaxian;
+        /* 清符号 */
+        clearFUHAO;clearAlarmStatus;
+        clearRH;clearJINBAO;
+        clearC;clearP1;clearP2;
+        /* 显示 2Er */
+        Lcd_Dis2Value(2);
+        Lcd_Dis3Value('E');
+        Lcd_Dis4Value('r');
+//    }
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
+}
+/**
+  * @brief  Description 
+  * @param  None
+  * @retval None
+  */
+void lcd_OFF(uint8_t offcode)
+{
+	/* 2[8] 3[8] 4[8]清零 */
+	Lcd_Dis1Value(0XFF);
+	Lcd_Dis2Value(0XFF);
+	Lcd_Dis3Value(0XFF);
+	Lcd_Dis4Value(0XFF);
+	
+	clearS12345;
+	clear_NFC;
+	clear_BOX;
+	clear_GPRS;
+	clear_GPS;
+	clearBATT;
+	clearFlashMEM;
+	cleartongdao;
+	clearJINBAO;
+	clearAlarmStatus;
+	clearshangxian;
+	clearxiaxian;
+	clearFUHAO;
+	clearP1;
+	clearP2;
+	clearC;
+	clearRH;
+	
+	if(offcode==0xff)
+	{
+		Lcd_Dis2Value(0XFF);
+	}
+	else
+	{
+		Lcd_Dis2Value(offcode);
+	}
+	/*显示OF*/
+	Lcd_Dis3Value('O');
+	Lcd_Dis4Value('F');
+}
 /**
   * @brief  Description 显示指定通道数据
   * @param  temp 		通道
@@ -1134,17 +1223,18 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
     Lcd_Dis2Value(0XFF);
     Lcd_Dis3Value(0XFF);
     Lcd_Dis4Value(0XFF);
-//    clearAlarmStatus;
-//    clearshangxian;
-//    clearxiaxian;
+    clearAlarmStatus;
+    clearshangxian;
+    clearxiaxian;
     
-//    clearFUHAO;clearAlarmStatus;
-//    clearRH;clearJINBAO;
-//    clearC;
+    clearFUHAO;clearAlarmStatus;
+    clearRH;clearJINBAO;
+    clearC;
         
     if(FlagSeniorErr[chanel-1]==1)
     {
-//        displayErr(2,chanel);
+		/*!< 显示传感器故障 */
+        displayErr(2);
     }
     else
     {
@@ -1172,25 +1262,24 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
             digit8_13(0XFF);
         */
         if(value/100>0)
-            Lcd_Dis2Value((value/100)%10);//12
+            Lcd_Dis2Value((value/100)%10);
         else
             Lcd_Dis2Value(0XFF);
         if(value/10)
-            Lcd_Dis3Value((value/10)%10);//13
+            Lcd_Dis3Value((value/10)%10);
         else
             Lcd_Dis3Value(0);
         
-        Lcd_Dis4Value(value%10);//14
+        Lcd_Dis4Value(value%10);
         
         if(value_fuhao==1)
             showFUHAO;
         
         clearRH;
         showC;
-		showDOTS14;
-//        showP2;
+		showP2;
     }
-	 /*!< Requesy LCD RAM update */
+	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
 }
 /**
@@ -1209,7 +1298,7 @@ void displayYEAR(unsigned char year)
     Lcd_Dis13Value(0);//2
     if(year>9)
     {
-        Lcd_Dis14Value(year/16);// 
+        Lcd_Dis14Value(year/16); 
         Lcd_Dis15Value(year%16);
     }
     else
@@ -1223,7 +1312,7 @@ void displayYEAR(unsigned char year)
   * @param  None
   * @retval None
   */
-void displayDAY(uint8_t month,uint8_t day)//--
+void displayDAY(uint8_t month,uint8_t day)
 {
 	Lcd_Dis12Value(0xff);
 	Lcd_Dis13Value(0xff);

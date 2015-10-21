@@ -63,11 +63,11 @@ uint32_t GetStartChanel(uint8_t chanel_num)
     return start_chanel;
 }
 /**
-  * @brief  Description 通道数据校准
+  * @brief  Description 计算通道原始温湿度数据
   * @param  ChannelItem  		
   * @retval bool		
   */
-static float Chang_to_Shishu(unsigned char ChannelItem)
+static float Chang_to_Shishu(uint16_t adc_value,uint8_t ChannelItem)
 {
     float low_data;//
     float top_data;
@@ -146,15 +146,99 @@ static float Chang_to_Shishu(unsigned char ChannelItem)
           SegOffset = AdjustCurveFirAddress[adjust_fa][ADJUST_TABLE_HEAD_LENGTH+ div_member*2 + j];
           SegValue0 = low_data + SegValue0;
           
-          t = ADJUST_TABLE_HEAD_LENGTH + (x-1)*2;//??ad????????
+          t = ADJUST_TABLE_HEAD_LENGTH + (x-1)*2;
           ft00 = adc[ChannelItem] - Char_to_Int(AdjustCurveFirAddress[adjust_fa][t],AdjustCurveFirAddress[adjust_fa][t+1]);//????????????
           SegOffset1 =  Char_to_Int(AdjustCurveFirAddress[adjust_fa][t],AdjustCurveFirAddress[adjust_fa][t+1]);
           SegOffset1 =  Char_to_Int(AdjustCurveFirAddress[adjust_fa][t+2],AdjustCurveFirAddress[adjust_fa][t+3])-SegOffset1;
-          temp = SegValue0 +  (ft00/SegOffset1)*SegOffset ;//??????
+          temp = SegValue0 +  (ft00/SegOffset1)*SegOffset ;
      }
      if(temp>top_data) temp = top_data;
      return temp;
 }
+
+// pchAry : 校准表
+// uCount : 校准表数量
+// dat_x  : 输入温度数值，输出校准之后的数据也是该值
+bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
+{
+    int idx = 0;
+	// 校准源表
+    const int16_t __KEY_PTR[] =
+    {
+        -800,-700,-600,-500,-300,-200, -100, 0, 100, 200, 300, 400, 500, 600,700,800,900,1000,1100,1200,1300,1400,1500,
+    };
+    float k, x0, y0, x1, y1;
+/*
+    //! 输入参数检查
+    if ((pchAry == NULL) || (uCount != 10))
+    {
+        return false;
+    }
+    if ((pchAry[0] >> 8) != 0x5A)
+    {
+        return false;
+    }
+    //! 数据有效性检查
+    for (idx = 0; idx < countof(__KEY_PTR); idx++)
+    {
+        if (abs((float)(pchAry[idx + 1] - __KEY_PTR[idx])) > 99.0)
+            pchAry[idx + 1] = __KEY_PTR[idx];
+    }
+	*/
+    //! 数据运算
+	//! 小于最小值
+    if ((*dat_x - (-80.0)) <= 0)
+    {
+        *dat_x = -80.0;
+        goto APP_TEMP_CALIB_END;
+    }
+	//! 大于最大值
+    if ((*dat_x - (150.0)) >= 0)
+    {
+        *dat_x = 150.0;
+        goto APP_TEMP_CALIB_END;
+    }
+    //!
+    *dat_x = *dat_x * 10;
+	//! 最小值区间
+    if ((*dat_x - (pchAry[0 + 1])) <= 0)
+    {
+        y0 = x0 = -800;
+        x1 = pchAry[0 + 1];
+        y1 = __KEY_PTR[0];
+        k = (y1 - y0) / (x1 - x0);
+        *dat_x = (y0 + k * (*dat_x - x0)) / 10;
+        goto APP_TEMP_CALIB_END;
+    }
+	//! 最大值区间
+    if ((dat_x - (pchAry[8 + 1])) >= 0)
+    {
+        y1 = x1 = 1500;
+        x0 = pchAry[8 + 1];
+        y0 = __KEY_PTR[8];
+        k = (y1 - y0) / (x1 - x0);
+        *dat_x = (y0 + k * (*dat_x - x0)) / 10;
+        goto APP_TEMP_CALIB_END;
+    }
+	//! 校准区间
+    for (idx = 0; idx < countof(__KEY_PTR) - 1; idx++)
+    {
+        if (((*dat_x - (pchAry[idx + 1])) >= 0) &&
+                ((*dat_x - (pchAry[idx + 2])) < 0))
+        {
+            x0 = pchAry[idx + 1];
+            x1 = pchAry[idx + 2];
+            y0 = __KEY_PTR[idx];
+            y1 = __KEY_PTR[idx + 1];
+            k = (y1 - y0) / (x1 - x0);
+            *dat_x = (y0 + k * (*dat_x - x0)) / 10;
+            break;
+        }
+    }
+APP_TEMP_CALIB_END:
+    return true;
+}
+
 /**
   * @brief  Description 传感器类型判断，并对数据处理
   * @param  sensortype  		
@@ -171,7 +255,10 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
             break;
         //温度处理
         case SENSOR_TEMP:
-                ChannelDataFloat[i] = Chang_to_Shishu(i);
+			///
+                ChannelDataFloat[i] = Chang_to_Shishu(adc[i]);
+		///
+				ChannelDataFloat[i]=Temp_Adjust(ChannelDataFloat[i]);
                 FlagSeniorErr[i]=0;//v2.0
                 if((adc[i]<ADC_ERR_L)|(adc[i]>ADC_ERR_H))
                 {

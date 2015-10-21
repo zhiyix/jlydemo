@@ -165,7 +165,7 @@ void PeripheralInit(void)
 //	Delay_ms(10);   //开启滴答定时
 	LCD_GLASS_Clear();
 	
-	AVCC1_POWER(OFF);    //关ADC1电源
+	AVCC1_POWER(OFF);    //关传感器电源
     BATTEST_POWER(OFF);  //关电池电压检测电源
 	MODEL_PWRCTRL(ON);	//开对外接口电源
 	ADC1_Init();

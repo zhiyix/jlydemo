@@ -50,12 +50,12 @@
 
 /* 定义控制IO的宏 */
 #define LED1_TOGGLE		digitalToggle(GPIOF,GPIO_Pin_12)
-#define LED1_ON				digitalHi(GPIOF,GPIO_Pin_12)
-#define LED1_OFF			digitalLo(GPIOF,GPIO_Pin_12)
+#define LED1_ON			digitalHi(GPIOF,GPIO_Pin_12)
+#define LED1_OFF		digitalLo(GPIOF,GPIO_Pin_12)
 
-#define LED2_TOGGLE		digitalToggle(GPIOF,GPIO_Pin_11)
-#define LED2_ON				digitalHi(GPIOF,GPIO_Pin_11)
-#define LED2_OFF			digitalLo(GPIOF,GPIO_Pin_11)
+#define AlarmLed2_TOGGLE	digitalToggle(GPIOF,GPIO_Pin_11)
+#define AlarmLed2_ON		digitalHi(GPIOF,GPIO_Pin_11)
+#define AlarmLed2_OFF		digitalLo(GPIOF,GPIO_Pin_11)
 
 /*!< 蜂鸣器 */
 #define BELL            BEEP(ON);Delay_ms(50);BEEP(OFF)

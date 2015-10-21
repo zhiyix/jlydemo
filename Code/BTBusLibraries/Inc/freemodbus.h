@@ -75,7 +75,7 @@
 // 	<o> 保持寄存器数量
 //	   <i> MAXSingleQuantity=MB_PDU_FUNC_READ_REGCNT_MAX
 //	   <16-1024:16>
-#define REG_HOLDING_NREGS				0x1000
+#define REG_HOLDING_NREGS				0x3000
 //	</e>
 
 //	<e> (04) Input Register

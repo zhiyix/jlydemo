@@ -201,6 +201,7 @@ extern struct 		FLAG			Flag;
 extern struct       RTCRX8025       Rtc;
 extern struct       BATTERY         Bat;
 extern struct       JLYPARAMETER    JlyParam;
+
 extern const char RESET_CHANNEL_SETUP_TABLE[104];
 extern const unsigned char *AdjustCurveFirAddress[];
 extern const uint32_t ConfMap_Address[5][2];

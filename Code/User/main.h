@@ -33,7 +33,7 @@
 #include "stm32l1xx.h"
 #include <stdio.h>
 #include <stdint.h>
-
+#include "math.h"
 
 #include "porttype.h"
 

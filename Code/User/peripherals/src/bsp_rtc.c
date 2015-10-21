@@ -58,6 +58,7 @@ void rtc_init(void)
 	buf[0] = 0x20;
     RTC8025_Write(buf,(RX8025_ADDR_CONTROL1&RX8025_WRITE_MODE),1);   //24小时制
 	
+	RTC8025_Write(&buf[1],(RX8025_ADDR_CONTROL1&RX8025_WRITE_MODE),1);   //24小时制
 }
 /**
   * @brief  Description 读取RX8025时间

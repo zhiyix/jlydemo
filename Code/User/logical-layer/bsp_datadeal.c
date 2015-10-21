@@ -61,8 +61,8 @@ static void LOWorNomal_Mode(void)
             Flag.StartSample=0;
             Flag.EndSample=1;
 			
+			AVCC1_POWER(ON);
             Dealing_Gather(Started_Channel);
-            
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
         }
@@ -74,7 +74,6 @@ static void LOWorNomal_Mode(void)
 			{
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
 				{
-					AVCC1_POWER(ON);
 					Flag.StartSample=1;
 				}
 				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
@@ -100,8 +99,8 @@ static void LOWorNomal_Mode(void)
             Flag.StartSample=0;
             Flag.EndSample=1;
                 
+			AVCC1_POWER(ON);
 			Dealing_Gather(Started_Channel);
-
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
         }
@@ -112,7 +111,6 @@ static void LOWorNomal_Mode(void)
 			{
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
 				{
-					AVCC1_POWER(ON);
 					Flag.StartSample=1;
 				}
 				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
@@ -125,7 +123,7 @@ static void LOWorNomal_Mode(void)
         {
             Flag.EndSample=0;
             
-            if(Flag.MucReset==1)//
+            if(Flag.MucReset==1)
             {
                 Flag.MucReset=0;
             }
@@ -141,49 +139,28 @@ static void WorkornotMode(void)
 {
     if(Conf.Jly.WorkStatueIsStop <1)//停止工作
     {
-//        OpenWDT_IE;
-//        CLR_ALL_INPUT_OUTPUT_IO;
-//        CLR_ALLCHANNELS_POWER_IO;
-
-//        lcd_OFF(4);
-//        buzzer_off();
-//        clearJINBAO;
-//        
-//        CLR_ALARM_LED;
-//        GSM_POWERCTL_OFF;
-//        clearMEM;
-//        Pt.IStep=0;
-//        
-//        if(LastErrorCode!=0)
-//        {
-//            displayErr(LastErrorCode,2);//zzz
-//        }
-//        if(Flag.MucReset==1)
-//        {
-//            Flag.MucReset=0;
-//            
-//        }
+		AVCC1_POWER(OFF);	/* 关传感器电源  */
+        BEEP(OFF);			/* 关蜂鸣器 */
+		AlarmLed2_OFF;		/* 关报警灯 */
+		
+		lcd_OFF(4);
+		
+        if(JlyParam.LastErrorCode!=0)
+        {
+            displayErr(JlyParam.LastErrorCode);
+		}
+        if(Flag.MucReset==1)
+        {
+            Flag.MucReset=0;
+            
+        }
         return;
     }
     else
     {
-//        WDT_CLR;
         
         LOWorNomal_Mode();
         
-        //-----------------
-//        if((Flag.STOP_SendGPRS==1)||(*(char*)(TCP_ENABLE_ADDR)==0))
-//        {
-//            LCDMEM[14]&=~0X20;LCDMEM[14]&=~0X10;
-//            LCDMEM[14]&=~0X40;LCDMEM[14]&=~0X80;
-//            clearMEM;
-//            
-//            buzzer_off();
-//            GSM_POWERCTL_OFF;
-//            Flag.STOP_SendGPRS=1;
-//            clearMEM;
-//            Pt.IStep=0;
-//        }
 //        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
 //        {
             Display_ChannelValue(StartedChannelForDisplay);  //LCD ????
