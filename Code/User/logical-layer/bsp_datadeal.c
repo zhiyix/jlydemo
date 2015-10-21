@@ -61,7 +61,7 @@ static void LOWorNomal_Mode(void)
             Flag.StartSample=0;
             Flag.EndSample=1;
 			
-			AVCC1_POWER(ON);
+			
             Dealing_Gather(Started_Channel);
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
@@ -75,6 +75,7 @@ static void LOWorNomal_Mode(void)
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
 				{
 					Flag.StartSample=1;
+					AVCC1_POWER(ON);
 				}
 				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
 				{
@@ -99,7 +100,7 @@ static void LOWorNomal_Mode(void)
             Flag.StartSample=0;
             Flag.EndSample=1;
                 
-			AVCC1_POWER(ON);
+			
 			Dealing_Gather(Started_Channel);
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
@@ -112,6 +113,7 @@ static void LOWorNomal_Mode(void)
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
 				{
 					Flag.StartSample=1;
+					AVCC1_POWER(ON);
 				}
 				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
 				{

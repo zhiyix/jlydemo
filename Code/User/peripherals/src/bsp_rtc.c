@@ -54,11 +54,11 @@
   */
 void rtc_init(void)
 {
-	uint8_t buf[7];
-	buf[0] = 0x20;
-    RTC8025_Write(buf,(RX8025_ADDR_CONTROL1&RX8025_WRITE_MODE),1);   //24小时制
+	uint8_t initbuf[7];
+	initbuf[0] = 0x20;
+    RTC8025_Write(initbuf,(RX8025_ADDR_CONTROL1&RX8025_WRITE_MODE),1);   //24小时制
 	
-	RTC8025_Write(&buf[1],(RX8025_ADDR_CONTROL1&RX8025_WRITE_MODE),1);   //24小时制
+	//RTC8025_Read(&buf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);   //24小时制
 }
 /**
   * @brief  Description 读取RX8025时间
@@ -68,18 +68,18 @@ void rtc_init(void)
 void read_time(void)
 {
 //    unsigned char i;
-	uint8_t buf[7];
+	uint8_t readbuf[7];
 
-    
-	RTC8025_Read(buf,(RX8025_ADDR_SECONDS&RX8025_READ_MODE),7);
+    RTC8025_Read(&readbuf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);
+	RTC8025_Read(readbuf,(RX8025_ADDR_SECONDS&RX8025_READ_MODE),7);
 	
-	Rtc.Second = buf[0];
-    Rtc.Minute = buf[1];
-    Rtc.Hour = buf[2];
-    Rtc.Day = buf[4];
-    Rtc.Week = buf[3];
-    Rtc.Month = buf[5];
-    Rtc.Year = buf[6];
+	Rtc.Second = readbuf[0];
+    Rtc.Minute = readbuf[1];
+    Rtc.Hour = readbuf[2];
+    Rtc.Day = readbuf[4];
+    Rtc.Week = readbuf[3];
+    Rtc.Month = readbuf[5];
+    Rtc.Year = readbuf[6];
 	
     Rtc.Second &= 0x7f;
     Rtc.Minute &= 0x7f;
@@ -97,9 +97,9 @@ void read_time(void)
   */
 void  set_time(void)
 {
-	uint8_t buf[]={0x30,0x36,0x17,0x00,0x19,0x10,0x15};
+	uint8_t setbuf[]={0x30,0x18,0x19,0x00,0x21,0x10,0x15};
 	
-	RTC8025_Write(buf,(RX8025_ADDR_SECONDS&RX8025_WRITE_MODE),7); 
+	RTC8025_Write(setbuf,(RX8025_ADDR_SECONDS&RX8025_WRITE_MODE),7); 
    
 }
 /**

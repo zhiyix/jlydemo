@@ -87,8 +87,8 @@ static void General_GPIO_Config(void)
 static void FirstScanSysData(void)
 {
 	uint8_t num=0;
-	uint8_t buf[20];
-	buf[0]=8;
+	uint8_t tempbuf[20];
+	tempbuf[0]=8;
     JlyParam.SaveDataTimeOnlyRead = 10; //采样时间
     JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
     
@@ -124,16 +124,12 @@ void SysInit(void)
 	Started_Channel = GetStartChanel(Conf.Jly.ChannelNum); //通道数转换为 启动的通道
 	StartedChannelForDisplay = Started_Channel;
     
-    Sensor1.sensor_infor[0] = 4;
-    Sensor1.sensor_infor[1] = 2;
     
     Bat.Voltage_TestTime=11;
     Sensor1.sensor1_str.sensor_type = 1;
     
     Flag.MucReset = 1;
     Flag.IsDisplayRightNow = 1;    
-    
-    JlyParam.WorkStatueIsStop = 1;
 	
 	Queue.FlashSectorPoint = 0;
 	

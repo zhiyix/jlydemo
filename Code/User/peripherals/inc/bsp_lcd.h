@@ -121,8 +121,8 @@
 #define showxiaxian     LCD->RAM[6]|=D_BIT32
 #define clearxiaxian    LCD->RAM[6]&=~D_BIT32
 //显示负号 s12
-#define showFUHAO	LCD->RAM[6]|=D_BIT29
-#define clearFUHAO	LCD->RAM[6]&=~D_BIT29
+#define showFUHAO	LCD->RAM[6]|=D_BIT28
+#define clearFUHAO	LCD->RAM[6]&=~D_BIT28
 //!第一行左边小数点 S13
 #define showP1		LCD->RAM[7]|=D_BIT8
 #define clearP1		LCD->RAM[7]&=~D_BIT8

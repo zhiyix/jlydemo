@@ -67,7 +67,7 @@ uint32_t GetStartChanel(uint8_t chanel_num)
   * @param  ChannelItem  		
   * @retval bool		
   */
-static float Chang_to_Shishu(uint16_t adc_value,uint8_t ChannelItem)
+static float Chang_to_Shishu(uint8_t ChannelItem)
 {
     float low_data;//
     float top_data;
@@ -124,7 +124,7 @@ static float Chang_to_Shishu(uint16_t adc_value,uint8_t ChannelItem)
     div_member = AdjustCurveFirAddress[adjust_fa][0];
 
     x=0;
-//    WDT_START;
+    //WDT_START;
     while( adc[ChannelItem] > Char_to_Int(AdjustCurveFirAddress[adjust_fa][ADJUST_TABLE_HEAD_LENGTH+2*x],AdjustCurveFirAddress[adjust_fa][ADJUST_TABLE_HEAD_LENGTH+2*x+1]) && x < div_member )
       x++;
     //----------------------------------------//
@@ -142,15 +142,15 @@ static float Chang_to_Shishu(uint16_t adc_value,uint8_t ChannelItem)
           {
               SegValue0 = SegValue0 + AdjustCurveFirAddress[adjust_fa][ADJUST_TABLE_HEAD_LENGTH+ div_member*2 + j];
           }
-//          WDT_START;
+          //WDT_START;
           SegOffset = AdjustCurveFirAddress[adjust_fa][ADJUST_TABLE_HEAD_LENGTH+ div_member*2 + j];
           SegValue0 = low_data + SegValue0;
           
-          t = ADJUST_TABLE_HEAD_LENGTH + (x-1)*2;
+          t = ADJUST_TABLE_HEAD_LENGTH + (x-1)*2;//??ad????????
           ft00 = adc[ChannelItem] - Char_to_Int(AdjustCurveFirAddress[adjust_fa][t],AdjustCurveFirAddress[adjust_fa][t+1]);//????????????
           SegOffset1 =  Char_to_Int(AdjustCurveFirAddress[adjust_fa][t],AdjustCurveFirAddress[adjust_fa][t+1]);
           SegOffset1 =  Char_to_Int(AdjustCurveFirAddress[adjust_fa][t+2],AdjustCurveFirAddress[adjust_fa][t+3])-SegOffset1;
-          temp = SegValue0 +  (ft00/SegOffset1)*SegOffset ;
+          temp = SegValue0 +  (ft00/SegOffset1)*SegOffset ;//??????
      }
      if(temp>top_data) temp = top_data;
      return temp;
@@ -163,9 +163,9 @@ bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 {
     int idx = 0;
 	// 校准源表
-    const int16_t __KEY_PTR[] =
+    const int16_t __KEY_PTR[15] =
     {
-        -800,-700,-600,-500,-300,-200, -100, 0, 100, 200, 300, 400, 500, 600,700,800,900,1000,1100,1200,1300,1400,1500,
+        -400,-300,-200, -100, 0, 100, 200, 300, 400, 500, 600,700,800,900,1000,
     };
     float k, x0, y0, x1, y1;
 /*
@@ -211,11 +211,11 @@ bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
         goto APP_TEMP_CALIB_END;
     }
 	//! 最大值区间
-    if ((dat_x - (pchAry[8 + 1])) >= 0)
+    if ((dat_x - (pchAry[13 + 1])) >= 0)
     {
         y1 = x1 = 1500;
-        x0 = pchAry[8 + 1];
-        y0 = __KEY_PTR[8];
+        x0 = pchAry[13 + 1];
+        y0 = __KEY_PTR[13];
         k = (y1 - y0) / (x1 - x0);
         *dat_x = (y0 + k * (*dat_x - x0)) / 10;
         goto APP_TEMP_CALIB_END;
@@ -255,10 +255,13 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
             break;
         //温度处理
         case SENSOR_TEMP:
-			///
-                ChannelDataFloat[i] = Chang_to_Shishu(adc[i]);
-		///
-				ChannelDataFloat[i]=Temp_Adjust(ChannelDataFloat[i]);
+				/*计算的原始温度数据*/
+                ChannelDataFloat[i] = Chang_to_Shishu(i);
+				/*校准数据*/
+				if(Conf.Sensor[i].AdjustSwitch == 0x01)
+				{
+					Temp_Adjust(Conf.Adjust[i].adbuf,1,&ChannelDataFloat[i]);
+				}
                 FlagSeniorErr[i]=0;//v2.0
                 if((adc[i]<ADC_ERR_L)|(adc[i]>ADC_ERR_H))
                 {
@@ -281,7 +284,7 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
                     temp=((temp/4096)-0.1515)/0.00636;
                     
                     if(FlagSeniorErr[0]!=1)
-                    temp=temp/(1.0546-0.00216*ChannelDataFloat[0]);//??????????????????????,ChannelDataFloat[0]存在疑问
+					temp=temp/(1.0546-0.00216*ChannelDataFloat[0]);//??????????????????????,ChannelDataFloat[0]存在疑问
                     
                     temp=temp*100.0;
                     adc[i]=(unsigned int)temp;//采样的实际值

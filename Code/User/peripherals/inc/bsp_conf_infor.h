@@ -209,7 +209,7 @@ struct SensorChanelConfDataStr
 /*!< 总共64个byte */
 struct TempHumiAdjustConfDataStr
 {
-	int16_t buf[24];
+	int16_t adbuf[24];
 //	int16_t DataPoint0;	/*!< 默认显示值：-80℃ / 0%RH*/
 //	int16_t DataPoint1;	/*!< 默认显示值：-70℃ /10%RH*/
 //	int16_t DataPoint2;	/*!< 默认显示值：-60℃ /20%RH*/

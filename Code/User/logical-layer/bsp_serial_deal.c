@@ -99,7 +99,7 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
 	uint8_t  offsetnum=0;	//偏移几个虚拟地址
-	uint8_t	 buf[128];
+	uint8_t	 frambuf[128];
 	uint16_t size = usNRegs * 2;
 	uint16_t offset = 0;
 	
@@ -119,7 +119,7 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		/*!< 报警配置数据地址表 */ 
 		offset = usAddress - VirtAlarmConfAddr;
 		Fram_Read(pucBuffer, ConfMap_Address[2][1] + offset * 2, size);
-		Fram_Read(buf, ConfMap_Address[2][1] + offset * 2, size);
+		Fram_Read(frambuf, ConfMap_Address[2][1] + offset * 2, size);
 		
 	} else if (usAddress < VirtTempHumiAdjustConfAddr)
 	{

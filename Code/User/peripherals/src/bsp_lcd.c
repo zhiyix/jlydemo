@@ -1165,6 +1165,8 @@ void displayErr(uint8_t Err)
   */
 void lcd_OFF(uint8_t offcode)
 {
+	/*!< Wait Until the last LCD RAM update finish */
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
 	/* 2[8] 3[8] 4[8]清零 */
 	Lcd_Dis1Value(0XFF);
 	Lcd_Dis2Value(0XFF);
@@ -1200,6 +1202,9 @@ void lcd_OFF(uint8_t offcode)
 	/*显示OF*/
 	Lcd_Dis3Value('O');
 	Lcd_Dis4Value('F');
+	
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
 }
 /**
   * @brief  Description 显示指定通道数据
@@ -1251,6 +1256,8 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
         value=(unsigned int)ft;
         if(value%10>=4)value=value+10;//四舍五入
         value=value/10;
+		if(value >= 1000)
+			value = 999;
         /*
         if(value/10000>0)
             digit8_12(value/10000);//10

@@ -84,8 +84,8 @@
 #define FRAM_TempHumiAdjustConfAddr  0x04A0 /*!< 起始地址0x04A0，结束地址(0x0CA0-1) 大小 2048byte */
 
 #define FRAM_ConfSize			     3232	/*!< 配置信息表大小 */
-#define FRAM_SensorChanelOffset      0x0020	/*!< 传感器通道，32byte,每一通道之间的物理(Fram)偏移量 */
-#define FRAM_TempHumiAdjustOffset    0x0040	/*!< 传感器校准，64byte,每一通道之间的物理(Fram)偏移量 */
+#define FRAM_SensorChanelOffset      0x0010	/*!< 传感器通道，32byte/2 offset*2,每一通道之间的物理(Fram)偏移量 */
+#define FRAM_TempHumiAdjustOffset    0x0020	/*!< 传感器校准，64byte/2 offset*2,每一通道之间的物理(Fram)偏移量 */
 
 //! \brief 配置信息表中成员  在Fram中的地址
 #define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+42
