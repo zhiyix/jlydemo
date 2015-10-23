@@ -54,7 +54,7 @@
 static void LOWorNomal_Mode(void)
 {
 	uint8_t i=0;
-    if((Conf.Jly.PowerMode == 1)&&(Conf.Jly.WorkStatueIsStop >= 1))//省电模式
+    if((Conf.Jly.PowerMode == 1)&&(Conf.Jly.WorkStatueIsStop >= 1)) /*低功耗模式*/
     {
         if(Flag.StartSample==1)
         {
@@ -68,16 +68,15 @@ static void LOWorNomal_Mode(void)
         }
         if(JlyParam.Save_Time == JlyParam.SaveDataTimeOnlyRead-1)
         {
-//            SET_CHANNEL0_POWER_IO;
-			//判断传感器接口类型 模拟/数字
+			/*判断传感器接口类型 模拟/数字*/
 			for(i=0;i<Conf.Jly.ChannelNum;i++)
 			{
-				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
+				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
 				{
 					Flag.StartSample=1;
-					AVCC1_POWER(ON);
+					AVCC1_POWER(ON);	/*打开传感器电源*/
 				}
-				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
+				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
 				{
 					
 				}
@@ -107,15 +106,15 @@ static void LOWorNomal_Mode(void)
         }
         if((JlyParam.Save_Time>1) && JlyParam.Save_Time%2==0)
         {
-			//判断传感器接口类型 模拟/数字
+			/*判断传感器接口类型 模拟/数字*/
 			for(i=0;i<Conf.Jly.ChannelNum;i++)
 			{
-				if(Conf.Sensor[i].SensorInterfaceType==0x00)//模拟
+				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
 				{
 					Flag.StartSample=1;
-					AVCC1_POWER(ON);
+					AVCC1_POWER(ON);	/*打开传感器电源*/
 				}
-				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
+				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
 				{
 					
 				}
@@ -133,7 +132,7 @@ static void LOWorNomal_Mode(void)
     }
 }
 /**
-  * @brief  Description 记录仪工作停止状态处理
+  * @brief  Description 记录仪工作状态处理
   * @param  无  		
   * @retval 无		
   */
@@ -141,7 +140,7 @@ static void WorkornotMode(void)
 {
     if(Conf.Jly.WorkStatueIsStop <1)//停止工作
     {
-		AVCC1_POWER(OFF);	/* 关传感器电源  */
+		AVCC1_POWER(OFF);	/* 关传感器电源 */
         BEEP(OFF);			/* 关蜂鸣器 */
 		AlarmLed2_OFF;		/* 关报警灯 */
 		
@@ -165,13 +164,12 @@ static void WorkornotMode(void)
         
 //        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
 //        {
-            Display_ChannelValue(StartedChannelForDisplay);  //LCD ????
+            Display_ChannelValue(StartedChannelForDisplay);  //LCD 
 //        }
         
 //         SaveData();
         Flag.IsDisplayRightNow=1;
         
-//        GSM_USART1_SendDeal();
     } 
 }
 /**

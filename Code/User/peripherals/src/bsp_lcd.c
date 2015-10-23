@@ -1228,12 +1228,15 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
     Lcd_Dis2Value(0XFF);
     Lcd_Dis3Value(0XFF);
     Lcd_Dis4Value(0XFF);
+	clearS12345;
+	clear_NFC;
     clearAlarmStatus;
     clearshangxian;
     clearxiaxian;
     
-    clearFUHAO;clearAlarmStatus;
-    clearRH;clearJINBAO;
+    clearFUHAO;
+    clearRH;
+	clearJINBAO;
     clearC;
         
     if(FlagSeniorErr[chanel-1]==1)
@@ -1450,7 +1453,7 @@ void Display_ChannelValue(uint8_t started_channel0)
         {
             ChannelForDisplay++;//ChannelForDisplay
             Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
-//            Alarm_deal(ChannelForDisplay);
+            AlarmDeal(ChannelForDisplay);
 //            showC;
             if(ChannelForDisplay==(CH_2+1))
             {

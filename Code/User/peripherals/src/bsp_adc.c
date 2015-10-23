@@ -21,88 +21,7 @@
   * @param  无
   * @retval 无
   */
-static void ADC1_BATTEST_GPIO_Config(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
 
-	/* Enable GPIOF clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF, ENABLE);
-		
-	/* Configure PF6 as analog input */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOF, &GPIO_InitStructure);				// 输入时不用设置速率
-}
-
-/**
-  * @brief  配置外接电池 ADC1检测的工作模式为DMA模式
-  * @param  无
-  * @retval 无
-  */
-static void ADC1_BATTEST_Mode_Config(void)
-{
-	DMA_InitTypeDef DMA_InitStructure;
-	ADC_InitTypeDef ADC_InitStructure;
-	
-	/* Enable DMA1 clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-	/* DMA channel1 configuration */
-	DMA_DeInit(DMA1_Channel1);
-	
-	DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;	 			        //ADC地址
-	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&Bat.ADC_BatConvertedValue;	//内存地址
-	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = 1;
-	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;	        //外设地址固定
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;  				    //内存地址固定
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;	//半字
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;								//循环传输
-	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-	DMA_Init(DMA1_Channel1, &DMA_InitStructure);
-	
-	/* Enable DMA channel1 */
-	DMA_Cmd(DMA1_Channel1, ENABLE);
-	
-	/* note !!!ADC1 configuration */	
-	ADC_StructInit(&ADC_InitStructure);
-    
-	/* Enable ADC1 clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 , ENABLE);
-	
-//	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;			                //独立ADC模式
-	ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
-	ADC_InitStructure.ADC_ScanConvMode = DISABLE ; 	 				            //关闭扫描模式
-	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;			                //关连续转换模式
-	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;	//不使用外部触发转换
-	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right; 	                    //采集数据右对齐
-	ADC_InitStructure.ADC_NbrOfConversion = 1;	 							    //要转换的通道数目
-	ADC_Init(ADC1, &ADC_InitStructure);
-	
-	/*配置ADC时钟，为PCLK2的8分频，即9MHz*/
-//	RCC_ADCCLKConfig(RCC_PCLK2_Div8); 
-
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_27, 1, ADC_SampleTime_4Cycles);
-	
-	/* Enable the request after last transfer for DMA Circular mode */
-	ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
-	/* Enable ADC1 DMA */
-	ADC_DMACmd(ADC1, ENABLE);
-	
-	/* Enable ADC1 */
-	ADC_Cmd(ADC1, ENABLE);
-	
-	/* Wait until the ADC1 is ready */
-	while(ADC_GetFlagStatus(ADC1, ADC_FLAG_ADONS) == RESET)
-	{
-	}
-	
-	/* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
-//	ADC_SoftwareStartConv(ADC1);
-	
-}
 /**
   * @brief  使能ADC1和DMA1的时钟，初始化PC.0
   * @param  无
@@ -121,6 +40,16 @@ static void ADC1_GPIO_Config(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);				// 输入时不用设置速率
 
+	/* Enable GPIOF clock */
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF, ENABLE);
+	
+	/*PF6 接 AN0 检测电池电压*/
+	/* Configure PF 6|7|8|9|10  as analog input */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	
+	GPIO_Init(GPIOF, &GPIO_InitStructure);
 }
 
 /**
@@ -141,7 +70,7 @@ static void ADC1_Mode_Config(void)
 	DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;	 			    //ADC地址
 	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&ADC_ConvertedValue[0];	//内存地址
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = 2;
+	DMA_InitStructure.DMA_BufferSize = 6+1;										//6个传感器通道，1电压采集
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;	        //外设地址固定
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;  				    //内存地址自增
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;	//半字
@@ -166,7 +95,7 @@ static void ADC1_Mode_Config(void)
 	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;			                //开启连续转换模式，即不停地进行ADC转换
 	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;	//不使用外部触发转换
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right; 	                    //采集数据右对齐
-	ADC_InitStructure.ADC_NbrOfConversion = 2;	 							    //要转换的通道数目
+	ADC_InitStructure.ADC_NbrOfConversion = 6+1;	 							//要转换的通道数目
 	ADC_Init(ADC1, &ADC_InitStructure);
 	
 	/*配置ADC时钟，为PCLK2的8分频，即9MHz*/
@@ -174,7 +103,11 @@ static void ADC1_Mode_Config(void)
 
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_24, 1, ADC_SampleTime_4Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_25, 2, ADC_SampleTime_4Cycles);
-	
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_27, 3, ADC_SampleTime_4Cycles);	//电池电压采集
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_28, 4, ADC_SampleTime_4Cycles);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_29, 5, ADC_SampleTime_4Cycles);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_30, 6, ADC_SampleTime_4Cycles);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_31, 7, ADC_SampleTime_4Cycles);
 	/* Enable the request after last transfer for DMA Circular mode */
 	ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
 	/* Enable ADC1 DMA */
@@ -205,8 +138,6 @@ void ADC1_Init(void)
 	/* Check that HSI oscillator is ready */
 	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
 	
-    ADC1_BATTEST_GPIO_Config();
-    ADC1_BATTEST_Mode_Config();
 	ADC1_GPIO_Config();
 	ADC1_Mode_Config();
    
@@ -227,16 +158,19 @@ static void Voltage_ADC1config(void)
     
     BATTEST_POWER(ON);  //开启电池电压检测电源
     
-    for(i=0;i<vtest_cnt;i++)//????
+    for(i=0;i<vtest_cnt;i++)//
     { 
         /* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
         ADC_SoftwareStartConv(ADC1);
         Delay_ms(5);    //延时5ms
+		Bat.ADC_BatConvertedValue = ADC_ConvertedValue[2];
         adc_temp[i] = Bat.ADC_BatConvertedValue;
     }
     
     BATTEST_POWER(OFF);  //关闭电池电压检测电源
     
+	//Bat.BatDataFloat = (float)ADC_ConvertedValue[2]/4095*3.3*2;
+	
     for(i=1;i<=vtest_cnt;i++)//
     for(j=0;j<=vtest_cnt-i;j++)
     if(adc_temp[j]>=adc_temp[j+1])
@@ -251,9 +185,9 @@ static void Voltage_ADC1config(void)
         sum=sum+adc_temp[1+i];
     }
 
-    temp2=5.0/4095;
-    temp2=temp2*sum;
-    temp2=temp2/(vtest_cnt-2);
+    //temp2=5.0/4095;///4095*3.3*2
+    temp2=sum/(vtest_cnt-2);
+    temp2=temp2/4095*3.3*2;
     temp =(uint16_t)(temp2*100);
 
     voltage_zhengshu=temp/100;
@@ -327,7 +261,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
     }
     else
     {
-        GatherMaxCt = 15;
+        GatherMaxCt = 14;
         if(GatherMaxCt==0||GatherMaxCt>15) //
             return;
         else

@@ -70,8 +70,11 @@ void read_time(void)
 //    unsigned char i;
 	uint8_t readbuf[7];
 
-    RTC8025_Read(&readbuf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);
+	//__disable_irq();
+	__set_PRIMASK(1);	/*≤‚ ‘*/
+    //RTC8025_Read(&readbuf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);
 	RTC8025_Read(readbuf,(RX8025_ADDR_SECONDS&RX8025_READ_MODE),7);
+	__set_PRIMASK(0);
 	
 	Rtc.Second = readbuf[0];
     Rtc.Minute = readbuf[1];
@@ -97,7 +100,7 @@ void read_time(void)
   */
 void  set_time(void)
 {
-	uint8_t setbuf[]={0x30,0x18,0x19,0x00,0x21,0x10,0x15};
+	uint8_t setbuf[]={0x30,0x04,0x09,0x00,0x22,0x10,0x15};
 	
 	RTC8025_Write(setbuf,(RX8025_ADDR_SECONDS&RX8025_WRITE_MODE),7); 
    

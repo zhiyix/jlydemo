@@ -155,10 +155,13 @@ static float Chang_to_Shishu(uint8_t ChannelItem)
      if(temp>top_data) temp = top_data;
      return temp;
 }
-
-// pchAry : 校准表
-// uCount : 校准表数量
-// dat_x  : 输入温度数值，输出校准之后的数据也是该值
+/**
+  * @brief  Description 温度校准
+  * @param  pchAry 	    校准表 
+  * @param  uCount      校准表数量 
+  * @param  dat_x       输入温度数值，输出校准之后的数据也是该值 
+  * @retval bool		
+  */
 bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 {
     int idx = 0;
@@ -211,7 +214,7 @@ bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
         goto APP_TEMP_CALIB_END;
     }
 	//! 最大值区间
-    if ((dat_x - (pchAry[13 + 1])) >= 0)
+    if ((*dat_x - (pchAry[13 + 1])) >= 0)
     {
         y1 = x1 = 1500;
         x0 = pchAry[13 + 1];
@@ -228,8 +231,8 @@ bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
         {
             x0 = pchAry[idx + 1];
             x1 = pchAry[idx + 2];
-            y0 = __KEY_PTR[idx];
-            y1 = __KEY_PTR[idx + 1];
+            y0 = __KEY_PTR[idx+1];
+            y1 = __KEY_PTR[idx + 2];
             k = (y1 - y0) / (x1 - x0);
             *dat_x = (y0 + k * (*dat_x - x0)) / 10;
             break;
@@ -238,7 +241,72 @@ bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 APP_TEMP_CALIB_END:
     return true;
 }
-
+/**
+  * @brief  Description 湿度校准
+  * @param  pchAry 	    校准表 
+  * @param  uCount      校准表数量 
+  * @param  dat_x       输入温度数值，输出校准之后的数据也是该值 
+  * @retval bool		
+  */
+bool Humi_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
+{
+    int idx = 0;
+	// 校准源表
+    const int16_t __KEY_PTR[] =
+    {
+        0, 100, 200, 300, 400, 500, 600,700,800,900,1000,
+    };
+    float k, x0, y0, x1, y1;
+/*
+    //! 输入参数检查
+    if ((pchAry == NULL) || (uCount != 10))
+    {
+        return false;
+    }
+    if ((pchAry[0] >> 8) != 0x5A)
+    {
+        return false;
+    }
+    //! 数据有效性检查
+    for (idx = 0; idx < countof(__KEY_PTR); idx++)
+    {
+        if (abs((float)(pchAry[idx + 1] - __KEY_PTR[idx])) > 99.0)
+            pchAry[idx + 1] = __KEY_PTR[idx];
+    }
+	*/
+    //! 数据运算
+	//! 小于最小值
+    if ((*dat_x - (0.0)) <= 0)
+    {
+        *dat_x = 0.0;
+        goto APP_TEMP_CALIB_END;
+    }
+	//! 大于最大值
+    if ((*dat_x - (100.0)) >= 0)
+    {
+        *dat_x = 100.0;
+        goto APP_TEMP_CALIB_END;
+    }
+    //!
+    *dat_x = *dat_x * 10;
+	//! 校准区间
+    for (idx = 0; idx < countof(__KEY_PTR) - 1; idx++)
+    {
+        if (((*dat_x - (pchAry[idx + 1])) >= 0) &&
+                ((*dat_x - (pchAry[idx + 2])) < 0))
+        {
+            x0 = pchAry[idx + 1];
+            x1 = pchAry[idx + 2];
+            y0 = __KEY_PTR[idx+1];
+            y1 = __KEY_PTR[idx + 2];
+            k = (y1 - y0) / (x1 - x0);
+            *dat_x = (y0 + k * (*dat_x - x0)) / 10;
+            break;
+        }
+    }
+APP_TEMP_CALIB_END:
+    return true;
+}
 /**
   * @brief  Description 传感器类型判断，并对数据处理
   * @param  sensortype  		
@@ -255,9 +323,9 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
             break;
         //温度处理
         case SENSOR_TEMP:
-				/*计算的原始温度数据*/
+				/*计算原始温度数据*/
                 ChannelDataFloat[i] = Chang_to_Shishu(i);
-				/*校准数据*/
+				/*校准开启，校准数据*/
 				if(Conf.Sensor[i].AdjustSwitch == 0x01)
 				{
 					Temp_Adjust(Conf.Adjust[i].adbuf,1,&ChannelDataFloat[i]);
@@ -291,7 +359,13 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
                     if(adc[i]%10>4)//四舍五入
                     adc[i]=adc[i]+10;
                     adc[i]=adc[i]/10;  //为采样值的10倍
-                    ChannelDataFloat[i]=Chang_to_Shishu(i);//校正后的值
+					/*计算原始湿度数据*/
+                    ChannelDataFloat[i]=Chang_to_Shishu(i);
+					/*校准开启，校准数据*/
+					if(Conf.Sensor[i].AdjustSwitch == 0x01)
+					{
+						Humi_Adjust(Conf.Adjust[i].adbuf,1,&ChannelDataFloat[i]);
+					}
                 }
             break;
         

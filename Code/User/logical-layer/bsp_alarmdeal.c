@@ -97,21 +97,25 @@ void AlarmDeal(uint8_t channel)
 			{
 			
 			}
-			if(Conf.Sensor[channel-1].AlarmSwitch & 0x01)
+			if(Conf.Sensor[channel-1].AlarmSwitch & 0x01)	/*报警声音打开*/
+			{
+				BellNn_longer(1);/*!< 表示响500ms一次 //buzzer_on();*/
+			}
+			else{
+				BEEP(OFF);
+			}
+			if(Conf.Sensor[channel-1].AlarmSwitch & 0x02) /*报警显示打开*/
 			{
 				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
 				showJINBAO;
-				LCD_UpdateDisplayRequest();  	/*!< 显示喇叭符号 */
+				LCD_UpdateDisplayRequest();
 			}
-			else{
+			else
+			{
 				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
 				clearJINBAO;
-				LCD_UpdateDisplayRequest();	/*!< 清除喇叭符号 */	
+				LCD_UpdateDisplayRequest();	
 			}
-			if(Conf.Sensor[channel-1].AlarmSwitch & 0x02)
-				BellNn_longer(1);/*!< 表示响500ms一次 //buzzer_on();*/
-			else
-				BEEP(OFF);
 			/*!< 短信 */
             //Alarmflag = Alarmflag | channel_BITx;	/*!< 短信报警相关 */
             

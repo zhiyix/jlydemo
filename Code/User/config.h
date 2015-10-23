@@ -169,7 +169,7 @@ struct FLAG
 //! \brief 电池结构
 struct BATTERY
 {
-    __IO uint8_t   Voltage_TestTime;        //多长时间检测
+    __IO uint8_t   Voltage_TestTime;        //多长时间检测,电池电压检测时间间隔
     __IO uint16_t  ADC_BatConvertedValue;   //存放电池AD值
     float          BatDataFloat;            //实际的电量
 };

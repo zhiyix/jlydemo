@@ -113,9 +113,7 @@ void SysInit(void)
 {
     FirstScanSysData();
     
-//	set_time();
     read_time();
-    
     while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
 	displayTIME(Rtc.Hour,Rtc.Minute);
     showTIME; 
@@ -125,7 +123,7 @@ void SysInit(void)
 	StartedChannelForDisplay = Started_Channel;
     
     
-    Bat.Voltage_TestTime=11;
+    Bat.Voltage_TestTime=1;	/*上电立即开始电池电压检测*/
     Sensor1.sensor1_str.sensor_type = 1;
     
     Flag.MucReset = 1;
@@ -173,7 +171,7 @@ void PeripheralInit(void)
     
     //rtc  初始化
     rtc_init();
-    
-    
+//    set_time();
+ 
 }
 
