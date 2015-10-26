@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file              : bsp_sensor_deal.c
+  * @file              : bsp_sensordeal.c
   * @author            : 
   * @version           : 
   * @date              : 
@@ -46,11 +46,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
-/**
+/******************************************************************************
   * @brief  Description  计算开启的通道
   * @param  chanel_num   总的通道数量		
   * @retval start_chanel 开启的通道		
-  */
+  *****************************************************************************/
 uint32_t GetStartChanel(uint8_t chanel_num)
 {
     uint8_t  i;
@@ -62,11 +62,11 @@ uint32_t GetStartChanel(uint8_t chanel_num)
     }
     return start_chanel;
 }
-/**
+/******************************************************************************
   * @brief  Description 计算通道原始温湿度数据
   * @param  ChannelItem  		
   * @retval bool		
-  */
+  *****************************************************************************/
 static float Chang_to_Shishu(uint8_t ChannelItem)
 {
     float low_data;//
@@ -155,13 +155,13 @@ static float Chang_to_Shishu(uint8_t ChannelItem)
      if(temp>top_data) temp = top_data;
      return temp;
 }
-/**
+/******************************************************************************
   * @brief  Description 温度校准
   * @param  pchAry 	    校准表 
   * @param  uCount      校准表数量 
   * @param  dat_x       输入温度数值，输出校准之后的数据也是该值 
   * @retval bool		
-  */
+  *****************************************************************************/
 bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 {
     int idx = 0;
@@ -241,13 +241,13 @@ bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 APP_TEMP_CALIB_END:
     return true;
 }
-/**
+/******************************************************************************
   * @brief  Description 湿度校准
   * @param  pchAry 	    校准表 
   * @param  uCount      校准表数量 
   * @param  dat_x       输入温度数值，输出校准之后的数据也是该值 
   * @retval bool		
-  */
+  *****************************************************************************/
 bool Humi_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 {
     int idx = 0;
@@ -307,11 +307,11 @@ bool Humi_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 APP_TEMP_CALIB_END:
     return true;
 }
-/**
+/******************************************************************************
   * @brief  Description 传感器类型判断，并对数据处理
   * @param  sensortype  		
   * @retval bool		
-  */
+  *****************************************************************************/
 static void Sensor_Deal(uint8_t sensortype,uint8_t i)
 {
     float temp;
@@ -374,11 +374,11 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
     }
 }
 
-/**
+/******************************************************************************
   * @brief  Description 把通道对应数据转换成实际对应的物理量
   * @param  ChannelCode 
   * @retval 无		
-  */
+  *****************************************************************************/
 void DoGatherChannelDataFloat(unsigned char ChannelCode)
 {
     uint8_t i;

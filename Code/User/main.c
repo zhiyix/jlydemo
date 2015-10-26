@@ -98,8 +98,8 @@ int main(void)
       if(Flag.KeyDuanAn ==1)
       {
 //          Fram_Test();
-//          Down_HisData();
-		  DownFlash_HisData();
+          Down_HisData();
+//		  DownFlash_HisData();
       }
 	  freemodbus_main();
   }

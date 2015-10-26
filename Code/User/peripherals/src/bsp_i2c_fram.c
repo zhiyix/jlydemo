@@ -4,7 +4,7 @@
   * @author  
   * @version V1.0
   * @date    2015-xx-xx
-  * @brief   i2c FRAM (FM24CL16B)应用函数bsp
+  * @brief   i2c FRAM (FM24CL64B)应用函数bsp
   ******************************************************************************
   * @attention
   *
@@ -19,11 +19,11 @@
 const char temp_unit[2]={0xA1,0xE6};//"温度符号"
 const char shidu_unit[3]={0x25,0x52,0x48};//"%RH"
 
-/**
+/******************************************************************************
   * @brief  Description 配置I2C总线的GPIO，采用模拟IO的方式实现
   * @param  无			
   * @retval 无		
-  */
+  *****************************************************************************/
 void I2C_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -40,13 +40,13 @@ void I2C_GPIO_Config(void)
 	/* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
 //	i2c_Stop();
 }
-/**
+/******************************************************************************
   * @brief  Description 通道数据处理
   * @param  channelnum  通道数		
   * @param  clockchoose		
   * @param  Gpschoose	选择GPS
   * @retval 无		
-  */
+  *****************************************************************************/
 void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose)
 {
     //-------------
@@ -116,17 +116,17 @@ void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose)
     zhuangtai_temp=0;
     DataBuf[i++]=zhuangtai_temp;
 }
-/**
+/******************************************************************************
   * @brief  Description 保存数据处理
   * @param  无  		 	
   * @retval 无		
-  */
-void SaveData(void)
-{
-    if(JlyParam.SaveDataTimeOnlyRead>=7)//至少7s v1.7
-    {
-        if(JlyParam.Save_Time == JlyParam.SaveDataTimeOnlyRead-5)//保存数据
-        {
+  *****************************************************************************/
+//void SaveData(void)
+//{
+//    if(JlyParam.SaveDataTimeOnlyRead>=7)//至少7s v1.7
+//    {
+//        if(JlyParam.Save_Time == JlyParam.SaveDataTimeOnlyRead-5)//保存数据
+//        {
 //            if(IsReadingI2c)
 //            {
 //                ++IsReadingI2cCt;
@@ -147,25 +147,25 @@ void SaveData(void)
 //                }
 //                else
 //                {
-                      read_time();
-                      ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
-                      SaveHisDataToFram();
+//                      read_time();
+//                      ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
+//                      SaveHisDataToFram();
 //                    Save_Channel_Data(started_channel);	//??????????
-                    //Flag.recflag=1;//????,REC???
-                    //showREC;
-                    //display_mem();
+//                    //Flag.recflag=1;//????,REC???
+//                    //showREC;
+//                    //display_mem();
 //                }
 //            }
-        }
-        if((--JlyParam.Save_Time)<=0)
-        {
-            JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
-        }
-    }
-    else
-    {
-        if((--JlyParam.Save_Time)<=0)
-        {
+//        }
+//        if((--JlyParam.Save_Time)<=0)
+//        {
+//            JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
+//        }
+//    }
+//    else
+//    {
+//        if((--JlyParam.Save_Time)<=0)
+//        {
 //            if(IsReadingI2c)
 //            {
 //                ++IsReadingI2cCt;
@@ -174,7 +174,7 @@ void SaveData(void)
 //            }
 //            else
 //            {
-                JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
+//                JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
 //                
 //                if(FileContinuouslyReadTimeoutCt!=0)
 //                {
@@ -188,59 +188,59 @@ void SaveData(void)
 //                }
 //                else
 //                {
-                    read_time();
-                    ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
-                    SaveHisDataToFram();	//??????????
-                    
+//                    read_time();
+//                    ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
+//                    SaveHisDataToFram();	//??????????
+//                    
 //                }
 //            }
-        }
-    }
-    
+//        }
+//    }
+//    
 //    if((--JlyParam.Save_Time)<=0)
 //    {
 //        JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
 //    }
 
-    Flag.IsDisplayRightNow=1;
-}
-/**
+//    Flag.IsDisplayRightNow=1;
+//}
+/******************************************************************************
   * @brief  Description 读Flash存储指针
   * @param  无  		 	
   * @retval 无		
-  */
+  *****************************************************************************/
 static void ReadFlashRecAddr(void)
 {
     union MYU32 myu32; 
     AI2C_Read(myu32.Byte,FLASH_RecAddr_Lchar,4);    //读出Flash存储指针
     Queue.RecorderFlashPoint = myu32.Variable;
 }
-/**
+/******************************************************************************
   * @brief  Description 存Flash存储指针
   * @param  无  		 	
   * @retval 无		
-  */
+  *****************************************************************************/
 static void WriteFlashRecAddr(void)
 {
     union MYU32 myu32; 
     myu32.Variable = Queue.RecorderFlashPoint;
     AI2C_Write(myu32.Byte, FLASH_RecAddr_Lchar, 4); //保存Flash存储指针
 }
-/**
+/******************************************************************************
   * @brief  Description 保存数据到flash
   * @param  无  		 	
   * @retval 无		
-  */
+  *****************************************************************************/
 void SaveHisDataToFlash(void)
 {
     
     
 }
-/**
+/******************************************************************************
   * @brief  Description 保存数据到铁电
   * @param  无  		 	
   * @retval 无		
-  */
+  *****************************************************************************/
 void SaveHisDataToFram(void)
 {
 	uint8_t Recorderpoint_L,Recorderpoint_H;
@@ -292,11 +292,11 @@ void SaveHisDataToFram(void)
 	AI2C_Write(&Recorderpoint_H, FRAM_RecAddr_Hchar, 1);
     WriteFlashRecAddr();
 }
-/**
+/******************************************************************************
   * @brief  Description 读铁电数据到内存中
   * @param  无   			
   * @retval 无		
-  */
+  *****************************************************************************/
 void ReadFramHisDataToRam(void)
 {
     uint8_t i=0,j=0,zhuangtai_temp=0;
@@ -335,11 +335,11 @@ void ReadFramHisDataToRam(void)
         
     }
 }
-/**
+/******************************************************************************
   * @brief  Description 下载数据处理
   * @param    		
   * @retval 		
-  */
+  *****************************************************************************/
 static void HisData_Tidy(uint16_t RecorderPoint_Begin,uint16_t RecorderPoint)
 {   
     uint8_t Buf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
@@ -380,11 +380,11 @@ static void HisData_Tidy(uint16_t RecorderPoint_Begin,uint16_t RecorderPoint)
         
     }
 }
-/**
+/******************************************************************************
   * @brief  Description 下载Fram中的数据
   * @param    		
   * @retval 		
-  */
+  *****************************************************************************/
 void Down_HisData(void)
 {
     uint8_t Recorderpoint_L,Recorderpoint_H;
@@ -414,11 +414,11 @@ void Down_HisData(void)
         Flag.KeyDuanAn = 0;            
     }
 }
-/**
+/******************************************************************************
   * @brief  Description 读flash中的数据
   * @param    		
   * @retval 		
-  */
+  *****************************************************************************/
 void ReadFlashHisData(uint32_t RecorderPoint_Begin,uint32_t RecorderPoint)
 {
 	uint8_t Buf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
@@ -460,11 +460,11 @@ void ReadFlashHisData(uint32_t RecorderPoint_Begin,uint32_t RecorderPoint)
         
     }
 }
-/**
+/******************************************************************************
   * @brief  Description 下载Flash中的数据
   * @param    		
   * @retval 		
-  */
+  *****************************************************************************/
 void DownFlash_HisData(void)
 {
     uint32_t  RecorderPoint_temp;
@@ -490,11 +490,11 @@ void DownFlash_HisData(void)
         Flag.KeyDuanAn = 0;            
     }
 }
-/**
+/******************************************************************************
   * @brief  Description 测试
   * @param    		
   * @retval 		
-  */
+  *****************************************************************************/
 void Fram_Test(void)
 {
 	char i=0;

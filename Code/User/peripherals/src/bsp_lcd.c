@@ -24,7 +24,6 @@ __I uint8_t shift[4] = {0x0C, 0x08, 0x04, 0x00};
   
 
 __I uint16_t NumberMap1[10]= {0x77,0x12,0x6b,0x5b,0x1e,0x5d,0x7d,0x13,0x7f,0x5f};	
-
 /**
   * @}
   */ 
@@ -34,87 +33,21 @@ __I uint16_t NumberMap1[10]= {0x77,0x12,0x6b,0x5b,0x1e,0x5d,0x7d,0x13,0x7f,0x5f}
   */ 
 static void LCD_GPIOConfig(void);
 static void Convert(uint8_t c);
-
-/**
-  * @brief  Configures the different system clocks.
-  * @param  None
-  * @retval None
-  */
-void RCC_Config(void)
-{  
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-
-	/* Allow access to the RTC */
-	PWR_RTCAccessCmd(ENABLE);
-
-	/* Reset Backup Domain */
-//	RCC_RTCResetCmd(ENABLE);
-//	RCC_RTCResetCmd(DISABLE);
-
-//  /*!< LSE Enable */
-//  RCC_LSEConfig(RCC_LSE_ON);
-
-//  /*!< Wait till LSE is ready */
-//  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
-//  {}
-//  /*!< LCD Clock Source Selection */
-//  RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
-	
-
-	RCC_LSICmd(ENABLE);
-	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
-	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
-	RCC_RTCCLKCmd(ENABLE); 
-
-}
-
-/**
-  * @brief  Configures the lcd.
-  * @param  None
-  * @retval None
-  */
-void LCD_GLASS_Init(void)
-{
-	LCD_InitTypeDef LCD_InitStructure;
-	
-	RCC_LSICmd(ENABLE);
-	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
-	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
-	
-	LCD_GPIOConfig();/*!< Configure the LCD Glass GPIO pins */
-	
-    LCD_StructInit(&LCD_InitStructure);
-	/*!< Configure the LCD interface -------------------------------------------*/
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_LCD, ENABLE);/*!< Enable LCD APB1 Clock */
-
-	LCD_InitStructure.LCD_Prescaler = LCD_Prescaler_8;
-	LCD_InitStructure.LCD_Divider = LCD_Divider_31;
-	LCD_InitStructure.LCD_Duty = LCD_Duty_1_4;
-	LCD_InitStructure.LCD_Bias = LCD_Bias_1_3;
-	LCD_InitStructure.LCD_VoltageSource = LCD_VoltageSource_Internal;
-	LCD_Init(&LCD_InitStructure);
-
-	/*!< Configure the Pulse On Duration */
-	LCD_PulseOnDurationConfig(LCD_PulseOnDuration_0);
-  
-	/*!< Configure the LCD Contrast (3.25V) */
-	LCD_ContrastConfig(LCD_Contrast_Level_7);
-
-	/*!< Wait Until the LCD FCR register is synchronized */
-	LCD_WaitForSynchro();
-  
-	/*!< Enable LCD peripheral */
-	LCD_Cmd(ENABLE);
-  
-	/*!< Wait Until the LCD is enabled */
-	while(LCD_GetFlagStatus(LCD_FLAG_ENS) == RESET)
-	{
-	}
-	/*!< Wait Until the LCD Booster is ready */  
-	while(LCD_GetFlagStatus(LCD_FLAG_RDY) == RESET)
-	{
-	}    
-}
+static void Lcd_Dis1Value(uint8_t value);
+static void Lcd_Dis2Value(uint8_t value);
+static void Lcd_Dis3Value(uint8_t value);
+static void Lcd_Dis4Value(uint8_t value);
+static void Lcd_Dis5Value(uint8_t value);
+static void Lcd_Dis6Value(uint8_t value);
+static void Lcd_Dis7Value(uint8_t value);
+static void Lcd_Dis8Value(uint8_t value);
+static void Lcd_Dis9Value(uint8_t value);
+static void Lcd_Dis10Value(uint8_t value);
+static void Lcd_Dis11Value(uint8_t value);
+static void Lcd_Dis12Value(uint8_t value);
+static void Lcd_Dis13Value(uint8_t value);
+static void Lcd_Dis14Value(uint8_t value);
+static void Lcd_Dis15Value(uint8_t value);
 
 /**
   * @brief  Configures the LCD Segments and Coms GPIOs.
@@ -204,6 +137,88 @@ static void LCD_GPIOConfig(void)
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
+}
+/**
+  * @brief  Configures the different system clocks.
+  * @param  None
+  * @retval None
+  */
+void RCC_Config(void)
+{  
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+
+	/* Allow access to the RTC */
+	PWR_RTCAccessCmd(ENABLE);
+
+	/* Reset Backup Domain */
+//	RCC_RTCResetCmd(ENABLE);
+//	RCC_RTCResetCmd(DISABLE);
+
+//  /*!< LSE Enable */
+//  RCC_LSEConfig(RCC_LSE_ON);
+
+//  /*!< Wait till LSE is ready */
+//  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
+//  {}
+//  /*!< LCD Clock Source Selection */
+//  RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
+	
+
+	RCC_LSICmd(ENABLE);
+	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
+	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
+	RCC_RTCCLKCmd(ENABLE); 
+
+	/* Wait for RTC APB registers synchronisation */
+	RTC_WaitForSynchro();
+}
+
+/**
+  * @brief  Configures the lcd.
+  * @param  None
+  * @retval None
+  */
+void LCD_GLASS_Init(void)
+{
+	LCD_InitTypeDef LCD_InitStructure;
+	
+	RCC_LSICmd(ENABLE);
+	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
+	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
+	
+	LCD_GPIOConfig();/*!< Configure the LCD Glass GPIO pins */
+	
+    LCD_StructInit(&LCD_InitStructure);
+	/*!< Configure the LCD interface -------------------------------------------*/
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_LCD, ENABLE);/*!< Enable LCD APB1 Clock */
+
+	LCD_InitStructure.LCD_Prescaler = LCD_Prescaler_8;
+	LCD_InitStructure.LCD_Divider = LCD_Divider_31;
+	LCD_InitStructure.LCD_Duty = LCD_Duty_1_4;
+	LCD_InitStructure.LCD_Bias = LCD_Bias_1_3;
+	LCD_InitStructure.LCD_VoltageSource = LCD_VoltageSource_Internal;
+	LCD_Init(&LCD_InitStructure);
+
+	/*!< Configure the Pulse On Duration */
+	LCD_PulseOnDurationConfig(LCD_PulseOnDuration_0);
+  
+	/*!< Configure the LCD Contrast (3.25V) */
+	LCD_ContrastConfig(LCD_Contrast_Level_7);
+
+	/*!< Wait Until the LCD FCR register is synchronized */
+	LCD_WaitForSynchro();
+  
+	/*!< Enable LCD peripheral */
+	LCD_Cmd(ENABLE);
+  
+	/*!< Wait Until the LCD is enabled */
+	while(LCD_GetFlagStatus(LCD_FLAG_ENS) == RESET)
+	{
+	}
+	/*!< Wait Until the LCD Booster is ready */  
+	while(LCD_GetFlagStatus(LCD_FLAG_RDY) == RESET)
+	{
+	}    
 }
 /**
   * @brief  This function Clear the whole LCD RAM.
@@ -1144,12 +1159,12 @@ void displayErr(uint8_t Err)
 		/* 清报警状态 */
         clearAlarmStatus;
 		/* 清 "设置上限"，“设置下限" */	
-        clearshangxian;		
-        clearxiaxian;
+        clearshangxian;clearxiaxian;		
         /* 清符号 */
-        clearFUHAO;clearAlarmStatus;
-        clearRH;clearJINBAO;
-        clearC;clearP1;clearP2;
+        clearFUHAO;clearAlarmStatus;clearJINBAO;
+        //clearRH;
+		showC;
+		clearP1;clearP2;
         /* 显示 2Er */
         Lcd_Dis2Value(2);
         Lcd_Dis3Value('E');
@@ -1178,7 +1193,7 @@ void lcd_OFF(uint8_t offcode)
 	clear_BOX;
 	clear_GPRS;
 	clear_GPS;
-	clearBATT;
+	//clearBATT;
 	clearFlashMEM;
 	cleartongdao;
 	clearJINBAO;
@@ -1191,16 +1206,17 @@ void lcd_OFF(uint8_t offcode)
 	clearC;
 	clearRH;
 	
-	if(offcode==0xff)
+	if(offcode==0xFF)
 	{
-		Lcd_Dis2Value(0XFF);
+		Lcd_Dis1Value(0xFF);
 	}
 	else
 	{
-		Lcd_Dis2Value(offcode);
+		Lcd_Dis1Value(offcode);
 	}
-	/*显示OF*/
-	Lcd_Dis3Value('O');
+	/*显示0FF*/
+	Lcd_Dis2Value(0);
+	Lcd_Dis3Value('F');
 	Lcd_Dis4Value('F');
 	
 	/*!< Requesy LCD RAM update */
@@ -1228,7 +1244,7 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
     Lcd_Dis2Value(0XFF);
     Lcd_Dis3Value(0XFF);
     Lcd_Dis4Value(0XFF);
-	clearS12345;
+	//clearS12345;
 	clear_NFC;
     clearAlarmStatus;
     clearshangxian;
@@ -1386,6 +1402,58 @@ void displayTIME(uint8_t hour,uint8_t min)
     }
 }
 /**
+  * @brief  Description  显示信号强度
+  * @param  signal_value 信号值
+  * @retval None
+  */
+void Display_Signal(uint8_t signal_value)
+{
+	/*!< Wait Until the last LCD RAM update finish */
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){} 
+	
+	if((signal_value>=0)&&(signal_value<=6))
+	{showS1;}
+	if((signal_value>=7)&&(signal_value<=13))
+	{showS12;}
+	if((signal_value>=14)&&(signal_value<=20))
+	{showS123;}
+	if((signal_value>=21)&&(signal_value<=27))
+	{showS1234;}
+	if((signal_value>=28)&&(signal_value<=31))
+	{showS12345;}
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();		
+}
+/**
+  * @brief  显示存储容量
+  * @param  None
+  * @retval None
+  */
+void Display_Mem(void) 
+{
+	/*!< Wait Until the last LCD RAM update finish */
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
+    if(Flag.RecordFlashOverFlow==0)/*未溢出过*/
+    {
+        if(Queue.RecorderFlashPoint<=(Flash_MAX_NUM/5)) /**/
+            {showFlashMEM1;}
+        else if((Queue.RecorderFlashPoint<=(Flash_MAX_NUM*2/5))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM/5)))
+            {showFlashMEM2;}
+        else if((Queue.RecorderFlashPoint<=(Flash_MAX_NUM*3/5))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM*2/5)))
+            {showFlashMEM3;}
+        else if((Queue.RecorderFlashPoint<=(Flash_MAX_NUM*4/5))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM*3/5)))
+            {showFlashMEM4;}
+        else if((Queue.RecorderFlashPoint<(Flash_MAX_NUM))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM*4/5)))
+            {showFlashMEM5;}
+    }
+    else/*溢出，显示满格*/
+    {
+        showFlashMEM5;
+    }
+    /*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
+}
+/**
   * @brief  显示仪器SN号
   * @param  None
   * @retval None
@@ -1449,13 +1517,12 @@ void Display_ChannelValue(uint8_t started_channel0)
         
         channel_cp = started_channel0;
         
-        while(channel_cp & 0x01)//
+        while(channel_cp & 0x01)
         {
             ChannelForDisplay++;//ChannelForDisplay
             Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
             AlarmDeal(ChannelForDisplay);
-//            showC;
-            if(ChannelForDisplay==(CH_2+1))
+            if(Conf.Sensor[ChannelForDisplay-1].SensorType == 0x02)	/*湿度*/
             {
                 /*!< Wait Until the last LCD RAM update finish */
                 while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 

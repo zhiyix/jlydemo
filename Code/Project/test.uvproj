@@ -604,11 +604,6 @@
               <FilePath>..\User\peripherals\src\bsp_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_sensor_deal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\logical-layer\bsp_sensor_deal.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\peripherals\src\bsp_timer.c</FilePath>
@@ -629,14 +624,24 @@
               <FilePath>..\User\peripherals\src\bsp_rtc.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_serial_deal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\logical-layer\bsp_serial_deal.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_alarmdeal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\logical-layer\bsp_alarmdeal.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_powerdeal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_powerdeal.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_sensordeal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_sensordeal.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_serialdeal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_serialdeal.c</FilePath>
             </File>
           </Files>
         </Group>

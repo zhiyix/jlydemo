@@ -46,11 +46,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
-/**
+
+/******************************************************************************
   * @brief  Description 正常、省电模式处理
+						省电模式：采集间隔最小10s
+						正常模式：采集间隔最小2s
   * @param  无  		
   * @retval 无		
-  */
+  *****************************************************************************/
 static void LOWorNomal_Mode(void)
 {
 	uint8_t i=0;
@@ -66,7 +69,7 @@ static void LOWorNomal_Mode(void)
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
         }
-        if(JlyParam.Save_Time == JlyParam.SaveDataTimeOnlyRead-1)
+        if(JlyParam.SampleTime == JlyParam.SampleInterval-1)//
         {
 			/*判断传感器接口类型 模拟/数字*/
 			for(i=0;i<Conf.Jly.ChannelNum;i++)
@@ -104,7 +107,7 @@ static void LOWorNomal_Mode(void)
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
         }
-        if((JlyParam.Save_Time>1) && JlyParam.Save_Time%2==0)
+        if((JlyParam.SampleTime>1) && JlyParam.SampleTime%2==0)//2s采集一次
         {
 			/*判断传感器接口类型 模拟/数字*/
 			for(i=0;i<Conf.Jly.ChannelNum;i++)
@@ -130,6 +133,11 @@ static void LOWorNomal_Mode(void)
             }
         }
     }
+	
+	if((--JlyParam.SampleTime)<=0)
+    {
+        JlyParam.SampleTime = JlyParam.SampleInterval;//采集时间 单位:s
+    }
 }
 /**
   * @brief  Description 记录仪工作状态处理
@@ -144,7 +152,7 @@ static void WorkornotMode(void)
         BEEP(OFF);			/* 关蜂鸣器 */
 		AlarmLed2_OFF;		/* 关报警灯 */
 		
-		lcd_OFF(4);
+		lcd_OFF(JlyParam.ShowOffCode);
 		
         if(JlyParam.LastErrorCode!=0)
         {
@@ -176,52 +184,104 @@ static void WorkornotMode(void)
   * @brief  Description 记录仪启动方式处理
   * @param  无  		
   * @retval 无		
+  * 说明：
+		 0FF:控制(手动)停机状态
+	    00FF:记录仪记满停机
+		10FF:定点启动方式，还未开始记录
+		20FF:定点停止方式，已到时停机
+		30FF:定时启动方式，还未开始记录
+		40FF:
+		50FF:延时启动方式，还未开始记录
+		90FF:出现故障停机
+	手动启动上位机配置和按键开启工作
   */
 void RecorderBootModeHandle(void)
 {
-    if(JlyParam.LastErrorCode!=0)
+    if(JlyParam.LastErrorCode != 0)
     {
-        if(Conf.Jly.WorkStatueIsStop==1)	/*!< 工作状态 */
+        if(Conf.Jly.WorkStatueIsStop == 1)	/* 工作状态 */
         {
             
-            Conf.Jly.WorkStatueIsStop = 0;
-            //写入fram
-//            ShowOffCode = 0x09;
+            Conf.Jly.WorkStatueIsStop = 0;	/*停止工作*/
+            Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+			
+            JlyParam.ShowOffCode = 0x09;	/*出现故障*/
         }
         return;
     }
-    if(Conf.Jly.RecBootMode == 0)	/*!< 延时启动(默认延时时间0，即立即启动)*/
+    if(Conf.Jly.RecBootMode == 0x00)	/* 延时启动(默认延时时间0，即立即启动)*/
     {
-		if(((JlyParam.delay_start_time--)<=0) && (!Conf.Jly.WorkStatueIsStop))	/*!< 工作 */
+		if(((JlyParam.delay_start_time--) <= 0) && (!Conf.Jly.WorkStatueIsStop))	
         {
             JlyParam.delay_start_time = -1;
-            Conf.Jly.WorkStatueIsStop = 1;
-            Conf.Jly.RecBootMode = 0;
+            Conf.Jly.WorkStatueIsStop = 1;	/*开启工作*/
         }
         if((JlyParam.delay_start_time)>0)
         {
-            
-            Conf.Jly.WorkStatueIsStop = 0;	/*!< 停止工作 */
+            Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
 			
-//            ShowOffCode=5;
+            JlyParam.ShowOffCode = 0x05;	/*表示延时启动方式，还未开始记录*/
         }
     }
-	else if(Conf.Jly.RecBootMode == 1)	/*!< 时间点定时启动 */
+	else if(Conf.Jly.RecBootMode == 0x01)	/* 时间点定时启动 */
 	{
-		
+		if(!Conf.Jly.WorkStatueIsStop)	/* 停止工作 */
+		{
+			/*读取时钟时间*/
+			read_time();
+			if((Rtc.Year == Conf.Jly.MixBoot_Year)&&(Rtc.Month == Conf.Jly.MixBoot_Month)&&(Rtc.Day == Conf.Jly.MixBoot_Day)\
+				&&(Rtc.Hour == Conf.Jly.MixBoot_Hour)&&(Rtc.Minute == Conf.Jly.MixBoot_Min))
+			{
+				Conf.Jly.WorkStatueIsStop = 1;	/*到时间点开启工作*/				
+			}
+			else
+			{
+				Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+				JlyParam.ShowOffCode = 0x03;	/*表示定时启动方式，还未开始记录*/
+			}
+		}
 	}
-	else if(Conf.Jly.RecBootMode == 2)	/*!< 时间点定点启停 */
+	else if(Conf.Jly.RecBootMode == 0x02)	/* 时间点定点启停 */
 	{
-		
+		if(!Conf.Jly.WorkStatueIsStop) /* 时间点定点启动 */
+		{
+			/*读取时钟时间*/
+			read_time();
+			if((Rtc.Year == Conf.Jly.MixBoot_Year)&&(Rtc.Month == Conf.Jly.MixBoot_Month)&&(Rtc.Day == Conf.Jly.MixBoot_Day)\
+				&&(Rtc.Hour == Conf.Jly.MixBoot_Hour)&&(Rtc.Minute == Conf.Jly.MixBoot_Min))
+			{
+				Conf.Jly.WorkStatueIsStop = 1;	/*到时间点开启工作*/
+			}
+			else
+			{
+				Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+				JlyParam.ShowOffCode = 0x01;	/*表示定点启动方式，还未开始记录*/
+			}
+		}
+		if(Conf.Jly.WorkStatueIsStop) /* 时间点定点停止 */
+		{
+			/*读取时钟时间*/
+			read_time();
+			if((Rtc.Year == Conf.Jly.FixedStop_Year)&&(Rtc.Month == Conf.Jly.FixedStop_Month)&&(Rtc.Day == Conf.Jly.FixedStop_Day)\
+				&&(Rtc.Hour == Conf.Jly.FixedStop_Hour)&&(Rtc.Minute == Conf.Jly.FixedStop_Min))
+			{
+				Conf.Jly.WorkStatueIsStop = 0;	/* 到时间点停止工作 */
+				JlyParam.ShowOffCode = 0x02;	/*表示定点停止方式 ，已到时停机*/
+			}
+			else
+			{
+				Conf.Jly.WorkStatueIsStop = 1;	
+			}
+		}
 	}
-	else if((Conf.Jly.RecBootMode == 3) && (Conf.Jly.WorkStatueIsStop))	/*!< 手动启动*/
+	else if((Conf.Jly.RecBootMode == 0x03) && (Conf.Jly.WorkStatueIsStop))	/* 手动启动*/
     {
-        Conf.Jly.WorkStatueIsStop = 0;	/*!< 停止工作 */
+        Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
             //写入fram
 		Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
-//		ShowOffCode = 0xFF;
+		JlyParam.ShowOffCode = 0xFF;
     }
-    else if(Conf.Jly.RecBootMode == 0x10)	/*!< 异常条件启动 */
+    else if(Conf.Jly.RecBootMode == 0x10)	/* 异常条件启动 */
     {
         
     }
@@ -238,18 +298,16 @@ void   RecorderStopModeHandle(void)
     
     if(Conf.Jly.WorkStatueIsStop)
     {
-        if(Conf.Jly.RecStopMode == 0){};	/*!< 先进先出的记录停止方式 */
-        if(Conf.Jly.RecStopMode ==1)	/*!< 存储器记满的记录停止方式 */
+        if(Conf.Jly.RecStopMode == 0){};	/* 先进先出的记录停止方式 */
+        if(Conf.Jly.RecStopMode == 1)		/* 存储器记满的记录停止方式 */
         {
             if((Queue.RecorderFlashPoint >= Flash_MAX_NUM)) //&&IsReadingI2c==0,下载数据
             {
-                
-                Conf.Jly.WorkStatueIsStop = 1;	/*!< 停止工作 */
+                Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
 				
-				//写Fram
 				Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
                 IsWriteLasestStopTimeToFram = 1;
-//                ShowOffCode = 0;
+                JlyParam.ShowOffCode = 0;	/*记录仪记满停机*/
             }
         }
         
@@ -270,7 +328,7 @@ void   RecorderStopModeHandle(void)
 }
 
 /**
-  * @brief  Description 记录仪1s处理
+  * @brief  Description 记录仪1s处理标志
   * @param  无  		
   * @retval 无		
   */
@@ -282,10 +340,42 @@ static void OneSec_Timedeal(void)
     if(display_ct>=36)
     {
         display_ct = 0;
-//        display_mem();
+		Display_Signal(2);/*显示信号强度*/
+        Display_Mem();	/*显示存储容量*/
          
     }
-   //----------------
+   /*检测外接电接入*/
+	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)         
+    {
+        PManage.HaveExternalPower++;
+        if(PManage.HaveExternalPower>=ExternalPowerchecktime)
+        {
+            Flag.Powerdowncountflag=1;
+            PManage.HaveExternalPower=0;
+        }
+    }    
+	/*检测电池电源是否充满*/
+	if(Flag.ExPwOn == 1)	/*在有外接电的情况下检测是否充满电*/
+	{
+		if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_CHGtest) == 1)         
+		{
+			PManage.BatChargeFullCount++;
+			if(PManage.BatChargeFullCount>=ExternalPowerchecktime)/*检测60s*/
+			{
+				Flag.BatChargeFull=1;
+				PManage.BatChargeFullCount=0;
+			}
+		}
+		else
+		{
+			Flag.BatChargeFull=0;
+		}
+	}
+	else
+	{
+		Flag.BatChargeFull=0;
+	}
+	
 }
 /**
   * @brief  Description 记录仪
@@ -303,19 +393,37 @@ void SaveDataOnTimeDeal(void)
     
     RtcD10ToBcd(&Rtc);
     
-    Rtc.TMPS=Rtc.TMPS/60;
-        
-    if(Rtc.TMPS%JlyParam.SaveHisDataTime ==0)
-    {   
-        if(Rtc.TMPS!=Rtc.TCPS)
-        {
-            Rtc.TCPS=Rtc.TMPS;
-            
-            read_time();
-            ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
-            SaveHisDataToFram();
-        }
-    }
+	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
+	{
+		Rtc.SCount++;
+		if(Rtc.SCount >= 60)
+		{
+			Rtc.SCount = 0;
+		}
+		if(Rtc.SCount % JlyParam.NormalRecInterval ==0)
+		{
+			
+			read_time();
+			ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
+			SaveHisDataToFram();
+		}
+	}
+	else
+	{
+		Rtc.TMPS = Rtc.TMPS/60;	//分钟
+		if(Rtc.TMPS % JlyParam.NormalRecIntervalMin ==0)//1分钟-
+		{   
+			if(Rtc.TMPS!=Rtc.TCPS)
+			{
+				Rtc.TCPS=Rtc.TMPS;
+				
+				read_time();
+				ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
+				SaveHisDataToFram();
+			}
+		}
+	}
+	
 }
 /**
   * @brief  Description 记录仪处理函数
@@ -328,18 +436,32 @@ void JlySecDeal(void)
     {
         Flag.Sec = 0;
         
-        Display_SN();   //显示SN号
+        Display_SN();   /*显示SN号*/
         
         OneSec_Timedeal();
         
         
         rtc_deel();
         
-        voltage_test();
+		OutpowerShan();
+		
+        VoltageTest();
         
         WorkornotMode();
         
 		SaveDataOnTimeDeal();
+    }
+	if(Conf.Jly.WorkStatueIsStop == 0) /*停止工作*/
+    {
+        AVCC1_POWER(OFF);	/* 关传感器电源 */
+        BEEP(OFF);			/* 关蜂鸣器 */
+		AlarmLed2_OFF;		/* 关报警灯 */
+        lcd_OFF(JlyParam.ShowOffCode);
+
+        if(JlyParam.LastErrorCode!=0)
+        {
+            displayErr(JlyParam.LastErrorCode);
+        }
     }
 }
 #endif /* __BSPDATADEAL_C */

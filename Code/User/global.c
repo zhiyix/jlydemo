@@ -15,20 +15,12 @@
 
 #include "main.h"
 
-struct BATTERY        Bat;
-struct FLAG			  Flag;
-struct RTCRX8025      Rtc;
-struct CircularQueue  Queue;
-struct JLYPARAMETER   JlyParam;
+struct PowerManagement	PManage;
+struct FLAG			  	Flag;
+struct RTCRX8025      	Rtc;
+struct CircularQueue  	Queue;
+struct JLYPARAMETER   	JlyParam;
 
-struct BasicConfDataStr Basic;	/*!< 总共64个byte */
-struct JlyConfDataStr 	Jly;	/*!< 总共64个byte */
-struct AlarmConfDataStr Alarm;	/*!< 总共32个byte */	
-struct SensorChanelConfDataStr Sensor[32];		/*!< 每一通道总共32个byte 32*32=1024*/	
-struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共64个byte 64*32=2048*/
-
-union  SENSEPEIZHIINFOR  Sensor1;
-union  ADCADJUSTINFOR    adcjust1;
 union ConfDataTable 	 Conf;
 
 uint8_t        rtc_pt;          //秒计数

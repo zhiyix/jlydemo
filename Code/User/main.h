@@ -52,11 +52,12 @@
 #include "bsp_spi_flash.h"
 #include "bsp_timer.h"
 
+#include "bsp_i2c_fram.h"
 #include "bsp_datadeal.h"
 #include "bsp_alarmdeal.h"
-#include "bsp_i2c_fram.h"
-#include "bsp_sensor_deal.h"
-#include "bsp_serial_deal.h"
+#include "bsp_powerdeal.h"
+#include "bsp_sensordeal.h"
+#include "bsp_serialdeal.h"
 
 
 /* Exported macro ------------------------------------------------------------*/

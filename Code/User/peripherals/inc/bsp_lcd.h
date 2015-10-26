@@ -93,18 +93,18 @@
 #define clear_GPS     LCD->RAM[4]&=~D_BIT11;LCD->RAM[6]&=~D_BIT11
 
 //! \brief  电池符号显示
-#define showBATT    LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26;LCD->RAM[2]|=D_BIT26;LCD->RAM[0]|=D_BIT26 //满格显示
+#define showBATT    LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26;LCD->RAM[2]|=D_BIT26;LCD->RAM[0]|=D_BIT26 //满格显示,show N1 N2 N3 N4
 #define clearBATT   LCD->RAM[6]&=~D_BIT26;LCD->RAM[4]&=~D_BIT26;LCD->RAM[2]&=~D_BIT26;LCD->RAM[0]&=~D_BIT26
-#define showBATT0   LCD->RAM[6]|=D_BIT26   //空格
-#define showBATT1   LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26  //1格
-#define showBATT2   LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26;LCD->RAM[2]|=D_BIT26 //2格
+#define showBATT0   LCD->RAM[6]|=D_BIT26   //空格,show N1
+#define showBATT1   LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26  //1格,show N1 N2
+#define showBATT2   LCD->RAM[6]|=D_BIT26;LCD->RAM[4]|=D_BIT26;LCD->RAM[2]|=D_BIT26 //2格,show N1 N2 N3
 //! \brief 显示Flash 存储 N5 N6 N7 N8 N9 N10
-#define clearFlashMEM	LCD->RAM[0]&=~D_BIT24;LCD->RAM[2]&=~(D_BIT22+D_BIT24);LCD->RAM[4]&=~(D_BIT22+D_BIT24)
-#define showFlashMEM1   clearFlashMEM;LCD->RAM[0]|=D_BIT24
-#define showFlashMEM2   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24
-#define showFlashMEM3   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24
-#define showFlashMEM4   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=(D_BIT22+D_BIT24)
-#define showFlashMEM5   clearFlashMEM;LCD->RAM[0]|=D_BIT24;LCD->RAM[2]|=(D_BIT22+D_BIT24);LCD->RAM[4]|=(D_BIT22+D_BIT24)
+#define clearFlashMEM	LCD->RAM[0]&=~(D_BIT22+D_BIT24);LCD->RAM[2]&=~(D_BIT22+D_BIT24);LCD->RAM[4]&=~(D_BIT22+D_BIT24)
+#define showFlashMEM1   clearFlashMEM;LCD->RAM[0]|=(D_BIT22+D_BIT24)
+#define showFlashMEM2   clearFlashMEM;LCD->RAM[0]|=(D_BIT22+D_BIT24);LCD->RAM[2]|=D_BIT24
+#define showFlashMEM3   clearFlashMEM;LCD->RAM[0]|=(D_BIT22+D_BIT24);LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=D_BIT24
+#define showFlashMEM4   clearFlashMEM;LCD->RAM[0]|=(D_BIT22+D_BIT24);LCD->RAM[2]|=D_BIT24;LCD->RAM[4]|=(D_BIT22+D_BIT24)
+#define showFlashMEM5   clearFlashMEM;LCD->RAM[0]|=(D_BIT22+D_BIT24);LCD->RAM[2]|=(D_BIT22+D_BIT24);LCD->RAM[4]|=(D_BIT22+D_BIT24)
 
 #define showtongdao   
 #define cleartongdao  
@@ -185,7 +185,6 @@ extern const uint32_t 		lcd_test[];
 void RCC_Config(void);
 void LCD_GLASS_Init(void);
 void LCD_GLASS_Clear(void);
-
 //void LCD_GLASS_DisplayString(uint8_t* ptr);
 void LCD_GLASS_DisplayChar(uint8_t ch,uint8_t position);
 //void LCD_GLASS_ScrollString(uint8_t* ptr, uint16_t nScroll, uint16_t ScrollSpeed);
@@ -194,7 +193,8 @@ void LCD_GLASS_ClearChar(uint8_t position);
 
 
 //void Lcd_Test(void);
-
+void Display_Signal(uint8_t signal_value);
+void Display_Mem(void);
 void Display_SN(void);
 void displayErr(uint8_t Err);
 void lcd_OFF(uint8_t offcode);

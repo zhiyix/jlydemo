@@ -47,69 +47,122 @@
 
 /* Private functions ---------------------------------------------------------*/
 
-/**
+/******************************************************************************
+  * @brief  Description 设置RTC出厂时间
+  * @param  无
+  * @retval 无		
+  *****************************************************************************/
+static void  Reset_Time(void)
+{
+	uint8_t setbuf[7];
+	setbuf[0] = 0x00;
+	RTC8025_Write(setbuf,RX8025_DigitalOffsetAddr,1);	/*不使用精度调整功能*/
+	
+	setbuf[0] = 0x20;
+	RTC8025_Write(setbuf,RX8025_Control1Addr,1);   /*设置24小时制*/
+	
+	/*写入出厂时间*/
+	setbuf[6] = 0x15;	/*年*/
+	setbuf[5] = 0x10;	/*月*/
+	setbuf[4] = 0x24;	/*日*/
+	setbuf[3] = 0x00;	/*星期*/
+	setbuf[2] = 0x10;	/*时*/
+	setbuf[1] = 0x39;	/*分*/
+	setbuf[0] = 0x30;	/*秒*/
+	RTC8025_Write(setbuf,RX8025_SecondsAddr,7);	/*写入RX8025*/ 
+}
+/******************************************************************************
   * @brief  Description RX8025初始化
   * @param  无
   * @retval 无		
-  */
-void rtc_init(void)
+  *****************************************************************************/
+uint8_t RX8025_RTC_Init(void)
 {
-	uint8_t initbuf[7];
-	initbuf[0] = 0x20;
-    RTC8025_Write(initbuf,(RX8025_ADDR_CONTROL1&RX8025_WRITE_MODE),1);   //24小时制
-	
-	//RTC8025_Read(&buf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);   //24小时制
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);	/*使能PWR和BKP外设时钟*/  
+	PWR_RTCAccessCmd(ENABLE);	                   		/*使能后备寄存器访问*/
+	/* Wait for RTC APB registers synchronisation */
+    RTC_WaitForSynchro();
+    /*检查是不是第一次配置时钟 ，这里MCU自带RTC未接备份电池*/
+	/*从指定的后备寄存器中读出数据：读出了与写入的指定数据不相乎*/
+	if (RTC_ReadBackupRegister(RTC_BKP_DR0) != 0x5050)//BKP_DR1 
+	{
+		printf("\r\n\r\n RX8025_RTC configured....");
+		Reset_Time();	/*设置时间出厂时间*/
+		
+		/*向指定的后备寄存器中写入用户程序数据*/
+		RTC_WriteBackupRegister(RTC_BKP_DR0, 0x5050);
+		return 1;	/*返回1，第一次初始化*/
+	}
+	else
+	{
+		/*启动无需设置新时钟*/
+		/*检查是否掉电重启*/
+		if (RCC_GetFlagStatus(RCC_FLAG_PORRST) != RESET)
+		{
+		  printf("\r\n Power On Reset occurred....\n\r");
+		}
+		/*检查是否Reset复位*/
+		else if (RCC_GetFlagStatus(RCC_FLAG_PINRST) != RESET)
+		{
+		  printf("\r\n External Reset occurred....\n\r");
+		}
+
+		printf("\n\r No need to configure RX8025_RTC....\n\r");
+	}
+    return 0;	/*返回0，已经初始化过*/
 }
-/**
+/******************************************************************************
   * @brief  Description 读取RX8025时间
   * @param  无
   * @retval 无		
-  */
+  *****************************************************************************/
 void read_time(void)
 {
 //    unsigned char i;
 	uint8_t readbuf[7];
 
-	//__disable_irq();
-	__set_PRIMASK(1);	/*测试*/
     //RTC8025_Read(&readbuf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);
-	RTC8025_Read(readbuf,(RX8025_ADDR_SECONDS&RX8025_READ_MODE),7);
-	__set_PRIMASK(0);
+	RTC8025_Read(readbuf,RX8025_SecondsAddr,7);	/*读取时钟时间*/
 	
 	Rtc.Second = readbuf[0];
     Rtc.Minute = readbuf[1];
-    Rtc.Hour = readbuf[2];
-    Rtc.Day = readbuf[4];
-    Rtc.Week = readbuf[3];
-    Rtc.Month = readbuf[5];
-    Rtc.Year = readbuf[6];
+    Rtc.Hour   = readbuf[2];
+	Rtc.Week   = readbuf[3];
+    Rtc.Day    = readbuf[4];
+    Rtc.Month  = readbuf[5];
+    Rtc.Year   = readbuf[6];
 	
     Rtc.Second &= 0x7f;
     Rtc.Minute &= 0x7f;
-    Rtc.Hour &= 0x3f;
-    Rtc.Day &= 0x3f;
-    Rtc.Week &= 0x07;
-    Rtc.Month &= 0x9f;
-    Rtc.Year &= 0x7f;
-    
+    Rtc.Hour   &= 0x3f;
+    Rtc.Day    &= 0x3f;
+    Rtc.Week   &= 0x07;
+    Rtc.Month  &= 0x9f;
+    Rtc.Year   &= 0x7f;
 }
-/**
-  * @brief  Description 设置RTC时间
+/******************************************************************************
+  * @brief  Description 设置RX8025时间
   * @param  无
   * @retval 无		
-  */
-void  set_time(void)
+  *****************************************************************************/
+void set_time(void)
 {
-	uint8_t setbuf[]={0x30,0x04,0x09,0x00,0x22,0x10,0x15};
+	uint8_t setbuf[7];
 	
-	RTC8025_Write(setbuf,(RX8025_ADDR_SECONDS&RX8025_WRITE_MODE),7); 
-   
+	setbuf[0] = Conf.Jly.Time_Sec;	 /*秒*/
+	setbuf[1] = Conf.Jly.Time_Min;	 /*分*/
+	setbuf[2] = Conf.Jly.Time_Hour;	 /*时*/
+	setbuf[3] = Conf.Jly.Time_Week;	 /*星期*/
+	setbuf[4] = Conf.Jly.Time_Day;	 /*日*/
+	setbuf[5] = Conf.Jly.Time_Month; /*月*/
+	setbuf[6] = Conf.Jly.Time_Year;	 /*年*/
+	RTC8025_Write(setbuf,RX8025_SecondsAddr,7);	/*写入RX8025*/ 
 }
-/**
+/******************************************************************************
   * @brief  Description rtc 处理
   * @param  无
   * @retval 无		
-  */
+  *****************************************************************************/
 void rtc_deel(void)
 {
     rtc_pt++;
@@ -181,11 +234,11 @@ void rtc_deel(void)
     }
 }
 
-/**
+/******************************************************************************
   * @brief  Description 转换成秒数 处理
   * @param  无
   * @retval 无		
-  */
+  *****************************************************************************/
 unsigned long DateToSeconds(struct   RTCRX8025 *Rtc)
 {
     static uint32_t month[12]=
@@ -217,11 +270,11 @@ unsigned long DateToSeconds(struct   RTCRX8025 *Rtc)
     //seconds += Rtc->Second;               //加上当前秒数
     return seconds;
 }
-/**
+/******************************************************************************
   * @brief  Description BCD码转D10 处理
   * @param  无
   * @retval 无		
-  */
+  *****************************************************************************/
 void RtcBcdToD10(struct   RTCRX8025 *Rtc)
 {
     Rtc->Second=(uint8_t)(BCD_TO_D10(Rtc->Second));
@@ -231,11 +284,11 @@ void RtcBcdToD10(struct   RTCRX8025 *Rtc)
     Rtc->Month=(uint8_t)(BCD_TO_D10(Rtc->Month));
     Rtc->Year=(uint8_t)(BCD_TO_D10(Rtc->Year));
 }
-/**
+/******************************************************************************
   * @brief  Description D10转BCD码 处理
   * @param  无
   * @retval 无		
-  */
+  *****************************************************************************/
 void RtcD10ToBcd(struct   RTCRX8025 *Rtc)
 {
     Rtc->Second=(uint8_t)(D10_TO_BCD(Rtc->Second));

@@ -10,6 +10,6 @@ extern float ChannelDataFloat[32];
 void ADC1_Init(void);
 //void Sample(void);
 void  Dealing_Gather(unsigned char all_channel_code);
-void  voltage_test(void);
+
 #endif /* __ADC_H */
 

@@ -89,15 +89,15 @@ struct JlyConfDataStr
 							 @0x02:立即停止 */  
 	
 	/*!< yyyy-MM-dd  hh-mm[BCD]
-		 1 定时启动的启动时间点
-		 2 延时启动的延时时间(默认0，即立即启动)
-		 3 时间点定点启停的启动时间点 */
-	uint8_t MixMoot_Min;      /*!< 启动时间-分 */ 
-	uint8_t MixMoot_Hour;     /*!< 启动时间-时 */ 
-	uint8_t MixMoot_Day;      /*!< 启动时间-日 */ 
-	uint8_t MixMoot_Month;    /*!< 启动时间-月 */ 
-	uint8_t MixMoot_Year;     /*!< 启动时间-年 */ 
-	uint8_t MixMoot_Cen;      /*!< 启动时间- */ 
+	     @0x00:延时启动的延时时间(默认0，即立即启动)
+		 @0x01:定时启动的启动时间点 */
+		 
+	uint8_t MixBoot_Min;      /*!< 启动时间-分 */ 
+	uint8_t MixBoot_Hour;     /*!< 启动时间-时 */ 
+	uint8_t MixBoot_Day;      /*!< 启动时间-日 */ 
+	uint8_t MixBoot_Month;    /*!< 启动时间-月 */ 
+	uint8_t MixBoot_Year;     /*!< 启动时间-年 */ 
+	uint8_t MixBoot_Cen;      /*!< 启动时间- */ 
 							  /*!< 8个byte */
 	/*!< 定点停止时间 yyyy-MM-dd hh-mm[BCD] */ 
 	uint8_t FixedStop_Min;	
@@ -129,8 +129,8 @@ struct JlyConfDataStr
 	/*!< 仪器时钟的实时时间 */
 	uint8_t Time_Sec;
 	uint8_t Time_Min;
-	uint8_t Time_Week;
 	uint8_t Time_Hour;
+	uint8_t Time_Week;
 	uint8_t Time_Day;
 	uint8_t Time_Month;
 	uint8_t Time_Year;
@@ -153,10 +153,11 @@ struct JlyConfDataStr
 /*!< 总共32个byte */	
 struct AlarmConfDataStr
 {
-	uint16_t AlarmSwitch;	/*!< 报警开关
+	uint8_t  AlarmSwitch;	/*!< 报警开关
 								 Bit0：声音开关
 								 Bit1：显示开关
 								 Bit2：短信开关 */
+	uint8_t  :8;			/*!< Reserv */	
 	uint8_t  AlarmTime_Mode;	/*!< 报警时间模式
 									 Bit0：上班时间
 									 Bit1：下班时间 */
@@ -270,62 +271,11 @@ union ConfDataTable
 	uint8_t Buf[3232];
 };
 
-//传感器通道信息结构
-struct SENSORINFOR
-{
-    uint8_t sensor_type;        //传感器类型
-    uint8_t alarm_switch;       //报警开关
-    uint8_t alarm_status;       //报警状态
-    uint8_t reserved;           //保留
-    uint32_t  idennum;          //传感器识别号
-    union FISI2CH4 alarm_high;  //报警上限
-    union FISI2CH4 alarm_low;   //报警下限
-};
-//传感器通道1信息表
-union SENSEPEIZHIINFOR
-{
-    struct  SENSORINFOR sensor1_str;
-    uint8_t sensor_infor[16];
-};
 
-//adc校准数据点
-struct ADCADJUST
-{
-    uint16_t adjustf20;
-    uint16_t adjustf10;
-    uint16_t adjust10;
-    uint16_t adjust20;
-    uint16_t adjust30;
-    uint16_t adjust40;
-    uint16_t adjust50;
-    uint16_t adjust60;
-};
-//adc校准数据表
-union ADCADJUSTINFOR
-{
-    struct ADCADJUST adc;
-    uint8_t adcadjust_infor[16];
-};
-//系统信息结构
-struct SYSPEIZHI
-{
 
-    
-    
-    uint32_t    startalarm_chanel;    //启动报警通道
-    uint8_t     downlatestdata;       //下载最新数据使能位
-    uint32_t    startsample_chanel;   //启动总的采样通道 
-};
 
-extern union  SENSEPEIZHIINFOR  Sensor1;
-extern union  ADCADJUSTINFOR    adcjust1;
 extern union  ConfDataTable     Conf;
 
-extern struct BasicConfDataStr Basic;	/*!< 总共64个byte */
-extern struct JlyConfDataStr   Jly;		/*!< 总共64个byte */
-extern struct AlarmConfDataStr Alarm;	/*!< 总共32个byte */	
-extern struct SensorChanelConfDataStr Sensor[32];	/*!< 每一通道总共32个byte 32*32=1024*/	
-extern struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共64个byte 64*32=2048*/
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/

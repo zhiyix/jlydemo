@@ -33,21 +33,21 @@
 /*============================ MACROS ========================================*/
 //! @{
 //! \brief 
-// 设备地址
-#define        RX8025_ADDR_READ                0x65
-#define        RX8025_ADDR_WRITE               0x64
- // 寄存器地址
-#define        RX8025_ADDR_SECONDS             0x00
-#define        RX8025_ADDR_WEEK                0x30
-#define        RX8025_ADDR_DATES               0x40
-#define        RX8025_ADDR_MONTH               0x50
-#define        RX8025_ADDR_MINUTES             0x80
-#define        RX8025_ADDR_CONTROL1        	   0xE0
-#define        RX8025_ADDR_CONTROL2        	   0xF0
- // 设备操作模式
-#define        RX8025_WRITE_MODE               0xF0
-#define        RX8025_READ_MODE                0xF0 
-#define        RX8025_SIMP_READ_MODE           0x04
+/*设备地址*/
+#define RX8025_ReadAddr          	0x65
+#define RX8025_WriteAddr         	0x64
+/*寄存器地址*/
+#define RX8025_SecondsAddr       	0x00
+#define RX8025_MinutesAddr       	0x01
+#define RX8025_HoursAddr         	0x02
+#define RX8025_WeekdaysAddr      	0x03
+#define RX8025_DaysAddr      		0x04
+#define RX8025_MonthsAddr         	0x05
+#define RX8025_YearsAddr         	0x06
+#define RX8025_DigitalOffsetAddr	0x07
+/*控制寄存器*/
+#define RX8025_Control1Addr        	   0x0E
+#define RX8025_Control2Addr        	   0x0F
 
 //2009年1月1日0时0分0秒起到当前时间所经过的秒数
 #define xMINUTE          (uint32_t)(60                 )//1分的秒数
@@ -69,10 +69,10 @@
 /*============================ PROTOTYPES ====================================*/
 // MCU:
 /*============================ EXTERN FUNCTIONS ==============================*/
-void  set_time(void);
-void rtc_init(void);
+uint8_t RX8025_RTC_Init(void);
 void read_time(void);
 void rtc_deel(void);
+void set_time(void);
 unsigned long DateToSeconds(struct   RTCRX8025 *Rtc);
 void RtcBcdToD10(struct   RTCRX8025 *Rtc);
 void RtcD10ToBcd(struct   RTCRX8025 *Rtc);

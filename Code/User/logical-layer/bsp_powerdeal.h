@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @file              : 
+  * @file              : bsp_powerdeal.h
   * @author            : 
   * @version           : 
-  * @date              : 
+  * @date              : 2015-10-xx
   * @brief             : h file
   * @description       : Main program body
   ******************************************************************************
@@ -16,8 +16,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __BSPCLASS_H
-#define __BSPCLASS_H
+#ifndef __BSPPOWER_H
+#define __BSPPOWER_H
 
 //#ifdef __cplusplus
 // extern "C" {
@@ -27,36 +27,35 @@
 //! @name include
 //! @{
 #include "stm32l1xx.h"
-
 //! @}
 
 /*============================ MACROS ========================================*/
 //! @{
 //! \brief 
 
+#define Power_Deal_PORT 	GPIOF
+/*指示 有效输入电源 ACOK*/
+#define Power_Deal_ACtest 	GPIO_Pin_4
+/*指示充电完成 CHGOK*/
+#define Power_Deal_CHGtest 	GPIO_Pin_5
 //! @}
 
 /*============================ TYPES =========================================*/
 //!
 
-
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/
-// MCU:
+
 /*============================ EXTERN FUNCTIONS ==============================*/
-
-uint16_t ValueFtToU16(float FtTmp);
-uint16_t U16ToValue10(uint8_t high,uint8_t low);
-unsigned int  Char_to_Int(unsigned int high,unsigned int low);
-int hex_2_ascii(uint8_t *data, uint8_t *buffer, uint16_t len);
-
-uint32_t Change3BytesTimeToLong(uint8_t hour,uint8_t min,uint8_t sec);
-uint32_t GetRecIntervalTime(uint8_t day,uint8_t hour,uint8_t min,uint8_t sec);
+void VoltageTest(void);
+void FirstCheckExternPower(void);
+void OutpowerShan(void);
 //#ifdef __cplusplus
 //}
 //#endif
 
-#endif /* __BSPCLASS_H */
+#endif /* bsp_powerdeal.h */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

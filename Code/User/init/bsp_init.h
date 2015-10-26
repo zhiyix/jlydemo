@@ -5,7 +5,7 @@
 
 /** the macro definition to trigger the led on or off 
   * 1 - off
-  *0 - on
+  * 0 - on
   */
 #define ON  1
 #define OFF 0
@@ -36,7 +36,7 @@
 					GPIO_SetBits(GPIOD,GPIO_Pin_0);\
 					else		\
 					GPIO_ResetBits(GPIOD,GPIO_Pin_0)					
-/*!< 蜂鸣器开关 */
+// 蜂鸣器开关 
 #define BEEP(a)	if (a)	\
 					GPIO_SetBits(GPIOF,GPIO_Pin_15);\
 					else		\
@@ -57,13 +57,16 @@
 #define AlarmLed2_ON		digitalHi(GPIOF,GPIO_Pin_11)
 #define AlarmLed2_OFF		digitalLo(GPIOF,GPIO_Pin_11)
 
-/*!< 蜂鸣器 */
+/* 蜂鸣器 */
 #define BELL            BEEP(ON);Delay_ms(50);BEEP(OFF)
 #define BELL_longer     BEEP(ON);Delay_ms(500);BEEP(OFF)
 
-/*!< 读取延时启动时间 */
-#define ReadDelayStartTime 	Change3BytesTimeToLong(Conf.Jly.MixMoot_Hour ,Conf.Jly.MixMoot_Min,0)
-//
+/* 读取延时启动时间 */
+#define ReadDelayStartTime   Change3BytesTimeToLong(Conf.Jly.MixBoot_Hour ,Conf.Jly.MixBoot_Min,0)
+
+/*读取正常记录间隔时间*/
+#define ReadNormalRecIntervalTime  GetRecIntervalTime(Conf.Jly.NormalRec_Day,Conf.Jly.NormalRec_Hour,Conf.Jly.NormalRec_Min,Conf.Jly.NormalRec_Sec)
+
 
 void SysInit(void);
 void PeripheralInit(void);
