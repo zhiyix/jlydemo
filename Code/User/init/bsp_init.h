@@ -10,6 +10,10 @@
 #define ON  1
 #define OFF 0
 
+/*液晶背光控制电源端口*/
+#define LcdVccCtrl_PORT GPIOF	
+#define LcdVccCtrl_PIN  GPIO_Pin_2
+
 /* 带参宏，可以像内联函数一样使用 */
 #define LED1(a)	if (a)	\
 					GPIO_SetBits(GPIOF,GPIO_Pin_12);\
@@ -41,6 +45,11 @@
 					GPIO_SetBits(GPIOF,GPIO_Pin_15);\
 					else		\
 					GPIO_ResetBits(GPIOF,GPIO_Pin_15)
+//液晶背光控制开关
+#define LcdBackLight(a)	if (a)	\
+					GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN);\
+					else		\
+					GPIO_ResetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN)				
 					
 /* 直接操作寄存器的方法控制IO */
 #define	digitalHi(p,i)			{p->BSRRL=i;}			//设置为高电平		

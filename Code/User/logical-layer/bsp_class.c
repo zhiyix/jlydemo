@@ -156,7 +156,7 @@ uint32_t GetRecIntervalTime(uint8_t day,uint8_t hour,uint8_t min,uint8_t sec)
 		buf[2] = 0;
 		buf[3] = 0;
 		/*写秒、分、时、天到Fram中 ,10分钟*/
-		Fram_Write(buf,FRAM_NormalRec_SecAddr,4);
+		Fram_Write(buf,FRAM_JlyTimeConfAddr,4);
 	}
 	return save_time;
 }

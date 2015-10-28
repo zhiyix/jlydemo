@@ -49,6 +49,8 @@
 
 /*******************************************************************************
   * @brief  Description 电池电压检测数据处理
+						数据采集时打开AD采集
+						电池电压低于2.85V时，低电压
   * @param  无
   * @retval 无
   *****************************************************************************/
@@ -114,11 +116,12 @@ static void Voltage_ADC1config(void)
 			
         LCD_UpdateDisplayRequest();
 			
-        if(temp<=340)  
+        if(temp<=285)  /*电压低于2.85V，置低电压标志*/
             Flag.Low_Voltage = 1;
         else 
             Flag.Low_Voltage = 0;
     }
+	/*
     else
     {
         if(temp>=412)
@@ -138,24 +141,45 @@ static void Voltage_ADC1config(void)
             Flag.BatteryFull=0;
         }
     }
+	*/
 }
 /*******************************************************************************
-  * @brief  Description 电池电压检测
+  * @brief  Description 电池电压检测 
+						在外接电断掉之后开启电池电压检测
   * @param  无
   * @retval 无
   *****************************************************************************/
 void VoltageTest(void)
 {
     #ifdef VOLTAGE
-    PManage.BatVoltage_TestTime--;
-    if(PManage.BatVoltage_TestTime==0)
-    {
-        Voltage_ADC1config();
-        if(Flag.Low_Voltage==0)//=1 低电压标志
-            PManage.BatVoltage_TestTime=voltagetesttimenum;
-        else 
-            PManage.BatVoltage_TestTime=voltagetesttimenum1;
-    }
+	if(Flag.ExPwOn == 0)
+	{
+		PManage.BatVoltage_TestTime--;
+		if(PManage.BatVoltage_TestTime==0)
+		{
+			Voltage_ADC1config();
+			if(Flag.Low_Voltage==0)
+				PManage.BatVoltage_TestTime=voltagetesttimenum1;/*电池未低电压 10分钟检测一次*/
+			else 	//=1 低电压标志
+				PManage.BatVoltage_TestTime=voltagetesttimenum;	/*电池低电压 5分钟检测一次*/
+		}
+		if(Flag.Low_Voltage == 1)//低压标志
+		{
+			//电池0格闪烁
+			while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
+			
+			if(Flag.BatLowShan == 1)
+			{
+				Flag.BatLowShan = 0;
+				showBATT0;
+			}else{
+				Flag.BatLowShan = 1;
+				clearBATT;
+			}
+			
+			LCD_UpdateDisplayRequest();
+		}
+	}
     #endif
 }
 /*******************************************************************************
@@ -170,25 +194,26 @@ void FirstCheckExternPower(void)
 {
 	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)
     {
-        Flag.ExPwOn=1;	/*有外接电*/
+        Flag.ExPwOn = 1;	/*有外接电*/
     }
     else
     {
-        Flag.ExPwOn=0;
-        PManage.BatVoltage_TestTime=1;         
+        Flag.ExPwOn = 0;
+        PManage.BatVoltage_TestTime = 1;         
     }
 }
 /*******************************************************************************
   * @brief  Description 检测是否接外接电
-						接外接电：电池符号满格闪烁
-						不接外接电：显示电池符号，不闪烁
+						接外接电并接电池而电未充满：电池符号一格一格往前跳
+						接外接电并接电池而电已充满：电池符号闪烁
+						不接外接电接电池：显示电池实际电量，电池符号不闪烁						
   * @param  无
   * @retval 无
   *****************************************************************************/
 void OutpowerShan(void)
 {
     // --------------------------------------------------
-    if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)
+    if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)/*有外接电*/
     {
         if(Flag.Powerdowncountflag==1)
         {
@@ -199,24 +224,29 @@ void OutpowerShan(void)
                 Flag.Powerdowncountflag=0;
                 
                 PManage.HaveExternalPower=0;
+				Flag.ExPwFirstDown = 0;
             }
         }
     }
     else
     {
         Flag.ExPwOn=0;
-		PManage.BatVoltage_TestTime=1;/*没有外接电立即开启电池电压检测*/
+		if(Flag.ExPwFirstDown == 0)
+		{
+			PManage.BatVoltage_TestTime=1;/*没有外接电立即开启电池电压检测*/
+			Flag.ExPwFirstDown = 1;
+		}
         PManage.HaveExternalPower=0;
         Flag.Powerdowncountflag=0;
     }
     // ----------------------------------------------------
     if(Flag.ExPwOn==1)
     {
-        if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)
+        if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)/*有外接电*/
         {
             Flag.ExPwOn=1;
 			while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
-            if(Flag.BatteryFull==1)
+            if(Flag.BatChargeFull == 1)/*电池充满电*/
             {
                 if(Flag.ExPwShan==1)
                 {
@@ -231,19 +261,22 @@ void OutpowerShan(void)
             }
             else
             {
-                PManage.JinDuCounts++;
-                if(PManage.JinDuCounts==1)
-                {clearBATT;showBATT0;}
-                else if(PManage.JinDuCounts==2)
-                {clearBATT;showBATT1;}
-                else if(PManage.JinDuCounts==3)
-                {clearBATT;showBATT2;}
-                else if(PManage.JinDuCounts>=4)
-                {
-					clearBATT;
-                    showBATT;
-                    PManage.JinDuCounts=0;
-                }
+				if(Flag.BatCharging == 1)
+				{
+					PManage.JinDuCounts++;
+					if(PManage.JinDuCounts==1)
+					{showBATT0;}
+					else if(PManage.JinDuCounts==2)
+					{showBATT1;}
+					else if(PManage.JinDuCounts==3)
+					{showBATT2;}
+					else if(PManage.JinDuCounts>=4)
+					{
+						clearBATT;
+						showBATT;
+						PManage.JinDuCounts=0;
+					}
+				}
             }
             LCD_UpdateDisplayRequest(); 
         }

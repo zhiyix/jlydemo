@@ -135,10 +135,31 @@ void read_time(void)
     Rtc.Second &= 0x7f;
     Rtc.Minute &= 0x7f;
     Rtc.Hour   &= 0x3f;
-    Rtc.Day    &= 0x3f;
     Rtc.Week   &= 0x07;
+    Rtc.Day    &= 0x3f;
     Rtc.Month  &= 0x9f;
     Rtc.Year   &= 0x7f;
+}
+/******************************************************************************
+  * @brief  Description 通过配置(协议)读取RX8025时间
+  * @param  无
+  * @retval 无		
+  *****************************************************************************/
+void serialread_time(void)
+{
+	uint8_t readbuf[7];
+	
+	read_time();
+	
+	readbuf[0] = Rtc.Second;
+    readbuf[1] = Rtc.Minute; 
+    readbuf[2] = Rtc.Hour;
+	readbuf[3] = Rtc.Week; 
+    readbuf[4] = Rtc.Day;
+    readbuf[5] = Rtc.Month; 
+    readbuf[6] = Rtc.Year;  
+	/*写最新时间到Fram中，这里没有修改cen的数据*/
+	Fram_Write(readbuf,FRAM_JlyTimeConfAddr,7);
 }
 /******************************************************************************
   * @brief  Description 设置RX8025时间
@@ -149,13 +170,13 @@ void set_time(void)
 {
 	uint8_t setbuf[7];
 	
-	setbuf[0] = Conf.Jly.Time_Sec;	 /*秒*/
-	setbuf[1] = Conf.Jly.Time_Min;	 /*分*/
-	setbuf[2] = Conf.Jly.Time_Hour;	 /*时*/
-	setbuf[3] = Conf.Jly.Time_Week;	 /*星期*/
-	setbuf[4] = Conf.Jly.Time_Day;	 /*日*/
-	setbuf[5] = Conf.Jly.Time_Month; /*月*/
-	setbuf[6] = Conf.Jly.Time_Year;	 /*年*/
+	setbuf[0] = Conf.Time.Time_Sec;	  /*秒*/
+	setbuf[1] = Conf.Time.Time_Min;	  /*分*/
+	setbuf[2] = Conf.Time.Time_Hour;  /*时*/
+	setbuf[3] = Conf.Time.Time_Week;  /*星期*/
+	setbuf[4] = Conf.Time.Time_Day;	  /*日*/
+	setbuf[5] = Conf.Time.Time_Month; /*月*/
+	setbuf[6] = Conf.Time.Time_Year;  /*年*/
 	RTC8025_Write(setbuf,RX8025_SecondsAddr,7);	/*写入RX8025*/ 
 }
 /******************************************************************************

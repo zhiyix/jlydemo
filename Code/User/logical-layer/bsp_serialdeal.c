@@ -66,30 +66,28 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 //		Fram_Read(Buf,ConfMap_Address[0][1] + offset * 2,size);
 		/*更新配置表数据 */
 		Fram_Read(Conf.Buf,ConfMap_Address[0][1] + offset * 2,size);
-	} else if (usAddress < VirtAlarmConfAddr)
+	} else if (usAddress < VirJlyTimeConfAddr)
 	{
-//		if(usAddress == VirJlyConf_TimeSecAddr)//设置仪器时间
-//		{
-//			
-//		}
-//		else if()
-//		{
-//			
-//		}
-//		else
-//		{}
 		/* 记录仪配置数据地址表 */
 		offset = usAddress - VirtJlyConfAddr;
 		Fram_Write(pucBuffer, ConfMap_Address[1][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_JlyConfAddr],ConfMap_Address[1][1] + offset * 2,size);
+		
+	}else if (usAddress < VirtAlarmConfAddr)
+	{
+		/*记录仪实时时间地址表*/
+		offset = usAddress - VirJlyTimeConfAddr;
+		Fram_Write(pucBuffer, ConfMap_Address[2][1] + offset * 2, size);
+		Fram_Read(&Conf.Buf[FRAM_JlyTimeConfAddr],ConfMap_Address[2][1] + offset * 2,size);
 		set_time();	/*设置仪器时间*/
-		displayTIME(Conf.Jly.Time_Hour,Conf.Jly.Time_Min);
-	} else if (usAddress < VirtSensorChanelConfAddr)
+		displayTIME(Conf.Time.Time_Hour,Conf.Time.Time_Min);
+	}
+	else if (usAddress < VirtSensorChanelConfAddr)
 	{
 		/* 报警配置数据地址表 */ 
 		offset = usAddress - VirtAlarmConfAddr;
-		Fram_Write(pucBuffer, ConfMap_Address[2][1] + offset * 2, size);
-		Fram_Read(&Conf.Buf[FRAM_AlarmConfAddr],ConfMap_Address[2][1] + offset * 2,size);
+		Fram_Write(pucBuffer, ConfMap_Address[3][1] + offset * 2, size);
+		Fram_Read(&Conf.Buf[FRAM_AlarmConfAddr],ConfMap_Address[3][1] + offset * 2,size);
 		
 	} else if (usAddress < VirtTempHumiAdjustConfAddr)
 	{
@@ -97,16 +95,16 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		// 通道0配置
 		offsetnum = (usAddress - VirtSensorChanelConfAddr) / VirtOffset;	/* 偏移多少个虚拟地址 */
 		offset = offsetnum * FRAM_SensorChanelOffset;						/* Fram中的偏移量 */
-		Fram_Write(pucBuffer, ConfMap_Address[3][1] + offset * 2, size);
-		Fram_Read(&Conf.Buf[FRAM_SensorChanelConfAddr + offset * 2],ConfMap_Address[3][1] + offset * 2,size);
+		Fram_Write(pucBuffer, ConfMap_Address[4][1] + offset * 2, size);
+		Fram_Read(&Conf.Buf[FRAM_SensorChanelConfAddr + offset * 2],ConfMap_Address[4][1] + offset * 2,size);
 		
 	} else if (usAddress < VirtMax)
 	{
 		/* 温湿度传感器校准配置数据地址表 */
 		offsetnum = (usAddress - VirtTempHumiAdjustConfAddr) / VirtOffset;
 		offset = offsetnum * FRAM_TempHumiAdjustOffset;
-		Fram_Write(pucBuffer, ConfMap_Address[4][1] + offset * 2, size);
-		Fram_Read(&Conf.Buf[FRAM_TempHumiAdjustConfAddr + offset * 2],ConfMap_Address[4][1] + offset * 2,size);
+		Fram_Write(pucBuffer, ConfMap_Address[5][1] + offset * 2, size);
+		Fram_Read(&Conf.Buf[FRAM_TempHumiAdjustConfAddr + offset * 2],ConfMap_Address[5][1] + offset * 2,size);
 	}
 	return true;
 }
@@ -118,7 +116,7 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
 	uint8_t  offsetnum=0;	//偏移几个虚拟地址
-	uint8_t	 frambuf[128];
+	//uint8_t	 frambuf[128];
 	uint16_t size = usNRegs * 2;
 	uint16_t offset = 0;
 	
@@ -128,19 +126,26 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = usAddress - VirtBasicConfAddr;
 		Fram_Read(pucBuffer,ConfMap_Address[0][1] + offset * 2,size);
 //		Fram_Read(Buf,ConfMap_Address[0][1] + offset * 2,size);
-	} else if (usAddress < VirtAlarmConfAddr)
+	} else if (usAddress < VirJlyTimeConfAddr)
 	{
 		
 		/* 记录仪配置数据地址表 */
 		offset = usAddress - VirtJlyConfAddr;
 		Fram_Read(pucBuffer, ConfMap_Address[1][1] + offset * 2, size);
 		
-	} else if (usAddress < VirtSensorChanelConfAddr)
+	} else if (usAddress < VirtAlarmConfAddr)
+	{
+		/*记录仪实时时间地址表*/
+		offset = usAddress - VirJlyTimeConfAddr;
+		serialread_time();
+		Fram_Read(pucBuffer, ConfMap_Address[2][1] + offset * 2, size);
+	}
+	else if (usAddress < VirtSensorChanelConfAddr)
 	{
 		/* 报警配置数据地址表 */ 
 		offset = usAddress - VirtAlarmConfAddr;
-		Fram_Read(pucBuffer, ConfMap_Address[2][1] + offset * 2, size);
-		//Fram_Read(frambuf, ConfMap_Address[2][1] + offset * 2, size);
+		Fram_Read(pucBuffer, ConfMap_Address[3][1] + offset * 2, size);
+		//Fram_Read(frambuf, ConfMap_Address[3][1] + offset * 2, size);
 		
 	} else if (usAddress < VirtTempHumiAdjustConfAddr)
 	{
@@ -148,14 +153,14 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		// 通道0配置
 		offsetnum = (usAddress - VirtSensorChanelConfAddr) / VirtOffset;	/* 偏移多少个虚拟地址 */
 		offset = offsetnum * FRAM_SensorChanelOffset;						/* Fram中的偏移量 */
-		Fram_Read(pucBuffer, ConfMap_Address[3][1] + offset * 2, size);
+		Fram_Read(pucBuffer, ConfMap_Address[4][1] + offset * 2, size);
 		
 	} else if (usAddress < VirtMax)
 	{
 		/* 温湿度传感器校准配置数据地址表 */
 		offsetnum = (usAddress - VirtTempHumiAdjustConfAddr) / VirtOffset;
 		offset = offsetnum * FRAM_TempHumiAdjustOffset;
-		Fram_Read(pucBuffer, ConfMap_Address[4][1] + offset * 2, size);
+		Fram_Read(pucBuffer, ConfMap_Address[5][1] + offset * 2, size);
 	}
 	return true;
 }

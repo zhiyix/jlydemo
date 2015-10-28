@@ -244,7 +244,7 @@ void SaveHisDataToFlash(void)
 void SaveHisDataToFram(void)
 {
 	uint8_t Recorderpoint_L,Recorderpoint_H;
-    uint8_t TempBuf[512];
+    //uint8_t TempBuf[512];
     uint16_t eeOffset;
 
 	AI2C_Read(&Recorderpoint_L,FRAM_RecAddr_Lchar,1);

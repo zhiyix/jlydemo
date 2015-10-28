@@ -54,6 +54,7 @@
 
 #include "bsp_i2c_fram.h"
 #include "bsp_datadeal.h"
+#include "bsp_bootstop.h"
 #include "bsp_alarmdeal.h"
 #include "bsp_powerdeal.h"
 #include "bsp_sensordeal.h"

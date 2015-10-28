@@ -49,12 +49,12 @@ static void Lcd_Dis13Value(uint8_t value);
 static void Lcd_Dis14Value(uint8_t value);
 static void Lcd_Dis15Value(uint8_t value);
 
-/**
+/*******************************************************************************
   * @brief  Configures the LCD Segments and Coms GPIOs.
   * @caller 
   * @param None
   * @retval None
-  */
+  ******************************************************************************/
 static void LCD_GPIOConfig(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -138,11 +138,11 @@ static void LCD_GPIOConfig(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 }
-/**
+/*******************************************************************************
   * @brief  Configures the different system clocks.
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void RCC_Config(void)
 {  
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
@@ -173,11 +173,11 @@ void RCC_Config(void)
 	RTC_WaitForSynchro();
 }
 
-/**
+/*******************************************************************************
   * @brief  Configures the lcd.
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void LCD_GLASS_Init(void)
 {
 	LCD_InitTypeDef LCD_InitStructure;
@@ -220,11 +220,11 @@ void LCD_GLASS_Init(void)
 	{
 	}    
 }
-/**
+/*******************************************************************************
   * @brief  This function Clear the whole LCD RAM.
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void LCD_GLASS_Clear(void)
 {
   uint8_t counter = 0;
@@ -242,11 +242,11 @@ void LCD_GLASS_Clear(void)
   
 }
 
-/**
+/*******************************************************************************
   * @brief  This function writes a char in the LCD RAM.
   * @param  ptr: Pointer to string to display on the LCD Glass.
   * @retval None
-  */
+  ******************************************************************************/
 void LCD_GLASS_DisplayChar(uint8_t ch,uint8_t position)
 {
   /*!< Wait Until the last LCD RAM update finish */
@@ -382,11 +382,11 @@ static void Convert(uint8_t c)
 	digit = ch << 24;
 }
 
-/**
+/*******************************************************************************
   * @brief  液晶1显示数字,加入通道显示
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis1Value(uint8_t value)
 {
 	/*!< Wait Until the last LCD RAM update finish */
@@ -394,22 +394,38 @@ static void Lcd_Dis1Value(uint8_t value)
 	switch(value)
 	{
 		case 0x00:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT1+D_BIT3;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_BIT2+D_BIT3;
 			break;
 		case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT1+D_BIT3;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_ZERO;
 			break;
 		case 0x02:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT1+D_BIT2;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT2;LCD->RAM[6] |= D_BIT2+D_BIT3;
 			break;
 		case 0x03:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT1+D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT3;
 			break;
 		case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT1+D_BIT2+D_BIT3;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_ZERO;
 			break;
+		case 0x05:
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT3;
+			break;
+		case 0x06:
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			break;
+		case 0x07:
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_ZERO;
+			break;
+		case 0x08:
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			break;
+		case 0x09:
+			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT3;
+			break;
+		
 		case 0xFF:
-			LCD->RAM[0] &= ~D_BIT3;LCD->RAM[2] &= ~(D_BIT2+D_BIT3);LCD->RAM[4] &= ~(D_BIT1+D_BIT2+D_BIT3);LCD->RAM[6] &= ~(D_BIT2+D_BIT3);
+			LCD->RAM[0] &= ~D_BIT3;LCD->RAM[2] &= ~(D_BIT2+D_BIT3);LCD->RAM[4] &= ~(D_BIT2+D_BIT3);LCD->RAM[6] &= ~(D_BIT2+D_BIT3);
 			break;
 		default:
 			break;
@@ -417,11 +433,11 @@ static void Lcd_Dis1Value(uint8_t value)
 	/*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶2显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis2Value(uint8_t value)
 {
 	/*!< Wait Until the last LCD RAM update finish */
@@ -467,11 +483,11 @@ static void Lcd_Dis2Value(uint8_t value)
 	/*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶3显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis3Value(uint8_t value)
 {
 	/*!< Wait Until the last LCD RAM update finish */
@@ -527,11 +543,11 @@ static void Lcd_Dis3Value(uint8_t value)
 //	LCD_UpdateDisplayRequest();  
 }
 
-/**
+/*******************************************************************************
   * @brief  液晶4显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis4Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -584,11 +600,11 @@ static void Lcd_Dis4Value(uint8_t value)
 //	LCD_UpdateDisplayRequest();  
 }
 
-/**
+/*******************************************************************************
   * @brief  液晶5显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis5Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -638,11 +654,11 @@ static void Lcd_Dis5Value(uint8_t value)
 //	LCD_UpdateDisplayRequest();  
 }
 
-/**
+/*******************************************************************************
   * @brief  液晶6显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis6Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -689,11 +705,11 @@ static void Lcd_Dis6Value(uint8_t value)
 //	LCD_UpdateDisplayRequest();  
 }
 
-/**
+/*******************************************************************************
   * @brief  液晶7显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis7Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -739,11 +755,11 @@ static void Lcd_Dis7Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶8显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis8Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -789,11 +805,11 @@ static void Lcd_Dis8Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶9显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis9Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -839,11 +855,11 @@ static void Lcd_Dis9Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶10显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis10Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -890,11 +906,11 @@ static void Lcd_Dis10Value(uint8_t value)
 //	LCD_UpdateDisplayRequest();  
 }
 
-/**
+/*******************************************************************************
   * @brief  液晶11显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis11Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -940,11 +956,11 @@ static void Lcd_Dis11Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶12显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis12Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -990,11 +1006,11 @@ static void Lcd_Dis12Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶13显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis13Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -1040,11 +1056,11 @@ static void Lcd_Dis13Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  液晶14显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis14Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -1091,11 +1107,11 @@ static void Lcd_Dis14Value(uint8_t value)
 //	LCD_UpdateDisplayRequest();  
 }
 
-/**
+/*******************************************************************************
   * @brief  液晶15显示数字
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_Dis15Value(uint8_t value)
 {
     /*!< Wait Until the last LCD RAM update finish */
@@ -1141,11 +1157,11 @@ static void Lcd_Dis15Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  Description 显示传感器故障
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void displayErr(uint8_t Err)
 {
 	/*!< Wait Until the last LCD RAM update finish */
@@ -1173,11 +1189,11 @@ void displayErr(uint8_t Err)
 	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  Description 
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void lcd_OFF(uint8_t offcode)
 {
 	/*!< Wait Until the last LCD RAM update finish */
@@ -1222,12 +1238,12 @@ void lcd_OFF(uint8_t offcode)
 	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  Description 显示指定通道数据
   * @param  temp 		通道
   * @param  humi		温湿度数据
   * @retval None
-  */
+  ******************************************************************************/
 static void Lcd_ChannelValue(uint8_t temp,float humi)
 {
     uint16_t value;
@@ -1240,6 +1256,7 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
 	
     Lcd_Dis1Value(0XFF);
+	showtongdao;
     Lcd_Dis1Value(chanel);	//显示通道号
     Lcd_Dis2Value(0XFF);
     Lcd_Dis3Value(0XFF);
@@ -1308,11 +1325,11 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
 	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  Description 显示年
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void displayYEAR(unsigned char year)
 {
 	Lcd_Dis12Value(0xff);
@@ -1333,11 +1350,11 @@ void displayYEAR(unsigned char year)
         Lcd_Dis15Value(year%16);
     }
 }
-/**
+/*******************************************************************************
   * @brief  Description 显示日期
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void displayDAY(uint8_t month,uint8_t day)
 {
 	Lcd_Dis12Value(0xff);
@@ -1367,11 +1384,11 @@ void displayDAY(uint8_t month,uint8_t day)
         Lcd_Dis14Value(0);//0
     }
 }
-/**
+/*******************************************************************************
   * @brief  Description 显示时间
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void displayTIME(uint8_t hour,uint8_t min)
 {
 	Lcd_Dis12Value(0xff);
@@ -1401,11 +1418,11 @@ void displayTIME(uint8_t hour,uint8_t min)
         Lcd_Dis14Value(0);//0
     }
 }
-/**
+/*******************************************************************************
   * @brief  Description  显示信号强度
   * @param  signal_value 信号值
   * @retval None
-  */
+  ******************************************************************************/
 void Display_Signal(uint8_t signal_value)
 {
 	/*!< Wait Until the last LCD RAM update finish */
@@ -1424,11 +1441,11 @@ void Display_Signal(uint8_t signal_value)
 	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();		
 }
-/**
+/*******************************************************************************
   * @brief  显示存储容量
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void Display_Mem(void) 
 {
 	/*!< Wait Until the last LCD RAM update finish */
@@ -1453,11 +1470,11 @@ void Display_Mem(void)
     /*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  显示仪器SN号
   * @param  None
   * @retval None
-  */
+  ******************************************************************************/
 void Display_SN(void)
 {
 //    unsigned char year,month;
@@ -1503,11 +1520,11 @@ void Display_SN(void)
     /*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
 }
-/**
+/*******************************************************************************
   * @brief  Description 		显示通道数据
   * @param  started_channel0 	通道
   * @retval None
-  */
+  ******************************************************************************/
 void Display_ChannelValue(uint8_t started_channel0)
 {
     uint8_t channel_cp;

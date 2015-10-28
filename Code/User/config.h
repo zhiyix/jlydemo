@@ -32,6 +32,7 @@
 
 /*============================ MACROS ========================================*/
 //! @{
+
 //! \brief 测试定义
 #define C_VER_YEAR      15
 #define C_VER_MONTH     10
@@ -50,12 +51,15 @@
 //! \brief 外接电池宏定义   
 #define  VOLTAGE 
 #define  vtest_cnt           7
-#define  voltagetesttimenum  180        
-#define  voltagetesttimenum1 240 //60 测试时修改为10
+#define  voltagetesttimenum   30//300 5分钟检测一次        
+#define  voltagetesttimenum1  60//600 10分钟检测一次
 
 #define  ExternalPowerchecktime 60 //外接电源检测时间
 //! \brief LCD显示的时间
 #define  channeldisplaytime  2       //display_ct%channeldisplaytime 
+
+//温湿度 梯度
+#define  TempHumi_Offset	 10
 //! \brief AD最小、最大值
 #define  ADC_ERR_L           10
 #define  ADC_ERR_H           4090
@@ -73,17 +77,19 @@
 //! \brief 协议中对应的虚拟地址
 #define VirtBasicConfAddr			0x0000
 #define VirtJlyConfAddr				0x0100
+#define VirJlyTimeConfAddr			0x01E0
 #define VirtAlarmConfAddr			0x0200
 #define VirtSensorChanelConfAddr	0x1000
 #define VirtTempHumiAdjustConfAddr	0x2000
 #define VirtMax						0x4000
 
 #define VirtOffset					0x0080	/* 传感器通道和校准，每一通道之间的虚拟偏移量 */
-#define VirJlyConf_TimeSecAddr		VirtJlyConfAddr+34	/*记录仪配置表中仪器实时时钟首地址*/
+
 //! \brief 配置信息表在Fram中的地址
-#define FRAM_BasicConfAddr           0x0000	/* 起始地址0x0000，结束地址(0x0040-1) 大小 64byte */
-#define FRAM_JlyConfAddr             0x0040	/* 起始地址0x0040，结束地址(0x0080-1) 大小 64byte */
-#define FRAM_AlarmConfAddr           0x0080	/* 起始地址0x0080，结束地址(0x00A0-1) 大小 32byte */
+#define FRAM_BasicConfAddr           0x0000	/* 起始地址0x0000，结束地址(0x0040-1) 大小   64byte */
+#define FRAM_JlyConfAddr             0x0040	/* 起始地址0x0040，结束地址(0x0078-1) 大小   56byte */
+#define FRAM_JlyTimeConfAddr		 0x0078	/* 起始地址0x0078，结束地址(0x0080-1) 大小    8byte */
+#define FRAM_AlarmConfAddr           0x0080	/* 起始地址0x0080，结束地址(0x00A0-1) 大小   32byte */
 #define FRAM_SensorChanelConfAddr    0x00A0	/* 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte */
 #define FRAM_TempHumiAdjustConfAddr  0x04A0 /* 起始地址0x04A0，结束地址(0x0CA0-1) 大小 2048byte */
 
@@ -92,8 +98,9 @@
 #define FRAM_TempHumiAdjustOffset    0x0020	/* 传感器校准，64byte/2 offset*2,每一通道之间的物理(Fram)偏移量 */
 
 //! \brief 配置信息表中成员  在Fram中的地址 
-#define FRAM_NormalRec_SecAddr		 FRAM_JlyConfAddr+18	//正常记录间隔秒地址
-#define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+42	//工作状态地址
+#define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+34	//工作状态地址
+
+
 //! \brief FRAM中存放fram记录指针地址
 #define FRAM_RecAddr_Hchar          0x0CA0      
 #define FRAM_RecAddr_Lchar          0x0CA1
@@ -115,6 +122,7 @@
 #define FLASH_RecFirstAddr           0x000000   //Flash中存放数据的首地址
 #define FLASH_SectorFirstAddr		 0x000000
 #define FLASH_SectorPerSize          4096		//Flash每个扇区的大小
+
 //! @}
 
 /*============================ TYPES =========================================*/
@@ -136,19 +144,19 @@ struct RTCRX8025
 {
 //    #define RTC_MK_SEC          5 
 //    #define RTC_MK_MIN          11
-    uint32_t TMPS; //--
-    uint32_t TCPS; //--
+    uint32_t TMPS; 	  //--
+    uint32_t TCPS; 	 //--
     //u32 SMSS;
     //u32 SS;
     //u32 SB;
     uint8_t SCount;  //--
-    uint8_t Second;//--
-    uint8_t Minute;//--
-    uint8_t Hour;  //--
-    uint8_t Day;   //
-    uint8_t Week;  //--
-    uint8_t Month; //--
-    uint8_t Year;  //--
+    uint8_t Second;	 //--
+    uint8_t Minute;	 //--
+    uint8_t Hour;  	 //--
+    uint8_t Day;   	 //
+    uint8_t Week;  	 //--
+    uint8_t Month; 	 //--
+    uint8_t Year;  	 //--
 };
 //! \brief 全局标志
 struct FLAG
@@ -161,26 +169,33 @@ struct FLAG
 	
 		 uint8_t Powerdowncountflag:1;	//接入外接电标志
          uint8_t Low_Voltage:1;     	//电池低电压标志
+		 uint8_t BatLowShan:1;     	    //电池低电压闪烁
+	
          uint8_t BatteryFull:1;     	//电池满电标志
 	     uint8_t BatChargeFull:1;       //电池充满电标志
+		 uint8_t BatCharging:1;			//电池正在充电中标志，1正在充电 0未充电
          uint8_t ExPwOn:1;				//外接电源标志
 		 uint8_t ExPwShan:1; 			//电池符号闪烁标志
+	     uint8_t ExPwFirstDown:1;		//外接电首次断掉
 	
          uint8_t IsDisplayRightNow:1;   //LCD显示
          uint8_t StartSample:1;         //开始采样
          uint8_t EndSample:1;           //结束采样
          uint8_t MucReset:1;            //上电复位？？
          uint8_t RtcShan:1;             //rtc
+	
+		 uint8_t RecTimeDingShiBoot:1;	//记录仪时间点定时启动
+		 uint8_t RecTimeDingDianBoot:1; //记录仪时间点定点启动
+		 uint8_t RecTimeDingDianStop:1; //记录仪时间点定点停止
 };
 //! \brief 电源管理
 struct PowerManagement
 {
-    __IO uint8_t  BatVoltage_TestTime;     //多长时间检测,电池电压检测时间间隔
-    
 		 uint8_t  BatChargeFullCount;	   //电池充满电检测计数
 	     uint8_t  HaveExternalPower;	   //接入外接电检测计数
 	     uint8_t  JinDuCounts;			   //表示电池一格一格往前
 	
+	__IO uint16_t  BatVoltage_TestTime;     //多长时间检测,电池电压检测时间间隔	
 	__IO uint16_t BatADC_ConvertedValue;   //存放电池AD值
 	
     float         BatDataFloat;            //实际的电量
@@ -221,7 +236,7 @@ extern struct       JLYPARAMETER    JlyParam;
 
 extern const char RESET_CHANNEL_SETUP_TABLE[104];
 extern const unsigned char *AdjustCurveFirAddress[];
-extern const uint32_t ConfMap_Address[5][2];
+extern const uint32_t ConfMap_Address[6][2];
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/

@@ -643,6 +643,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\logical-layer\bsp_serialdeal.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_bootstop.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_bootstop.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

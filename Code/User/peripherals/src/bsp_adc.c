@@ -16,17 +16,13 @@
 #include "main.h"
 
 #define ADC1_DR_Address    ((uint32_t)0x40012400+0x58)
-/**
-  * @brief  配置外接电池 ADC1检测 GPIO
-  * @param  无
-  * @retval 无
-  */
 
-/**
+
+/*******************************************************************************
   * @brief  使能ADC1和DMA1的时钟，初始化PC.0
   * @param  无
   * @retval 无
-  */
+  ******************************************************************************/
 static void ADC1_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -52,11 +48,11 @@ static void ADC1_GPIO_Config(void)
 	GPIO_Init(GPIOF, &GPIO_InitStructure);
 }
 
-/**
+/*******************************************************************************
   * @brief  配置ADC1的工作模式为MDA模式
   * @param  无
   * @retval 无
-  */
+  ******************************************************************************/
 static void ADC1_Mode_Config(void)
 {
 	DMA_InitTypeDef DMA_InitStructure;
@@ -126,11 +122,11 @@ static void ADC1_Mode_Config(void)
 	
 }
 
-/**
+/*******************************************************************************
   * @brief  ADC1初始化
   * @param  无
   * @retval 无
-  */
+  ******************************************************************************/
 void ADC1_Init(void)
 {
 	/* Enable the HSI oscillator */
@@ -142,11 +138,11 @@ void ADC1_Init(void)
 	ADC1_Mode_Config();
    
 }
-/**
+/*******************************************************************************
   * @brief  Description 数据采样,滤数据
   * @param  无
   * @retval 无
-  */
+  ******************************************************************************/
 void  Dealing_Gather(unsigned char all_channel_code)
 {
     unsigned char channel_cp;
@@ -154,7 +150,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
 //    unsigned int  add_adc;
     if(!all_channel_code)
     {
-        for(m=0;m<32;m++)adc[m] = 0;
+        for(m=0;m<Conf.Jly.ChannelNum;m++)adc[m] = 0;
         return;
     }
     else
@@ -166,7 +162,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
         for(i=0;i<GatherMaxCt;i++)//GatherMaxCt=15
         {
             channel_cp = all_channel_code;
-            for(m = 0;m < 32;m++)//
+            for(m = 0;m < Conf.Jly.ChannelNum;m++)//
             {
                 if(channel_cp & 0x01)
                 {
@@ -183,7 +179,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
             }
         }
         
-        for(m = 0;m < 32;m++)//GatherMaxCt
+        for(m = 0;m < Conf.Jly.ChannelNum;m++)//GatherMaxCt
         {
             adc[m] = adcCopy[m]/GatherMaxCt;
             adcCopy[m] = 0;

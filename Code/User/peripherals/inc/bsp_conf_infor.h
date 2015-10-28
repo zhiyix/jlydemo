@@ -75,7 +75,7 @@ struct BasicConfDataStr
 	uint8_t Reserv[44];		/*!< Reserv */
 };
 //! \brief记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
-/*!< 总共64个byte */
+/*!< 总共56个byte */
 struct JlyConfDataStr
 {
 	uint8_t RecBootMode;   /*!< 启动方式说明
@@ -126,6 +126,24 @@ struct JlyConfDataStr
 	uint16_t SampleInterval;
 	uint16_t :16;			/*!< Reserv */
 	uint16_t :16;			/*!< 34个byte */
+	 
+	uint8_t WorkStatueIsStop;  /*!< 记录仪工作状态
+									0x00：停止记录 
+									0x01：正在记录 */
+	uint8_t PowerMode;         /*!< 记录仪功耗模式 
+									0x00：正常模式 
+									0x01：低功耗模式(省电模式) */
+    /*!< 36个byte */								
+	uint32_t StorageCapacity;  /*!< flash存储容量 */										 
+	uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
+	
+	uint8_t	 ChannelNum;	   /*!< 通道数 */
+	uint8_t	 Reserv[11];
+};
+//! \brief仪器时钟实时时间地址表 3 (Display="Hex" ,ADDRESS_OFFSET=0x01E0):
+/*!< 总共 8个byte */
+struct JlyTimeConfDataStr
+{
 	/*!< 仪器时钟的实时时间 */
 	uint8_t Time_Sec;
 	uint8_t Time_Min;
@@ -135,21 +153,8 @@ struct JlyConfDataStr
 	uint8_t Time_Month;
 	uint8_t Time_Year;
 	uint8_t Time_Cen;
-	 
-	uint8_t WorkStatueIsStop;  /*!< 记录仪工作状态
-									0x00：停止记录 
-									0x01：正在记录 */
-	uint8_t PowerMode;         /*!< 记录仪功耗模式 
-									0x00：正常模式 
-									0x01：低功耗模式(省电模式) */
-    /*!< 44个byte */								
-	uint32_t StorageCapacity;  /*!< flash存储容量 */										 
-	uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
-	
-	uint8_t	 ChannelNum;	   /*!< 通道数 */
-	uint8_t	 Reserv[11];
 };
-//! \brief报警配置数据地址表 3 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
+//! \brief报警配置数据地址表 4 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
 /*!< 总共32个byte */	
 struct AlarmConfDataStr
 {
@@ -178,7 +183,7 @@ struct AlarmConfDataStr
 	
 	uint8_t	 Reserv[20];	/*!< Reserv */	
 };
-//! \brief传感器通道配置数据地址表 4 (Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+//! \brief传感器通道配置数据地址表 5 (Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
 /*!< 总共32个byte */	
 struct SensorChanelConfDataStr
 {
@@ -205,7 +210,7 @@ struct SensorChanelConfDataStr
     union FISI2CH4 SensorAlarm_Low;   /*!< 报警下限 [IEEE-754_1二进制浮点操作数]0x0000 0000*/
 	uint8_t Reserv[12];	/*!< Reserv */
 };
-//! \brief温湿度传感器校准配置数据地址表 5 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+//! \brief温湿度传感器校准配置数据地址表 6 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
 
 /*!< 总共64个byte */
 struct TempHumiAdjustConfDataStr
@@ -248,14 +253,16 @@ struct CircularQueue
 //! \brief 配置表
 /*!< 基本配置数据地址表   1 (Display="Hex",ADDRESS_OFFSET=0x0000):
 	 记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
-	 报警配置数据地址表   3 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
-	 传感器通道配置数据地址表       4 (Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
-	 温湿度传感器校准配置数据地址表 5 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):  
+	 仪器时钟实时时间地址表 3 (Display="Hex" ,ADDRESS_OFFSET=0x01E0):
+	 报警配置数据地址表   4 (Display="Hex" ,ADDRESS_OFFSET=0x0200):
+	 传感器通道配置数据地址表       5 (Display="Hex",ADDRESS_OFFSET=0x1000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
+	 温湿度传感器校准配置数据地址表 6 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):  
 	 表 1 在Fram中 起始地址0x0000，结束地址(0x0040-1) 大小 64byte
-     表 2 在Fram中 起始地址0x0040，结束地址(0x0080-1) 大小 64byte
-     表 3 在Fram中 起始地址0x0080，结束地址(0x00A0-1) 大小 32byte
-	 表 4 在Fram中 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte,AADDRESS_OFFSET=0x00A0 + Sensor_Channel * 0x20,其中Sensor_Channel取值为0~31):
-	 表 5 在Fram中 起始地址0x04A0，结束地址(0x0CA0-1) 大小 2048byte,AADDRESS_OFFSET=0x04A0 + Sensor_Channel * 0x40,其中Sensor_Channel取值为0~31):*/
+     表 2 在Fram中 起始地址0x0040，结束地址(0x0078-1) 大小 56byte
+	 表 3 在Fram中 起始地址0x0078，结束地址(0x0080-1) 大小 8 byte
+     表 4 在Fram中 起始地址0x0080，结束地址(0x00A0-1) 大小 32byte
+	 表 5 在Fram中 起始地址0x00A0，结束地址(0x04A0-1) 大小 1024byte,AADDRESS_OFFSET=0x00A0 + Sensor_Channel * 0x20,其中Sensor_Channel取值为0~31):
+	 表 6 在Fram中 起始地址0x04A0，结束地址(0x0CA0-1) 大小 2048byte,AADDRESS_OFFSET=0x04A0 + Sensor_Channel * 0x40,其中Sensor_Channel取值为0~31):*/
 
 union ConfDataTable 
 {
@@ -263,7 +270,8 @@ union ConfDataTable
 	struct 
 	{
 		struct BasicConfDataStr Basic;	/*!< 总共64个byte */
-		struct JlyConfDataStr 	Jly;	/*!< 总共64个byte */
+		struct JlyConfDataStr 	Jly;	/*!< 总共56个byte */
+		struct JlyTimeConfDataStr Time;	/*!< 总共8 个byte */
 		struct AlarmConfDataStr Alarm;	/*!< 总共32个byte */	
 		struct SensorChanelConfDataStr Sensor[32];		/*!< 每一通道总共32个byte 32*32=1024*/	
 		struct TempHumiAdjustConfDataStr Adjust[32];	/*!< 每一通道总共64个byte 64*32=2048*/

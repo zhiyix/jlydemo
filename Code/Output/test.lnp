@@ -38,6 +38,7 @@
 "..\output\bsp_powerdeal.o"
 "..\output\bsp_sensordeal.o"
 "..\output\bsp_serialdeal.o"
+"..\output\bsp_bootstop.o"
 --library_type=microlib --strict --scatter "..\Output\test.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
