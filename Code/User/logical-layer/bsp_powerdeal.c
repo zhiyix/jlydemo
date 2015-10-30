@@ -60,8 +60,8 @@ static void Voltage_ADC1config(void)
     unsigned int temp=0;
     unsigned int sum=0,adc_temp[vtest_cnt];
     float temp2=0;
-    unsigned char        voltage_zhengshu=0;    //电压整数位
-    unsigned char        voltage_xiaoshu=0;     //电压小数位
+    //unsigned char        voltage_zhengshu=0;    //电压整数位
+    //unsigned char        voltage_xiaoshu=0;     //电压小数位
     
     BATTEST_POWER(ON);  //开启电池电压检测电源
     
@@ -96,10 +96,10 @@ static void Voltage_ADC1config(void)
     temp2=sum/(vtest_cnt-2);
     temp2=temp2/4095*3.3*2;
     temp =(uint16_t)(temp2*100);
-
-    voltage_zhengshu=temp/100;
-    voltage_xiaoshu=temp-voltage_zhengshu*100;
-    voltage_xiaoshu=((voltage_xiaoshu/10)<<4)+(voltage_xiaoshu%10);
+	PManage.BatVoltage = temp; //电池电压最新值
+    //voltage_zhengshu=temp/100;
+    //voltage_xiaoshu=temp-voltage_zhengshu*100;
+    //voltage_xiaoshu=((voltage_xiaoshu/10)<<4)+(voltage_xiaoshu%10);
     
     if(Flag.ExPwOn==0)  //没外接电，电池电压检测
     {
@@ -279,6 +279,7 @@ void OutpowerShan(void)
 				}
             }
             LCD_UpdateDisplayRequest(); 
+			PManage.BatVoltage = 412;//电池充电的时候电压赋值412,电压为4.12V
         }
         else
         {

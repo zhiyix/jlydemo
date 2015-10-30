@@ -9,11 +9,24 @@
   */
 #define ON  1
 #define OFF 0
-
+/**********************GPIOF*********************/
 /*液晶背光控制电源端口*/
-#define LcdVccCtrl_PORT GPIOF	
-#define LcdVccCtrl_PIN  GPIO_Pin_2
+#define LcdVccCtrl_CLK	  RCC_AHBPeriph_GPIOF
+#define LcdVccCtrl_PORT   GPIOF	
+#define LcdVccCtrl_PIN    GPIO_Pin_2
+/*触摸按键控制电源端口*/
+#define TouchVccCtrl_PORT GPIOF
+#define TouchVccCtrl_PIN  GPIO_Pin_3
+/************************************************/
 
+/**********************GPIOC*********************/
+/*触摸按键*/
+#define TouchKey_CLK	  RCC_AHBPeriph_GPIOC
+#define TouchKey_PORT	  GPIOC
+#define TouchKey1_PIN	  GPIO_Pin_15
+#define TouchKey2_PIN	  GPIO_Pin_14
+#define TouchKey3_PIN	  GPIO_Pin_13
+/***********************************************/
 /* 带参宏，可以像内联函数一样使用 */
 #define LED1(a)	if (a)	\
 					GPIO_SetBits(GPIOF,GPIO_Pin_12);\
@@ -35,6 +48,11 @@
 					GPIO_SetBits(GPIOE,GPIO_Pin_4);\
 					else		\
 					GPIO_ResetBits(GPIOE,GPIO_Pin_4)
+//触摸按键电源开关 0打开 1关闭
+#define TOUCHKEY_POWER(a)	if (a)	\
+					GPIO_ResetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN);\
+					else		\
+					GPIO_SetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN)					
 //model 对外接口
 #define MODEL_PWRCTRL(a)	if (a)	\
 					GPIO_SetBits(GPIOD,GPIO_Pin_0);\

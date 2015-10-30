@@ -15,8 +15,49 @@
 
 #include "main.h"
 
+static void RCC_Config(void);
 static void General_GPIO_Config(void);
 static void FirstScanSysData(void);
+
+/*******************************************************************************
+  * @brief  Configures the different system clocks.
+  * @param  None
+  * @retval None
+  ******************************************************************************/
+static void RCC_Config(void)
+{  
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+
+	/* Allow access to the RTC */
+	PWR_RTCAccessCmd(ENABLE);
+
+	/* Reset Backup Domain */
+//	RCC_RTCResetCmd(ENABLE);
+//	RCC_RTCResetCmd(DISABLE);
+	
+//  /*!< Wait till LSE is ready */
+//  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
+//  {}
+//  /*!< LCD Clock Source Selection */
+//  RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
+	
+//	PWR_BackupAccessCmd(ENABLE);//允许修改RTC和后备寄存器
+//	BKP_TamperPinCmd(DISABLE);//关闭入检测功能，也就是PC13，也可以当普通IO使用
+//	PWR_BackupAccessCmd(DISABLE);//禁止修改后备寄存器
+
+//BKP_ITConfig(DISABLE);  
+	
+	/*关闭低速外部时钟信号功能后,PC13 PC14 PC15才可以当普通IO用*/
+    RCC_LSEConfig(RCC_LSE_OFF); 
+	/*开启低速内部时钟供LCD 使用*/
+	RCC_LSICmd(ENABLE);
+	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
+	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
+	RCC_RTCCLKCmd(ENABLE); 
+
+	/* Wait for RTC APB registers synchronisation */
+	RTC_WaitForSynchro();
+}
 /*****************************************************************************
  * 函数名：General_GPIO_Config
  * 描述  ：配置用到的I/O口
@@ -27,7 +68,7 @@ static void FirstScanSysData(void);
 static void General_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	
+	/************************GPIOF***************************/
 	/*外接电接入，充电指示完成*/
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = Power_Deal_ACtest | Power_Deal_CHGtest;
@@ -43,7 +84,16 @@ static void General_GPIO_Config(void)
 	GPIO_Init(LcdVccCtrl_PORT,&GPIO_InitStructure);
 	
 	GPIO_ResetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN); 
+	/*触摸按键控制电源 PF3*/
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = TouchVccCtrl_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(TouchVccCtrl_PORT,&GPIO_InitStructure);
 	
+	GPIO_SetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN);//关闭触摸按键电源 
 	//LED和 蜂鸣器GPIO初始化 ，蜂鸣器GPIO_Pin_15
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_15;
@@ -61,6 +111,7 @@ static void General_GPIO_Config(void)
 //	GPIO_SetBits(GPIOB,GPIO_Pin_0);
 	GPIO_ResetBits(GPIOF,GPIO_Pin_11|GPIO_Pin_12|GPIO_Pin_15);//关闭
 	
+	/************************GPIOE***************************/
 	//ADC电源开关
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
@@ -84,6 +135,7 @@ static void General_GPIO_Config(void)
     
     GPIO_ResetBits(GPIOE,GPIO_Pin_4);   //关闭电池电源检测
 	
+	/************************GPIOD***************************/
 	//model 对外接口电源
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
@@ -153,8 +205,12 @@ void SysInit(void)
 	
 	Queue.FlashSectorPoint = 0;
 	
+	AVCC1_POWER(OFF);     //关传感器电源
+    BATTEST_POWER(OFF);   //关电池电压检测电源
+	MODEL_PWRCTRL(ON);	  //开对外接口电源
+	TOUCHKEY_POWER(ON);	  //开触摸按键电源
+	
 	BellNn(1);
-
 }
 /******************************************************************************
   * @brief  Description 外设初始化
@@ -181,9 +237,6 @@ void PeripheralInit(void)
 //	Delay_ms(10);   //开启滴答定时
 	LCD_GLASS_Clear();
 	
-	AVCC1_POWER(OFF);    //关传感器电源
-    BATTEST_POWER(OFF);  //关电池电压检测电源
-	MODEL_PWRCTRL(ON);	//开对外接口电源
 	ADC1_Init();
     
     /* 8M串行flash W25Q64初始化 */

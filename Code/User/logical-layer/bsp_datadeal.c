@@ -139,15 +139,16 @@ static void LOWorNomal_Mode(void)
         JlyParam.SampleTime = JlyParam.SampleInterval;//采集时间 单位:s
     }
 }
-/**
+/******************************************************************************
   * @brief  Description 记录仪工作状态处理
   * @param  无  		
   * @retval 无		
-  */
+  *****************************************************************************/
 static void WorkornotMode(void)
 {
     if(Conf.Jly.WorkStatueIsStop <1)//停止工作
     {
+		/*关掉外设电源*/
 		AVCC1_POWER(OFF);	/* 关传感器电源 */
         BEEP(OFF);			/* 关蜂鸣器 */
 		AlarmLed2_OFF;		/* 关报警灯 */
@@ -183,11 +184,11 @@ static void WorkornotMode(void)
 }
 
 
-/**
+/******************************************************************************
   * @brief  Description 记录仪1s处理标志
   * @param  无  		
   * @retval 无		
-  */
+  *****************************************************************************/
 static void OneSec_Timedeal(void)
 {
     
@@ -240,11 +241,11 @@ static void OneSec_Timedeal(void)
 	}
 	
 }
-/**
+/******************************************************************************
   * @brief  Description 记录仪
   * @param  无  		
   * @retval 无		
-  */
+  *****************************************************************************/
 void SaveDataOnTimeDeal(void)
 {
     
@@ -288,11 +289,11 @@ void SaveDataOnTimeDeal(void)
 	}
 	
 }
-/**
+/******************************************************************************
   * @brief  Description 记录仪处理函数
   * @param  无  		
   * @retval 无		
-  */
+  *****************************************************************************/
 void JlySecDeal(void)
 {
     if(Flag.Sec == 1)   //1秒
@@ -319,9 +320,11 @@ void JlySecDeal(void)
     }
 	if(Conf.Jly.WorkStatueIsStop == 0) /*停止工作*/
     {
+		/*关掉外设电源*/
         AVCC1_POWER(OFF);	/* 关传感器电源 */
         BEEP(OFF);			/* 关蜂鸣器 */
 		AlarmLed2_OFF;		/* 关报警灯 */
+		
         lcd_OFF(JlyParam.ShowOffCode);
 
         if(JlyParam.LastErrorCode!=0)

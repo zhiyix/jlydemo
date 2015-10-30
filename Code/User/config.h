@@ -71,9 +71,7 @@
 //#define HIS_ONE_BYTES            (uint16_t)(Channel_count*8+(5+Clock_choose)+2)//24  72
 #define HIS_ONE_BYTES            (uint16_t)(Channel_count*2+8*Gps_choose+5+Clock_choose) 
 
-//! \brief
-#define ADJUST_TABLE_HEAD_LENGTH    0x08
-
+/****************************************************************************************/
 //! \brief 协议中对应的虚拟地址
 #define VirtBasicConfAddr			0x0000
 #define VirtJlyConfAddr				0x0100
@@ -84,7 +82,11 @@
 #define VirtMax						0x4000
 
 #define VirtOffset					0x0080	/* 传感器通道和校准，每一通道之间的虚拟偏移量 */
-
+/****************************************************************************************/
+/**Fram使用说明:0-CA0(3232),配置信息表已使用
+  *			    CA0-1000(4096),供开发者使用
+  * 			1000-2000(8192),作为历史数据缓存已使用
+  */
 //! \brief 配置信息表在Fram中的地址
 #define FRAM_BasicConfAddr           0x0000	/* 起始地址0x0000，结束地址(0x0040-1) 大小   64byte */
 #define FRAM_JlyConfAddr             0x0040	/* 起始地址0x0040，结束地址(0x0078-1) 大小   56byte */
@@ -98,17 +100,17 @@
 #define FRAM_TempHumiAdjustOffset    0x0020	/* 传感器校准，64byte/2 offset*2,每一通道之间的物理(Fram)偏移量 */
 
 //! \brief 配置信息表中成员  在Fram中的地址 
+#define FRAM_BatVoltageAddr			 FRAM_BasicConfAddr+20	//电池电压地址
 #define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+34	//工作状态地址
-
 
 //! \brief FRAM中存放fram记录指针地址
 #define FRAM_RecAddr_Hchar          0x0CA0      
 #define FRAM_RecAddr_Lchar          0x0CA1
 
-#define FLASH_RecAddr_Lchar          0x0CA2     //存放flash记录指针
-#define FLASH_RecAddr_MidLchar       0x0CA3
-#define FLASH_RecAddr_MidHchar       0x0CA4
-#define FLASH_RecAddr_Hchar          0x0CA5
+#define FLASH_RecAddr_Lchar         0x0CA2     //存放flash记录指针
+#define FLASH_RecAddr_MidLchar      0x0CA3
+#define FLASH_RecAddr_MidHchar      0x0CA4
+#define FLASH_RecAddr_Hchar         0x0CA5
 
 //! \brief FRAM中地址定义
 #define FRAM_RecFirstAddr           0x1000      //Fram中存放历史数据的首地址
@@ -195,28 +197,28 @@ struct PowerManagement
 	     uint8_t  HaveExternalPower;	   //接入外接电检测计数
 	     uint8_t  JinDuCounts;			   //表示电池一格一格往前
 	
-	__IO uint16_t  BatVoltage_TestTime;     //多长时间检测,电池电压检测时间间隔	
+	__IO uint16_t BatVoltage_TestTime;     //多长时间检测,电池电压检测时间间隔	
 	__IO uint16_t BatADC_ConvertedValue;   //存放电池AD值
 	
-    float         BatDataFloat;            //实际的电量
+         uint16_t BatVoltage;              //电池实际电量
 };
 
 //! \brief 记录仪工作状态等参数
 struct JLYPARAMETER
 {
-    uint8_t  WorkStatueIsStop:1; //记录仪工作状态，0停止工作
-    uint8_t  LowMode:1;          //功耗模式，1低功耗，0正常功耗 
-    uint8_t  LastErrorCode:1;	//错误码 
-	uint8_t  ShowOffCode;		//启动方式 ,停止方式 ，故障码显示 
-	uint16_t NormalRecIntervalMin;//正常记录间隔 单位：min 
+    uint8_t  WorkStatueIsStop:1; 	//记录仪工作状态，0停止工作
+    uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
+    uint8_t  LastErrorCode:1;		//错误码 
+	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
+	uint16_t NormalRecIntervalMin;	//正常记录间隔 单位：min 
 	
-	uint32_t SampleInterval;    //采集时间间隔 单位：s
-    uint32_t SampleTime;		//采集时间 单位：s
+	uint32_t SampleInterval;    	//采集时间间隔 单位：s
+    uint32_t SampleTime;			//采集时间 单位：s
 	
-    uint32_t NormalRecInterval;  //正常记录间隔 单位：s
+    uint32_t NormalRecInterval;  	//正常记录间隔 单位：s
     //uint32_t SaveHisDataTime;       //存储间隔
 	
-	int32_t delay_start_time;	// 延时启动时间 
+	int32_t delay_start_time;		// 延时启动时间 
 	
 };
 

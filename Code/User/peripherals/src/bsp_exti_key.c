@@ -24,11 +24,21 @@ void KEY_GPIO_Config(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
+	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	
 	GPIO_Init(GPIOF,&GPIO_InitStructure);
+	
+	/************************GPIOC***************************/
+	/*´¥Ãþ°´¼ü*/
+	RCC_AHBPeriphClockCmd(TouchKey_CLK ,ENABLE);
+	/*´¥Ãþ°´¼ü touchkey3ÅäÖÃ*/
+	GPIO_InitStructure.GPIO_Pin = TouchKey1_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	
+	GPIO_Init(TouchKey_PORT,&GPIO_InitStructure);
+	/********************************************************/
 }
 /**
   * @brief  Configure PF13 in interrupt mode
@@ -42,16 +52,29 @@ void EXTI15_10_Config(void)
   
 	/* Enable SYSCFG clock */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
+	
+    /**************************************************************/
 	/* Connect EXTI13 Line to PF13 pin */
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOF, EXTI_PinSource13);
-
 	/* Configure EXTI13 line */
 	EXTI_InitStructure.EXTI_Line = EXTI_Line13;
 
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	
+	EXTI_Init(&EXTI_InitStructure);
+	/**************************************************************/
+	
+	 /**************************************************************/
+	/* Connect EXTI15 Line to PC15 pin */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource15);
+	/* Configure EXTI15 line */
+	EXTI_InitStructure.EXTI_Line = EXTI_Line15;
+
+//	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	
 	EXTI_Init(&EXTI_InitStructure);
   
@@ -62,4 +85,5 @@ void EXTI15_10_Config(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
 	NVIC_Init(&NVIC_InitStructure);
+	/**************************************************************/
 }

@@ -349,12 +349,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -384,7 +384,7 @@ I (..\BTBusLibraries\FreeModbus\modbus\././include/mbutils.h)(0x53C35903)
 I (..\BTBusLibraries\FreeModbus\modbus\././rtu/mbrtu.h)(0x54AA2584)
 F (..\User\main.h)(0x563047D5)()
 F (..\User\stm32l1xx_conf.h)(0x55FA3040)()
-F (..\User\stm32l1xx_it.c)(0x560CECB4)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\stm32l1xx_it.o --omf_browse ..\output\stm32l1xx_it.crf --depend ..\output\stm32l1xx_it.d)
+F (..\User\stm32l1xx_it.c)(0x5631DE69)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\stm32l1xx_it.o --omf_browse ..\output\stm32l1xx_it.crf --depend ..\output\stm32l1xx_it.d)
 I (..\User\stm32l1xx_it.h)(0x5534FBD6)
 I (..\Libraries\CMSIC\stm32l1xx.h)(0x53468694)
 I (..\Libraries\CMSIC\core_cm3.h)(0x4D523B58)
@@ -410,12 +410,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -431,7 +431,7 @@ I (..\User\logical-layer\bsp_powerdeal.h)(0x562B471D)
 I (..\User\logical-layer\bsp_sensordeal.h)(0x55FA16C2)
 I (..\User\logical-layer\bsp_serialdeal.h)(0x561F79D6)
 F (..\User\stm32l1xx_it.h)(0x5534FBD6)()
-F (..\User\init\bsp_init.c)(0x5630A076)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_init.o --omf_browse ..\output\bsp_init.crf --depend ..\output\bsp_init.d)
+F (..\User\init\bsp_init.c)(0x5631DA05)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_init.o --omf_browse ..\output\bsp_init.crf --depend ..\output\bsp_init.d)
 I (..\User\main.h)(0x563047D5)
 I (..\Libraries\CMSIC\stm32l1xx.h)(0x53468694)
 I (..\Libraries\CMSIC\core_cm3.h)(0x4D523B58)
@@ -456,12 +456,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -521,12 +521,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -541,7 +541,7 @@ I (..\User\logical-layer\bsp_alarmdeal.h)(0x56237775)
 I (..\User\logical-layer\bsp_powerdeal.h)(0x562B471D)
 I (..\User\logical-layer\bsp_sensordeal.h)(0x55FA16C2)
 I (..\User\logical-layer\bsp_serialdeal.h)(0x561F79D6)
-F (..\User\peripherals\src\bsp_exti_key.c)(0x55D3FC60)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_exti_key.o --omf_browse ..\output\bsp_exti_key.crf --depend ..\output\bsp_exti_key.d)
+F (..\User\peripherals\src\bsp_exti_key.c)(0x5631E2E8)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_exti_key.o --omf_browse ..\output\bsp_exti_key.crf --depend ..\output\bsp_exti_key.d)
 I (..\User\main.h)(0x563047D5)
 I (..\Libraries\CMSIC\stm32l1xx.h)(0x53468694)
 I (..\Libraries\CMSIC\core_cm3.h)(0x4D523B58)
@@ -566,12 +566,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -586,7 +586,7 @@ I (..\User\logical-layer\bsp_alarmdeal.h)(0x56237775)
 I (..\User\logical-layer\bsp_powerdeal.h)(0x562B471D)
 I (..\User\logical-layer\bsp_sensordeal.h)(0x55FA16C2)
 I (..\User\logical-layer\bsp_serialdeal.h)(0x561F79D6)
-F (..\User\peripherals\src\bsp_lcd.c)(0x56307360)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_lcd.o --omf_browse ..\output\bsp_lcd.crf --depend ..\output\bsp_lcd.d)
+F (..\User\peripherals\src\bsp_lcd.c)(0x5631C96E)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_lcd.o --omf_browse ..\output\bsp_lcd.crf --depend ..\output\bsp_lcd.d)
 I (..\User\main.h)(0x563047D5)
 I (..\Libraries\CMSIC\stm32l1xx.h)(0x53468694)
 I (..\Libraries\CMSIC\core_cm3.h)(0x4D523B58)
@@ -611,12 +611,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -677,12 +677,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -722,12 +722,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -767,12 +767,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -813,12 +813,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -858,12 +858,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -903,12 +903,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -923,7 +923,7 @@ I (..\User\logical-layer\bsp_alarmdeal.h)(0x56237775)
 I (..\User\logical-layer\bsp_powerdeal.h)(0x562B471D)
 I (..\User\logical-layer\bsp_sensordeal.h)(0x55FA16C2)
 I (..\User\logical-layer\bsp_serialdeal.h)(0x561F79D6)
-F (..\User\logical-layer\bsp_datadeal.c)(0x5630969F)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_datadeal.o --omf_browse ..\output\bsp_datadeal.crf --depend ..\output\bsp_datadeal.d)
+F (..\User\logical-layer\bsp_datadeal.c)(0x5630A586)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_datadeal.o --omf_browse ..\output\bsp_datadeal.crf --depend ..\output\bsp_datadeal.d)
 I (..\User\main.h)(0x563047D5)
 I (..\Libraries\CMSIC\stm32l1xx.h)(0x53468694)
 I (..\Libraries\CMSIC\core_cm3.h)(0x4D523B58)
@@ -948,12 +948,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -993,12 +993,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -1038,12 +1038,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -1058,7 +1058,7 @@ I (..\User\logical-layer\bsp_alarmdeal.h)(0x56237775)
 I (..\User\logical-layer\bsp_powerdeal.h)(0x562B471D)
 I (..\User\logical-layer\bsp_sensordeal.h)(0x55FA16C2)
 I (..\User\logical-layer\bsp_serialdeal.h)(0x561F79D6)
-F (..\User\logical-layer\bsp_powerdeal.c)(0x5630993D)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_powerdeal.o --omf_browse ..\output\bsp_powerdeal.crf --depend ..\output\bsp_powerdeal.d)
+F (..\User\logical-layer\bsp_powerdeal.c)(0x5631EEFF)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_powerdeal.o --omf_browse ..\output\bsp_powerdeal.crf --depend ..\output\bsp_powerdeal.d)
 I (..\User\main.h)(0x563047D5)
 I (..\Libraries\CMSIC\stm32l1xx.h)(0x53468694)
 I (..\Libraries\CMSIC\core_cm3.h)(0x4D523B58)
@@ -1083,12 +1083,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -1128,12 +1128,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -1148,7 +1148,7 @@ I (..\User\logical-layer\bsp_alarmdeal.h)(0x56237775)
 I (..\User\logical-layer\bsp_powerdeal.h)(0x562B471D)
 I (..\User\logical-layer\bsp_sensordeal.h)(0x55FA16C2)
 I (..\User\logical-layer\bsp_serialdeal.h)(0x561F79D6)
-F (..\User\logical-layer\bsp_serialdeal.c)(0x56304250)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_serialdeal.o --omf_browse ..\output\bsp_serialdeal.crf --depend ..\output\bsp_serialdeal.d)
+F (..\User\logical-layer\bsp_serialdeal.c)(0x5631F173)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Libraries\CMSIC\startup -I..\Libraries\CMSIC -I..\Libraries\inc -I..\Libraries\src -I..\Doc -I..\User -I..\User\init -I..\User\SysTick -I..\User\peripherals\inc -I..\User\peripherals\src -I..\Libraries -I..\User\logical-layer -I..\BTBusLibraries\FreeModbus\modbus -I..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\BTBusLibraries\Inc-I C:\Keil\MDK4.73\ARM\RV31\INC-I C:\Keil\MDK4.73\ARM\CMSIS\Include-I C:\Keil\MDK4.73\ARM\Inc\ST\STM32L1xx-DSTM32L1XX_HD -DUSE_STDPERIPH_DRIVER -DUSE_HAL_DRIVER -DSTM32L152xE -DMB_SLAVE -o ..\output\bsp_serialdeal.o --omf_browse ..\output\bsp_serialdeal.crf --depend ..\output\bsp_serialdeal.d)
 I (..\User\main.h)(0x563047D5)
 I (..\Libraries\CMSIC\stm32l1xx.h)(0x53468694)
 I (..\Libraries\CMSIC\core_cm3.h)(0x4D523B58)
@@ -1173,12 +1173,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -1218,12 +1218,12 @@ I (C:\Keil\MDK4.73\ARM\ARMCC\include\math.h)(0x51C7B744)
 I (..\BTBusLibraries\FreeModbus\modbus\porttype.h)(0x561CBB70)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\stdbool.h)(0x51C7B744)
 I (C:\Keil\MDK4.73\ARM\ARMCC\include\inttypes.h)(0x51C7B744)
-I (..\User\config.h)(0x56308F36)
+I (..\User\config.h)(0x5631EE16)
 I (..\User\logical-layer\bsp_class.h)(0x562DB91F)
-I (..\User\init\bsp_init.h)(0x56309F2F)
-I (..\User\peripherals\inc\bsp_conf_infor.h)(0x562EEE18)
+I (..\User\init\bsp_init.h)(0x5631D18D)
+I (..\User\peripherals\inc\bsp_conf_infor.h)(0x5631EA4B)
 I (..\User\peripherals\inc\bsp_exti_key.h)(0x55D434AC)
-I (..\User\peripherals\inc\bsp_lcd.h)(0x563086E0)
+I (..\User\peripherals\inc\bsp_lcd.h)(0x5631C993)
 I (..\User\SysTick\bsp_SysTick.h)(0x55D68656)
 I (..\User\peripherals\inc\bsp_usart.h)(0x55E4148C)
 I (..\User\peripherals\inc\bsp_adc.h)(0x562B3977)
@@ -1239,4 +1239,4 @@ I (..\User\logical-layer\bsp_powerdeal.h)(0x562B471D)
 I (..\User\logical-layer\bsp_sensordeal.h)(0x55FA16C2)
 I (..\User\logical-layer\bsp_serialdeal.h)(0x561F79D6)
 F (..\Doc\readme.txt)(0x56234918)()
-F (..\Doc\note.txt)(0x5623793E)()
+F (..\Doc\note.txt)(0x56317E63)()

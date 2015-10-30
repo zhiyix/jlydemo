@@ -138,40 +138,6 @@ static void LCD_GPIOConfig(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 }
-/*******************************************************************************
-  * @brief  Configures the different system clocks.
-  * @param  None
-  * @retval None
-  ******************************************************************************/
-void RCC_Config(void)
-{  
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-
-	/* Allow access to the RTC */
-	PWR_RTCAccessCmd(ENABLE);
-
-	/* Reset Backup Domain */
-//	RCC_RTCResetCmd(ENABLE);
-//	RCC_RTCResetCmd(DISABLE);
-
-//  /*!< LSE Enable */
-//  RCC_LSEConfig(RCC_LSE_ON);
-
-//  /*!< Wait till LSE is ready */
-//  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
-//  {}
-//  /*!< LCD Clock Source Selection */
-//  RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
-	
-
-	RCC_LSICmd(ENABLE);
-	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
-	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
-	RCC_RTCCLKCmd(ENABLE); 
-
-	/* Wait for RTC APB registers synchronisation */
-	RTC_WaitForSynchro();
-}
 
 /*******************************************************************************
   * @brief  Configures the lcd.
@@ -195,15 +161,15 @@ void LCD_GLASS_Init(void)
 	LCD_InitStructure.LCD_Prescaler = LCD_Prescaler_8;
 	LCD_InitStructure.LCD_Divider = LCD_Divider_31;
 	LCD_InitStructure.LCD_Duty = LCD_Duty_1_4;
-	LCD_InitStructure.LCD_Bias = LCD_Bias_1_3;
+	LCD_InitStructure.LCD_Bias = LCD_Bias_1_3;/*选择了COM0~COM3，偏压选LCD_Bias_1_3*/
 	LCD_InitStructure.LCD_VoltageSource = LCD_VoltageSource_Internal;
 	LCD_Init(&LCD_InitStructure);
 
 	/*!< Configure the Pulse On Duration */
-	LCD_PulseOnDurationConfig(LCD_PulseOnDuration_0);
+	LCD_PulseOnDurationConfig(LCD_PulseOnDuration_1); //配置LCD脉冲持续时间 LCD_PulseOnDuration_0
   
 	/*!< Configure the LCD Contrast (3.25V) */
-	LCD_ContrastConfig(LCD_Contrast_Level_7);
+	LCD_ContrastConfig(LCD_Contrast_Level_7); //配置LCD对比度 LCD_Contrast_Level_7
 
 	/*!< Wait Until the LCD FCR register is synchronized */
 	LCD_WaitForSynchro();

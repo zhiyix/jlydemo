@@ -42,6 +42,13 @@
 //! @}
 
 /*============================ TYPES =========================================*/
+/*整形(半字)、字符型--联合体*/
+union Si2Char
+{
+    uint16_t hwd;//半字
+    uint8_t  byte[2];
+};
+
 //! \brief单精度浮点型
 union FISI2CH4
 {
@@ -54,25 +61,25 @@ union FISI2CH4
 /*!< 总共64个byte */
 struct BasicConfDataStr
 {
-	uint8_t  Sn[6];	/*!< 序列号 SN号 */
-	uint16_t :16;	/*!< 保留 */
+	uint8_t  Sn[6];		  /*!< 序列号 SN号 */
+	uint16_t :16;		  /*!< 保留 */
 	
-	uint16_t SoftVerml;		/*!< 软件版本 MID LOW */
-	uint8_t  SoftVermain;	/*!< 软件版本 Main */
-	uint8_t	 :8;		/*!< 保留 */
+	uint16_t SoftVerml;	  /*!< 软件版本 MID LOW */
+	uint8_t  SoftVermain; /*!< 软件版本 Main */
+	uint8_t	 :8;		  /*!< 保留 */
 	
-	uint16_t HardVerml;		/*!< 硬件版本 MID LOW */
-	uint8_t  HardVermain;	/*!< 硬件版本 Main */
-	uint8_t	 :8;		/*!< 保留 */
+	uint16_t HardVerml;	  /*!< 硬件版本 MID LOW */
+	uint8_t  HardVermain; /*!< 硬件版本 Main */
+	uint8_t	 :8;		  /*!< 保留 */
 	
-	uint16_t CommuMode;		/*!< 通讯方式 */
+	uint16_t CommuMode;	  /*!< 通讯方式 */
 	/*后备电池状态说明
 	 *@1Bit[1:0]:充电状态
 	 *@2Bit[6:4]:电池电量状态
 	 */
 	uint16_t BatteryState;	/*!< 后备电池状态 */
-	
-	uint8_t Reserv[44];		/*!< Reserv */
+	union    Si2Char BatVoltage;/*!< 电池电压,  */
+	uint8_t  Reserv[42];	/*!< Reserv */
 };
 //! \brief记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
 /*!< 总共56个byte */

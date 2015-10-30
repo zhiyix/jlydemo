@@ -184,6 +184,12 @@ void EXTI15_10_IRQHandler(void)
 		/* Clear the EXTI line 13 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line13);
 	}
+	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
+	{
+		LED1_TOGGLE;
+		/* Clear the EXTI line 15 pending bit */
+		EXTI_ClearITPendingBit(EXTI_Line15);
+	}
 }
 /**
   * @brief  This function handles TIM2 interrupt request.

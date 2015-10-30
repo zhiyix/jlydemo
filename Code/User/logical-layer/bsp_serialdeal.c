@@ -42,13 +42,27 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private function prototypes -----------------------------------------------*/
+static void ReadBatVoltage(uint16_t value);
 
 /* Private variables ---------------------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
+
+/*******************************************************************************
+  * @brief  Description 读取基本配置数据地址表时更新Fram中电池电压
+  * @param  value       电池电压
+  * @retval 无
+  *****************************************************************************/
+static void ReadBatVoltage(uint16_t value)
+{
+	Conf.Basic.BatVoltage.hwd = value;//更新内存
+	Fram_Write(Conf.Basic.BatVoltage.byte,FRAM_BatVoltageAddr,2);//电池电量写入Fram中
+}
 /******************************************************************************
   * @brief  Description 写配置数据到Fram中，同时更新内存中的数据
-  * @param  无
+  * @param  pucBuffer   要写入数据指针
+  * @param  usAddress	要写入数据地址
+  * @param  usNRegs		写入数据数量
   * @retval 无
   *****************************************************************************/
 bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
@@ -72,6 +86,8 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = usAddress - VirtJlyConfAddr;
 		Fram_Write(pucBuffer, ConfMap_Address[1][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_JlyConfAddr],ConfMap_Address[1][1] + offset * 2,size);
+		/*记录间隔变化时做相应处理*/
+		//if(Conf.)
 		
 	}else if (usAddress < VirtAlarmConfAddr)
 	{
@@ -109,8 +125,10 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	return true;
 }
 /******************************************************************************
-  * @brief  Description 
-  * @param  无
+  * @brief  Description 读取配置数据信息
+  * @param  pucBuffer   存放读出数据的指针
+  * @param  usAddress	读出数据的地址
+  * @param  usNRegs		读的数量
   * @retval 无
   *****************************************************************************/
 bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
@@ -124,6 +142,7 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	{
 		/* 基本配置数据地址表 */
 		offset = usAddress - VirtBasicConfAddr;
+		ReadBatVoltage(PManage.BatVoltage);//跟新Fram中电池电量
 		Fram_Read(pucBuffer,ConfMap_Address[0][1] + offset * 2,size);
 //		Fram_Read(Buf,ConfMap_Address[0][1] + offset * 2,size);
 	} else if (usAddress < VirJlyTimeConfAddr)

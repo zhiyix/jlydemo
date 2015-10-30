@@ -182,7 +182,7 @@ extern const uint32_t 		lcd_test[];
 /*============================ PROTOTYPES ====================================*/
 
 /*============================ EXTERN FUNCTIONS ==============================*/
-void RCC_Config(void);
+
 void LCD_GLASS_Init(void);
 void LCD_GLASS_Clear(void);
 //void LCD_GLASS_DisplayString(uint8_t* ptr);
