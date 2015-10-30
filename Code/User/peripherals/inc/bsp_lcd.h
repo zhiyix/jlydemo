@@ -196,12 +196,14 @@ void LCD_GLASS_ClearChar(uint8_t position);
 void Display_Signal(uint8_t signal_value);
 void Display_Mem(void);
 void Display_SN(void);
+void Display_NUL(void);
 void displayErr(uint8_t Err);
 void lcd_OFF(uint8_t offcode);
 void displayYEAR(unsigned char year);
 void displayDAY(uint8_t month,uint8_t day);
 void displayTIME(uint8_t hour,uint8_t min);
 void Display_ChannelValue(uint8_t started_channel0);
+void FisrtPowerOnDisplay(void);
 //#ifdef __cplusplus
 //}
 //#endif

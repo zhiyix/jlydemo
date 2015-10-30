@@ -78,7 +78,7 @@ void RecorderBootModeHandle(void)
     }
     if(Conf.Jly.RecBootMode == 0x00)	/* 延时启动(默认延时时间0，即立即启动)*/
     {
-		if(((JlyParam.delay_start_time--) <= 0) && (!Conf.Jly.WorkStatueIsStop) )	//
+		if((JlyParam.delay_start_time--) <= 0)	//&& (!Conf.Jly.WorkStatueIsStop)
         {
             JlyParam.delay_start_time = -1;
             Conf.Jly.WorkStatueIsStop = 1;	/*开启工作*/
@@ -141,12 +141,20 @@ void RecorderBootModeHandle(void)
 			}
 		}
 	}
-	else if((Conf.Jly.RecBootMode == 0x03) && (Conf.Jly.WorkStatueIsStop))	/* 手动启动*/
+	else if(Conf.Jly.RecBootMode == 0x03 )	/* 机械按键手动启动*/
     {
-        Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+		if(Conf.Jly.WorkStatueIsStop >= 1)
+		{
+			Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+			Conf.Jly.RecBootMode = 0xFF;
             //写入fram
-		Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
-		JlyParam.ShowOffCode = 0xFF;
+			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+			JlyParam.ShowOffCode = 0xFF;
+		}else{
+			Conf.Jly.WorkStatueIsStop = 1;
+			Conf.Jly.RecBootMode = 0xFF;
+			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+		}
     }
     else if(Conf.Jly.RecBootMode == 0x10)	/* 异常条件启动 */
     {
@@ -168,7 +176,7 @@ void RecorderStopModeHandle(void)
         if(Conf.Jly.RecStopMode == 0){};	/* 先进先出的记录停止方式 */
         if(Conf.Jly.RecStopMode == 1)		/* 存储器记满的记录停止方式 */
         {
-            if((Queue.RecorderFlashPoint >= Flash_MAX_NUM)) //&&IsReadingI2c==0,下载数据
+            if((Queue.RecorderFlashPointer >= Flash_MAX_NUM)) //&&IsReadingI2c==0,下载数据
             {
                 Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
 				

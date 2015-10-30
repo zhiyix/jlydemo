@@ -440,6 +440,13 @@ static void Lcd_Dis2Value(uint8_t value)
 		case 0x09:
 			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT5;
 			break;
+		case '-':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT4;LCD->RAM[6] |= D_ZERO;
+			break;
+		case 'n':
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_BIT4;
+			break;
+		
 		case 0xFF:
 			LCD->RAM[0] &= ~D_BIT5;LCD->RAM[2] &= ~(D_BIT4+D_BIT5);LCD->RAM[4] &= ~(D_BIT4+D_BIT5);LCD->RAM[6] &= ~(D_BIT4+D_BIT5);
 			break;
@@ -499,6 +506,13 @@ static void Lcd_Dis3Value(uint8_t value)
 		case 'O':
 			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
 			break; 
+		case '-':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_ZERO;
+			break;
+		case 'U':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT6+D_BIT7;LCD->RAM[4] |= D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			break;
+		
         case 0xFF:
             LCD->RAM[0] &= ~D_BIT7;LCD->RAM[2] &= ~(D_BIT6+D_BIT7);LCD->RAM[4] &= ~(D_BIT6+D_BIT7);LCD->RAM[6] &= ~(D_BIT6+D_BIT7);
             break;
@@ -555,7 +569,14 @@ static void Lcd_Dis4Value(uint8_t value)
 			break; 
 		case 'F':
 			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT8;
-			break;		
+			break;	
+		case '-':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_ZERO;
+			break;
+		case 'L':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			break;
+		
         case 0xFF:
             LCD->RAM[0] &= ~D_BIT9;LCD->RAM[2] &= ~(D_BIT8+D_BIT9);LCD->RAM[4] &= ~(D_BIT8+D_BIT9);LCD->RAM[6] &= ~(D_BIT8+D_BIT9);
             break;    
@@ -1123,174 +1144,7 @@ static void Lcd_Dis15Value(uint8_t value)
     /*!< Requesy LCD RAM update */
 //	LCD_UpdateDisplayRequest();  
 }
-/*******************************************************************************
-  * @brief  Description 显示传感器故障
-  * @param  None
-  * @retval None
-  ******************************************************************************/
-void displayErr(uint8_t Err)
-{
-	/*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-//    if(FlagDownIng==0)
-//    {
-        /* 2[8] 3[8] 4[8]清零 */
-        Lcd_Dis2Value(0XFF);
-        Lcd_Dis3Value(0XFF);
-        Lcd_Dis4Value(0XFF);
-		/* 清报警状态 */
-        clearAlarmStatus;
-		/* 清 "设置上限"，“设置下限" */	
-        clearshangxian;clearxiaxian;		
-        /* 清符号 */
-        clearFUHAO;clearAlarmStatus;clearJINBAO;
-        //clearRH;
-		showC;
-		clearP1;clearP2;
-        /* 显示 2Er */
-        Lcd_Dis2Value(2);
-        Lcd_Dis3Value('E');
-        Lcd_Dis4Value('r');
-//    }
-	/*!< Requesy LCD RAM update */
-	LCD_UpdateDisplayRequest();  
-}
-/*******************************************************************************
-  * @brief  Description 
-  * @param  None
-  * @retval None
-  ******************************************************************************/
-void lcd_OFF(uint8_t offcode)
-{
-	/*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-	/* 2[8] 3[8] 4[8]清零 */
-	Lcd_Dis1Value(0XFF);
-	Lcd_Dis2Value(0XFF);
-	Lcd_Dis3Value(0XFF);
-	Lcd_Dis4Value(0XFF);
-	
-	clearS12345;
-	clear_NFC;
-	clear_BOX;
-	clear_GPRS;
-	clear_GPS;
-	//clearBATT;
-	clearFlashMEM;
-	cleartongdao;
-	clearJINBAO;
-	clearAlarmStatus;
-	clearshangxian;
-	clearxiaxian;
-	clearFUHAO;
-	clearP1;
-	clearP2;
-	clearC;
-	clearRH;
-	
-	if(offcode==0xFF)
-	{
-		Lcd_Dis1Value(0xFF);
-	}
-	else
-	{
-		Lcd_Dis1Value(offcode);
-	}
-	/*显示0FF*/
-	Lcd_Dis2Value(0);
-	Lcd_Dis3Value('F');
-	Lcd_Dis4Value('F');
-	
-	/*!< Requesy LCD RAM update */
-	LCD_UpdateDisplayRequest();  
-}
-/*******************************************************************************
-  * @brief  Description 显示指定通道数据
-  * @param  temp 		通道
-  * @param  humi		温湿度数据
-  * @retval None
-  ******************************************************************************/
-static void Lcd_ChannelValue(uint8_t temp,float humi)
-{
-    uint16_t value;
-    uint8_t value_fuhao,chanel;
-    float ft;
-    
-    chanel=temp;
-    
-	/*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-	
-    Lcd_Dis1Value(0XFF);
-	showtongdao;
-    Lcd_Dis1Value(chanel);	//显示通道号
-    Lcd_Dis2Value(0XFF);
-    Lcd_Dis3Value(0XFF);
-    Lcd_Dis4Value(0XFF);
-	//clearS12345;
-	clear_NFC;
-    clearAlarmStatus;
-    clearshangxian;
-    clearxiaxian;
-    
-    clearFUHAO;
-    clearRH;
-	clearJINBAO;
-    clearC;
-        
-    if(FlagSeniorErr[chanel-1]==1)
-    {
-		/*!< 显示传感器故障 */
-        displayErr(2);
-    }
-    else
-    {
-        if(humi<0)
-        {
-            value_fuhao=1;
-            ft=humi*(-100.0);
-        }
-        else
-        {
-            value_fuhao=0;
-            ft=humi*100.0;
-        }
-        value=(unsigned int)ft;
-        if(value%10>=4)value=value+10;//四舍五入
-        value=value/10;
-		if(value >= 1000)
-			value = 999;
-        /*
-        if(value/10000>0)
-            digit8_12(value/10000);//10
-        else
-            digit8_12(0XFF);
-        if(value/1000>0)
-            digit8_13((value/1000)%10);//11
-        else
-            digit8_13(0XFF);
-        */
-        if(value/100>0)
-            Lcd_Dis2Value((value/100)%10);
-        else
-            Lcd_Dis2Value(0XFF);
-        if(value/10)
-            Lcd_Dis3Value((value/10)%10);
-        else
-            Lcd_Dis3Value(0);
-        
-        Lcd_Dis4Value(value%10);
-        
-        if(value_fuhao==1)
-            showFUHAO;
-        
-        clearRH;
-        showC;
-		showP2;
-    }
-	/*!< Requesy LCD RAM update */
-	LCD_UpdateDisplayRequest();  
-}
+
 /*******************************************************************************
   * @brief  Description 显示年
   * @param  None
@@ -1394,7 +1248,7 @@ void Display_Signal(uint8_t signal_value)
 	/*!< Wait Until the last LCD RAM update finish */
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){} 
 	
-	if((signal_value>=0)&&(signal_value<=6))
+	if((signal_value >0)&&(signal_value<=6))
 	{showS1;}
 	if((signal_value>=7)&&(signal_value<=13))
 	{showS12;}
@@ -1418,15 +1272,15 @@ void Display_Mem(void)
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
     if(Flag.RecordFlashOverFlow==0)/*未溢出过*/
     {
-        if(Queue.RecorderFlashPoint<=(Flash_MAX_NUM/5)) /**/
+        if(Queue.RecorderFlashPointer<=(Flash_MAX_NUM/5)) /**/
             {showFlashMEM1;}
-        else if((Queue.RecorderFlashPoint<=(Flash_MAX_NUM*2/5))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM/5)))
+        else if((Queue.RecorderFlashPointer<=(Flash_MAX_NUM*2/5))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM/5)))
             {showFlashMEM2;}
-        else if((Queue.RecorderFlashPoint<=(Flash_MAX_NUM*3/5))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM*2/5)))
+        else if((Queue.RecorderFlashPointer<=(Flash_MAX_NUM*3/5))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM*2/5)))
             {showFlashMEM3;}
-        else if((Queue.RecorderFlashPoint<=(Flash_MAX_NUM*4/5))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM*3/5)))
+        else if((Queue.RecorderFlashPointer<=(Flash_MAX_NUM*4/5))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM*3/5)))
             {showFlashMEM4;}
-        else if((Queue.RecorderFlashPoint<(Flash_MAX_NUM))&&(Queue.RecorderFlashPoint>(Flash_MAX_NUM*4/5)))
+        else if((Queue.RecorderFlashPointer<(Flash_MAX_NUM))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM*4/5)))
             {showFlashMEM5;}
     }
     else/*溢出，显示满格*/
@@ -1435,6 +1289,48 @@ void Display_Mem(void)
     }
     /*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
+}
+/*******************************************************************************
+  * @brief  显示NUL
+  * @param  None
+  * @retval None
+  ******************************************************************************/
+void Display_NUL(void)
+{
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	
+	/*先清数据*/
+	Lcd_Dis2Value(0xFF);
+	Lcd_Dis3Value(0xFF);
+	Lcd_Dis4Value(0xFF);
+	
+	Lcd_Dis2Value('n');
+	Lcd_Dis3Value('U');
+	Lcd_Dis4Value('L');
+	
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
+}
+/*******************************************************************************
+  * @brief  首次上电显示 ---,SN号,仪器时间
+  * @param  None
+  * @retval None
+  ******************************************************************************/
+void FisrtPowerOnDisplay(void)
+{
+	Display_SN();//显示SN号
+	/*显示时间*/
+	read_time();
+    while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	
+	displayTIME(Rtc.Hour,Rtc.Minute);
+    showTIME;	/*显示钟表符号*/
+	
+	Lcd_Dis2Value('-');
+	Lcd_Dis3Value('-');
+	Lcd_Dis4Value('-');
+	
+	LCD_UpdateDisplayRequest();
 }
 /*******************************************************************************
   * @brief  显示仪器SN号
@@ -1460,6 +1356,14 @@ void Display_SN(void)
     /*!< Wait Until the last LCD RAM update finish */
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){} 
     
+	Lcd_Dis5Value(0xFF);	
+	Lcd_Dis6Value(0xFF);	
+	Lcd_Dis7Value(0xFF);	
+	Lcd_Dis8Value(0xFF);	
+	Lcd_Dis9Value(0xFF);	
+	Lcd_Dis10Value(0xFF);	
+	Lcd_Dis11Value(0xFF);	
+	
     showID;
 //    LCDMEM[3]|=digit[month%16];
     Lcd_Dis5Value(0x0c);
@@ -1487,6 +1391,179 @@ void Display_SN(void)
 	LCD_UpdateDisplayRequest();  
 }
 /*******************************************************************************
+  * @brief  Description 显示传感器故障
+  * @param  None
+  * @retval None
+  ******************************************************************************/
+void displayErr(uint8_t Err)
+{
+	/*!< Wait Until the last LCD RAM update finish */
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+//    if(FlagDownIng==0)
+//    {
+        /* 2[8] 3[8] 4[8]清零 */
+        Lcd_Dis2Value(0XFF);
+        Lcd_Dis3Value(0XFF);
+        Lcd_Dis4Value(0XFF);
+		/* 清报警状态 */
+        clearAlarmStatus;
+		/* 清 "设置上限"，“设置下限" */	
+        clearshangxian;clearxiaxian;		
+        /* 清符号 */
+        clearFUHAO;clearAlarmStatus;clearJINBAO;
+        //clearRH;
+		showC;
+		clearP1;clearP2;
+        /* 显示 2Er */
+        Lcd_Dis2Value(2);
+        Lcd_Dis3Value('E');
+        Lcd_Dis4Value('r');
+//    }
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
+}
+/*******************************************************************************
+  * @brief  Description 关闭LCD
+  * @param  None
+  * @retval None
+  ******************************************************************************/
+void lcd_OFF(uint8_t offcode)
+{
+	/*!< Wait Until the last LCD RAM update finish */
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	/* 2[8] 3[8] 4[8]清零 */
+	Lcd_Dis1Value(0XFF);
+	Lcd_Dis2Value(0XFF);
+	Lcd_Dis3Value(0XFF);
+	Lcd_Dis4Value(0XFF);
+	
+	clearS12345;
+	clear_NFC;
+	clear_BOX;
+	clear_GPRS;
+	clear_GPS;
+	//clearBATT;
+	clearFlashMEM;
+	cleartongdao;
+	clearJINBAO;
+	clearAlarmStatus;
+	clearshangxian;
+	clearxiaxian;
+	clearFUHAO;
+	clearP1;
+	clearP2;
+	clearC;
+	clearRH;
+	
+	if(offcode==0xFF)
+	{
+		Lcd_Dis1Value(0xFF);
+	}
+	else
+	{
+		Lcd_Dis1Value(offcode);
+	}
+	/*显示0FF*/
+	Lcd_Dis2Value(0);
+	Lcd_Dis3Value('F');
+	Lcd_Dis4Value('F');
+	
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
+}
+/*******************************************************************************
+  * @brief  Description 显示指定通道数据
+  * @param  temp 		通道
+  * @param  humi		温湿度数据
+  * @retval None
+  ******************************************************************************/
+static void Lcd_ChannelValue(uint8_t temp,float humi)
+{
+    uint16_t value;
+    uint8_t value_fuhao,chanel;
+    float ft;
+    
+    chanel=temp;
+    
+	/*!< Wait Until the last LCD RAM update finish */
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	
+    Lcd_Dis1Value(0XFF);
+	showtongdao;
+    Lcd_Dis1Value(chanel);	//显示通道号
+    Lcd_Dis2Value(0XFF);
+    Lcd_Dis3Value(0XFF);
+    Lcd_Dis4Value(0XFF);
+	//clearS12345;
+	clear_NFC;
+    clearAlarmStatus;
+    clearshangxian;
+    clearxiaxian;
+    
+    clearFUHAO;
+    clearRH;
+	clearJINBAO;
+    clearC;
+	
+    if(Conf.Sensor[chanel-1].SensorType ==0x00 )    
+	{
+		clearP2;
+		Display_NUL();
+	}else{
+		if(FlagSeniorErr[chanel-1]==1)
+		{
+			/*!< 显示传感器故障 */
+			displayErr(2);
+		}
+		else
+		{
+			if(humi<0)
+			{
+				value_fuhao=1;
+				ft=humi*(-100.0);
+			}
+			else
+			{
+				value_fuhao=0;
+				ft=humi*100.0;
+			}
+			value=(unsigned int)ft;
+			if(value%10>=4)value=value+10;//四舍五入
+			value=value/10;
+			if(value >= 1000)
+				value = 999;
+			/*
+			if(value/10000>0)
+				digit8_12(value/10000);//10
+			else
+				digit8_12(0XFF);
+			if(value/1000>0)
+				digit8_13((value/1000)%10);//11
+			else
+				digit8_13(0XFF);
+			*/
+			if(value/100>0)
+				Lcd_Dis2Value((value/100)%10);
+			else
+				Lcd_Dis2Value(0XFF);
+			if(value/10)
+				Lcd_Dis3Value((value/10)%10);
+			else
+				Lcd_Dis3Value(0);
+			
+			Lcd_Dis4Value(value%10);
+			
+			if(value_fuhao==1)
+				showFUHAO;
+			
+			showP2;
+		}
+	}
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
+}
+
+/*******************************************************************************
   * @brief  Description 		显示通道数据
   * @param  started_channel0 	通道
   * @retval None
@@ -1502,10 +1579,11 @@ void Display_ChannelValue(uint8_t started_channel0)
         
         while(channel_cp & 0x01)
         {
-            ChannelForDisplay++;//ChannelForDisplay
-            Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
-            AlarmDeal(ChannelForDisplay);
-            if(Conf.Sensor[ChannelForDisplay-1].SensorType == 0x02)	/*湿度*/
+			ChannelForDisplay++;//ChannelForDisplay
+			Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
+			AlarmDeal(ChannelForDisplay);
+            
+            if(Conf.Sensor[ChannelForDisplay-1].SensorType == SENSOR_HUMI)	/*湿度*/
             {
                 /*!< Wait Until the last LCD RAM update finish */
                 while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
@@ -1513,7 +1591,12 @@ void Display_ChannelValue(uint8_t started_channel0)
 				showRH;
                 /*!< Requesy LCD RAM update */
                 LCD_UpdateDisplayRequest();  
-            }
+            }else{
+				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+				clearRH;
+				showC;
+				LCD_UpdateDisplayRequest();  
+			}
             break;
         }
         

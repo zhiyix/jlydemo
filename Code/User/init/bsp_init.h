@@ -18,7 +18,10 @@
 #define TouchVccCtrl_PORT GPIOF
 #define TouchVccCtrl_PIN  GPIO_Pin_3
 /************************************************/
-
+/*»úÐµ°´¼ü key PF13*/
+#define Key_CLK			  RCC_AHBPeriph_GPIOF
+#define Key_PORT		  GPIOF
+#define Key1_PIN		  GPIO_Pin_13
 /**********************GPIOC*********************/
 /*´¥Ãþ°´¼ü*/
 #define TouchKey_CLK	  RCC_AHBPeriph_GPIOC
@@ -97,5 +100,6 @@
 
 void SysInit(void);
 void PeripheralInit(void);
-
+void SetJlyParamData(void);
+void OffPowerSupply(void);
 #endif

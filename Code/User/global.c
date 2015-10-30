@@ -26,14 +26,13 @@ union ConfDataTable 	 Conf;
 uint8_t        rtc_pt;          //秒计数
 uint8_t        display_ct = 5;  //显示
 uint8_t 	   uAddress ;
+uint8_t 	   Key1ChangAnCount;	//机械按键长按检测计数
 uint8_t        ChannelForDisplay;   //显示计数
 uint8_t        StartedChannelForDisplay;    //显示启动的通道
-uint8_t        Started_Channel =3;
+uint8_t        Started_Channel;
 uint8_t  	   DataBuf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES]={0};
 
 uint16_t	   MsCount; //系统滴答计数
-
-uint16_t       testcount;
 
 uint16_t       adc[32];
 uint16_t       adcCopy[32];

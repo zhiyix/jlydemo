@@ -61,7 +61,7 @@ int main(void)
     SysInit();
 	
 	printf("\r\n this is a 32bits  demo \r\n");
-	
+	printf("struct BasicConfDataStr size:%d",sizeof(struct BasicConfDataStr));
   /* Add your application code here
      */
 
@@ -88,17 +88,16 @@ int main(void)
 	  JlySerialDeal();
 	  
       JlySecDeal();
-	  if(Flag.SysTickSec ==1)//模拟10s保存数据
+	  if(Flag.SysTickSec ==1)//模拟10s 数据
 	  {
          Flag.SysTickSec = 0;
          
          ReadFramHisDataToRam();
 //         Down_HisData();
 	  }
-      if(Flag.KeyDuanAn ==1)
+      if(Flag.TouchKey1DuanAn ==1)
       {
-//          Fram_Test();
-          Down_HisData();
+         Down_HisData();
 //		  DownFlash_HisData();
       }
 	  freemodbus_main();

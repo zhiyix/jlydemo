@@ -23,17 +23,18 @@ void KEY_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
+	/*»úÐµ°´¼ü key1 PF13*/
+	RCC_AHBPeriphClockCmd(Key_CLK,ENABLE);
 	
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+	GPIO_InitStructure.GPIO_Pin = Key1_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	
-	GPIO_Init(GPIOF,&GPIO_InitStructure);
+	GPIO_Init(Key_PORT,&GPIO_InitStructure);
 	
 	/************************GPIOC***************************/
 	/*´¥Ãþ°´¼ü*/
 	RCC_AHBPeriphClockCmd(TouchKey_CLK ,ENABLE);
-	/*´¥Ãþ°´¼ü touchkey3ÅäÖÃ*/
+	/*´¥Ãþ°´¼ü touchkey1 ÅäÖÃ*/
 	GPIO_InitStructure.GPIO_Pin = TouchKey1_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	

@@ -87,6 +87,8 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		Fram_Write(pucBuffer, ConfMap_Address[1][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_JlyConfAddr],ConfMap_Address[1][1] + offset * 2,size);
 		/*记录间隔变化时做相应处理*/
+		SetJlyParamData();
+		JudgingChannelNumberDisplay(Conf.Jly.ChannelNum);//修改通道数量
 		//if(Conf.)
 		
 	}else if (usAddress < VirtAlarmConfAddr)

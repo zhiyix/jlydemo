@@ -22,6 +22,4 @@ void ReadFramHisDataToRam(void);
 void Down_HisData(void);
 void DownFlash_HisData(void);
 
-void SaveData(void);
-
 #endif /* __I2C_EE_H */

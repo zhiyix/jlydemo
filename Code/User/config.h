@@ -34,9 +34,9 @@
 //! @{
 
 //! \brief 测试定义
-#define C_VER_YEAR      15
-#define C_VER_MONTH     10
-#define C_VER_DAY       23
+#define  C_VER_YEAR      15
+#define  C_VER_MONTH     10
+#define  C_VER_DAY       23
 //! \brief
 #define  Gps_choose          0
 #define  Clock_choose        1
@@ -67,9 +67,10 @@
 #define  Headend_BYTES       2
 #define  ID_BYTES            2
 //----------------------------------------------------------
-#define HIS_MAX_NUM              ((uint16_t)512/HIS_ONE_BYTES)//1540 ((u16)360/HIS_ONE_BYTES)
+/*Fram中存储数据的最大条数 (1000-2000)4096*/
+#define  HIS_MAX_NUM              ((uint16_t)4096/HIS_ONE_BYTES)//1540 ((u16)360/HIS_ONE_BYTES)
 //#define HIS_ONE_BYTES            (uint16_t)(Channel_count*8+(5+Clock_choose)+2)//24  72
-#define HIS_ONE_BYTES            (uint16_t)(Channel_count*2+8*Gps_choose+5+Clock_choose) 
+#define  HIS_ONE_BYTES            (uint16_t)(Channel_count*2+8*Gps_choose+5+Clock_choose) 
 
 /****************************************************************************************/
 //! \brief 协议中对应的虚拟地址
@@ -104,8 +105,8 @@
 #define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+34	//工作状态地址
 
 //! \brief FRAM中存放fram记录指针地址
-#define FRAM_RecAddr_Hchar          0x0CA0      
-#define FRAM_RecAddr_Lchar          0x0CA1
+#define FRAM_RecAddr_Lchar          0x0CA0      
+#define FRAM_RecAddr_Hchar          0x0CA1
 
 #define FLASH_RecAddr_Lchar         0x0CA2     //存放flash记录指针
 #define FLASH_RecAddr_MidLchar      0x0CA3
@@ -128,8 +129,14 @@
 //! @}
 
 /*============================ TYPES =========================================*/
-//! \brief 
-union MYU32
+//! \brief 自定义的u16数据结构
+union MyU16Data
+{
+	uint16_t Variable;
+	uint8_t  Byte[2];
+};
+//! \brief 自定义的u32数据结构
+union MyU32Data
 {
     uint32_t Variable;
     struct BSS
@@ -165,7 +172,8 @@ struct FLAG
 {
     __IO uint8_t Sec:1;             	//TIM2定时1s时间
     __IO uint8_t SysTickSec:1;      	//系统滴答时钟
-	__IO uint8_t KeyDuanAn:1;       	//key 短按
+	__IO uint8_t Key1DuanAn:1;       	//机械按键key1 短按
+	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
          uint8_t RecordFramOverFlow:1; 	//Fram中记录数据溢出标志，溢出置1
          uint8_t RecordFlashOverFlow:1; //Flash中记录数据溢出标志，溢出置1
 	
@@ -209,6 +217,7 @@ struct JLYPARAMETER
     uint8_t  WorkStatueIsStop:1; 	//记录仪工作状态，0停止工作
     uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
     uint8_t  LastErrorCode:1;		//错误码 
+	
 	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
 	uint16_t NormalRecIntervalMin;	//正常记录间隔 单位：min 
 	
@@ -216,6 +225,7 @@ struct JLYPARAMETER
     uint32_t SampleTime;			//采集时间 单位：s
 	
     uint32_t NormalRecInterval;  	//正常记录间隔 单位：s
+	uint32_t NormalRecIntervalOld;  //保存上一次的记录间隔 单位：s
     //uint32_t SaveHisDataTime;       //存储间隔
 	
 	int32_t delay_start_time;		// 延时启动时间 
@@ -225,11 +235,12 @@ struct JLYPARAMETER
 //----------------------------
 extern uint8_t      rtc_pt;
 extern uint8_t      display_ct;
-extern uint16_t     testcount;
+extern uint8_t 	    Key1ChangAnCount;
+extern uint8_t  	DataBuf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
 extern uint16_t     adc[32];
 extern uint16_t     adcCopy[32];
-extern uint8_t  	DataBuf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
 extern uint16_t	    MsCount;
+
 extern struct 		CircularQueue   Queue;
 extern struct 		FLAG			Flag;
 extern struct       RTCRX8025       Rtc;

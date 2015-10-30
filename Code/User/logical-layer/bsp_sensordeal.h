@@ -45,8 +45,9 @@
 /*============================ PROTOTYPES ====================================*/
 // MCU:
 /*============================ EXTERN FUNCTIONS ==============================*/
-uint32_t GetStartChanel(uint8_t chanel_num);
-void DoGatherChannelDataFloat(unsigned char ChannelCode);
+
+void DoGatherChannelDataFloat(uint8_t ChannelCode);
+void JudgingChannelNumberDisplay(uint8_t ChannelNum);
 //#ifdef __cplusplus
 //}
 //#endif

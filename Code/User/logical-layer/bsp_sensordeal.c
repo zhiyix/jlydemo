@@ -52,7 +52,7 @@
   * @param  chanel_num   总的通道数量		
   * @retval start_chanel 开启的通道		
   *****************************************************************************/
-uint32_t GetStartChanel(uint8_t chanel_num)
+static uint32_t GetStartChanel(uint8_t chanel_num)
 {
     uint8_t  i;
     uint32_t start_chanel;
@@ -63,6 +63,7 @@ uint32_t GetStartChanel(uint8_t chanel_num)
     }
     return start_chanel;
 }
+
 /******************************************************************************
   * @brief  Description 计算通道原始温湿度数据
   * @param  ChannelItem 传感器通道 		
@@ -509,7 +510,7 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
     switch(sensortype)
     {
         case NULL:
-            
+				
             break;
         //温度处理
         case SENSOR_TEMP:
@@ -570,7 +571,7 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
   * @param  ChannelCode 启动的通道
   * @retval 无		
   *****************************************************************************/
-void DoGatherChannelDataFloat(unsigned char ChannelCode)
+void DoGatherChannelDataFloat(uint8_t ChannelCode)
 {
     uint8_t i;
     uint8_t ChiFang2 = 0x01;
@@ -586,7 +587,21 @@ void DoGatherChannelDataFloat(unsigned char ChannelCode)
     }
 }
 
-
+/******************************************************************************
+  * @brief  Description  
+  * @param  chanel_num   
+  * @retval start_chanel 
+  *****************************************************************************/
+void JudgingChannelNumberDisplay(uint8_t ChannelNum)
+{
+	if(ChannelNum <= 0)
+	{
+		Display_NUL();//配置的通道数为0,显示NUL
+	}else{
+		Started_Channel = GetStartChanel(ChannelNum); //通道数转换为 启动的通道
+		StartedChannelForDisplay = Started_Channel;
+	}
+}
 #endif /* __BSPSENSORDEAL_C */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

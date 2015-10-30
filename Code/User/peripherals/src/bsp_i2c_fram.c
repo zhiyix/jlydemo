@@ -117,114 +117,48 @@ void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose)
     DataBuf[i++]=zhuangtai_temp;
 }
 /******************************************************************************
-  * @brief  Description 保存数据处理
+  * @brief  Description 读Fram存储指针
   * @param  无  		 	
   * @retval 无		
   *****************************************************************************/
-//void SaveData(void)
-//{
-//    if(JlyParam.SaveDataTimeOnlyRead>=7)//至少7s v1.7
-//    {
-//        if(JlyParam.Save_Time == JlyParam.SaveDataTimeOnlyRead-5)//保存数据
-//        {
-//            if(IsReadingI2c)
-//            {
-//                ++IsReadingI2cCt;
-//                if(IsReadingI2cCt>200){IsReadingI2cCt=0;IsReadingI2c=0;}
-//                save_time = SaveDataTimeOnlyRead-6;
-//            }
-//            else
-//            {
-//                if(FileContinuouslyReadTimeoutCt!=0)
-//                {
-//                    WriteGatherDataToRam(started_channel);
-//                    Flag.IsWritenToRam = 1;
-//                }
-//                else if(Flag.IsWritenToRam)
-//                {
-//                    WriteE2promFromRam();
-//                    Flag.IsWritenToRam = 0;
-//                }
-//                else
-//                {
-//                      read_time();
-//                      ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
-//                      SaveHisDataToFram();
-//                    Save_Channel_Data(started_channel);	//??????????
-//                    //Flag.recflag=1;//????,REC???
-//                    //showREC;
-//                    //display_mem();
-//                }
-//            }
-//        }
-//        if((--JlyParam.Save_Time)<=0)
-//        {
-//            JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
-//        }
-//    }
-//    else
-//    {
-//        if((--JlyParam.Save_Time)<=0)
-//        {
-//            if(IsReadingI2c)
-//            {
-//                ++IsReadingI2cCt;
-//                if(IsReadingI2cCt>200){IsReadingI2cCt=0;IsReadingI2c=0;}
-//                save_time = SaveDataTimeOnlyRead-1;
-//            }
-//            else
-//            {
-//                JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
-//                
-//                if(FileContinuouslyReadTimeoutCt!=0)
-//                {
-//                    WriteGatherDataToRam(started_channel);
-//                    Flag.IsWritenToRam = 1;
-//                }
-//                else if(Flag.IsWritenToRam)
-//                {
-//                    WriteE2promFromRam();
-//                    Flag.IsWritenToRam = 0;
-//                }
-//                else
-//                {
-//                    read_time();
-//                    ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
-//                    SaveHisDataToFram();	//??????????
-//                    
-//                }
-//            }
-//        }
-//    }
-//    
-//    if((--JlyParam.Save_Time)<=0)
-//    {
-//        JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
-//    }
-
-//    Flag.IsDisplayRightNow=1;
-//}
+static void ReadFramRecPointer(void)
+{
+	union MyU16Data myu16;
+	Fram_Read(myu16.Byte,FRAM_RecAddr_Lchar,2); //读出Fram存储指针 u16 2字节
+	Queue.RecorderFramPointer = myu16.Variable; //更新Fram存储指针
+}
+/******************************************************************************
+  * @brief  Description 读Fram存储指针
+  * @param  无  		 	
+  * @retval 无		
+  *****************************************************************************/
+static void WriteFramRecPointer(void)
+{
+	union MyU16Data myu16;
+	myu16.Variable = Queue.RecorderFramPointer;
+	Fram_Write(myu16.Byte,FRAM_RecAddr_Lchar,2); //保存Fram存储指针 u16 2字节
+}
 /******************************************************************************
   * @brief  Description 读Flash存储指针
   * @param  无  		 	
   * @retval 无		
   *****************************************************************************/
-static void ReadFlashRecAddr(void)
+static void ReadFlashRecPointer(void)
 {
-    union MYU32 myu32; 
-    AI2C_Read(myu32.Byte,FLASH_RecAddr_Lchar,4);    //读出Flash存储指针
-    Queue.RecorderFlashPoint = myu32.Variable;
+    union MyU32Data myu32; 
+    Fram_Read(myu32.Byte,FLASH_RecAddr_Lchar,4);    //读出Flash存储指针 u32 4字节
+    Queue.RecorderFlashPointer = myu32.Variable;	//更新Flash存储指针
 }
 /******************************************************************************
   * @brief  Description 存Flash存储指针
   * @param  无  		 	
   * @retval 无		
   *****************************************************************************/
-static void WriteFlashRecAddr(void)
+static void WriteFlashRecPointer(void)
 {
-    union MYU32 myu32; 
-    myu32.Variable = Queue.RecorderFlashPoint;
-    AI2C_Write(myu32.Byte, FLASH_RecAddr_Lchar, 4); //保存Flash存储指针
+    union MyU32Data myu32; 
+    myu32.Variable = Queue.RecorderFlashPointer;
+    Fram_Write(myu32.Byte, FLASH_RecAddr_Lchar, 4); //保存Flash存储指针 u32 4字节
 }
 /******************************************************************************
   * @brief  Description 保存数据到flash
@@ -243,24 +177,21 @@ void SaveHisDataToFlash(void)
   *****************************************************************************/
 void SaveHisDataToFram(void)
 {
-	uint8_t Recorderpoint_L,Recorderpoint_H;
     //uint8_t TempBuf[512];
     uint16_t eeOffset;
 
-	AI2C_Read(&Recorderpoint_L,FRAM_RecAddr_Lchar,1);
-	AI2C_Read(&Recorderpoint_H,FRAM_RecAddr_Hchar,1);
-    Queue.RecorderPoint=Recorderpoint_L+(Recorderpoint_H<<8);
+	ReadFramRecPointer();	//读取Fram指针
     //ReadFlashRecAddr();
     
-    eeOffset = Queue.RecorderPoint*HIS_ONE_BYTES; 
-	AI2C_Write(&DataBuf[3], (FRAM_RecFirstAddr+eeOffset), HIS_ONE_BYTES);
+    eeOffset = Queue.RecorderFramPointer * HIS_ONE_BYTES; 
+	Fram_Write(&DataBuf[3], (FRAM_RecFirstAddr+eeOffset), HIS_ONE_BYTES); //写历史数据到Fram中
 
-    Queue.RecorderPoint++;
-    Queue.RecorderFlashPoint ++;
-    if(Queue.RecorderPoint >= HIS_MAX_NUM)
+    Queue.RecorderFramPointer++;	//数据在Fram中存完一条指针加1
+    Queue.RecorderFlashPointer++;
+    if(Queue.RecorderFramPointer >= HIS_MAX_NUM)
     {
-        Queue.RecorderPoint=0;
-        Flag.RecordFramOverFlow=1;
+        Queue.RecorderFramPointer = 0;
+        Flag.RecordFramOverFlow = 1;
         
         //AI2C_Read(TempBuf,FRAM_RecFirstAddr,HIS_MAX_NUM*HIS_ONE_BYTES);
 		
@@ -272,25 +203,22 @@ void SaveHisDataToFram(void)
 //			}
 //			SPI_FLASH_SectorErase(FLASH_SectorFirstAddr+(Queue.FlashSectorPoint/8)*FLASH_SectorPerSize);//考虑边界问题
 //		}
-		Queue.FlashSectorPoint++;
+		Queue.FlashSectorPointer++;
 		//SPI_FLASH_SectorErase();
 		//fram第一次存储满，从flash中0地址开始存储,
 //        SPI_FLASH_BufferWrite(TempBuf, (FLASH_RecFirstAddr+(Queue.RecorderFlashPoint-HIS_MAX_NUM)*HIS_ONE_BYTES), HIS_MAX_NUM*HIS_ONE_BYTES);
     
-        if(Queue.RecorderFlashPoint >=Flash_MAX_NUM)
+        if(Queue.RecorderFlashPointer >= Flash_MAX_NUM)
         {
-            Queue.RecorderFlashPoint = 0;
+            Queue.RecorderFlashPointer = 0;
             Flag.RecordFlashOverFlow =1;
             
         }
     }
 	
-    Recorderpoint_L=(uint8_t)Queue.RecorderPoint&0X00FF;
-    Recorderpoint_H=(uint8_t)Queue.RecorderPoint>>8;
-    
-	AI2C_Write(&Recorderpoint_L, FRAM_RecAddr_Lchar, 1);
-	AI2C_Write(&Recorderpoint_H, FRAM_RecAddr_Hchar, 1);
-    WriteFlashRecAddr();
+    WriteFramRecPointer(); //保存完数据，保存当前Fram中的记录指针
+	
+    //WriteFlashRecPointer();
 }
 /******************************************************************************
   * @brief  Description 读铁电数据到内存中
@@ -307,8 +235,8 @@ void ReadFramHisDataToRam(void)
     
     AI2C_Read(&Recorderpoint_L,FRAM_RecAddr_Lchar,1);
 	AI2C_Read(&Recorderpoint_H,FRAM_RecAddr_Hchar,1);
-    Queue.RecorderPoint=Recorderpoint_L+(Recorderpoint_H<<8);
-    RecorderPoint_temp = Queue.RecorderPoint;
+    Queue.RecorderFramPointer=Recorderpoint_L+(Recorderpoint_H<<8);
+    RecorderPoint_temp = Queue.RecorderFramPointer;
     read_eeOffset_temp = RecorderPoint_temp*HIS_ONE_BYTES;
     
     BufA[i++]=0xaa;//
@@ -387,31 +315,29 @@ static void HisData_Tidy(uint16_t RecorderPoint_Begin,uint16_t RecorderPoint)
   *****************************************************************************/
 void Down_HisData(void)
 {
-    uint8_t Recorderpoint_L,Recorderpoint_H;
     uint16_t  RecorderPoint_temp;
     
-    AI2C_Read(&Recorderpoint_L,FRAM_RecAddr_Lchar,1);
-	AI2C_Read(&Recorderpoint_H,FRAM_RecAddr_Hchar,1);
-    Queue.RecorderPoint=Recorderpoint_L+(Recorderpoint_H<<8);
-    RecorderPoint_temp = Queue.RecorderPoint;
+    ReadFramRecPointer(); //
+	
+    RecorderPoint_temp = Queue.RecorderFramPointer;
     
     //RecorderPoint_temp=3;
     //Flag.Record_BelowMax =0;
     if(RecorderPoint_temp==0)
     {
-        Flag.KeyDuanAn = 0;
+        Flag.TouchKey1DuanAn = 0;
     }
     if(Flag.RecordFramOverFlow ==0)
     {
         HisData_Tidy(0,RecorderPoint_temp);
-        Flag.KeyDuanAn = 0;
+        Flag.TouchKey1DuanAn = 0;
     }
     if(Flag.RecordFramOverFlow >=1)
     {
         HisData_Tidy(RecorderPoint_temp,HIS_MAX_NUM); 
         
         HisData_Tidy(0,RecorderPoint_temp);
-        Flag.KeyDuanAn = 0;            
+        Flag.TouchKey1DuanAn = 0;            
     }
 }
 /******************************************************************************
@@ -469,25 +395,26 @@ void DownFlash_HisData(void)
 {
     uint32_t  RecorderPoint_temp;
     
-    ReadFlashRecAddr();
-    RecorderPoint_temp = Queue.RecorderFlashPoint;
+    ReadFlashRecPointer();
+	
+    RecorderPoint_temp = Queue.RecorderFlashPointer;
     
     
     if(RecorderPoint_temp==0)
     {
-        Flag.KeyDuanAn = 0;
+        Flag.Key1DuanAn = 0;
     }
     if(Flag.RecordFlashOverFlow ==0)
     {
         ReadFlashHisData(0,RecorderPoint_temp);
-        Flag.KeyDuanAn = 0;
+        Flag.Key1DuanAn = 0;
     }
     if(Flag.RecordFlashOverFlow >=1)
     {
         ReadFlashHisData(RecorderPoint_temp,Flash_MAX_NUM); 
         
         ReadFlashHisData(0,RecorderPoint_temp);
-        Flag.KeyDuanAn = 0;            
+        Flag.Key1DuanAn = 0;            
     }
 }
 /******************************************************************************

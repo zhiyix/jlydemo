@@ -192,7 +192,7 @@ void VoltageTest(void)
   *****************************************************************************/
 void FirstCheckExternPower(void)
 {
-	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)
+	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)
     {
         Flag.ExPwOn = 1;	/*有外接电*/
     }
@@ -213,11 +213,11 @@ void FirstCheckExternPower(void)
 void OutpowerShan(void)
 {
     // --------------------------------------------------
-    if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)/*有外接电*/
+    if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)/*有外接电*/
     {
         if(Flag.Powerdowncountflag==1)
         {
-            if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)
+            if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)
             {
                 //BellNn(1);
                 Flag.ExPwOn=1;
@@ -242,7 +242,7 @@ void OutpowerShan(void)
     // ----------------------------------------------------
     if(Flag.ExPwOn==1)
     {
-        if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)/*有外接电*/
+        if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)/*有外接电*/
         {
             Flag.ExPwOn=1;
 			while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);

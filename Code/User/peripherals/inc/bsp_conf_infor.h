@@ -253,9 +253,9 @@ struct TempHumiAdjustConfDataStr
 //! \brief fram flash存储指针结构
 struct CircularQueue
 {
-    uint16_t RecorderPoint;     //fram中记录数据指针
-    uint32_t RecorderFlashPoint;//flash中记录数据指针
-    uint32_t FlashSectorPoint;	//flash中扇区指针
+    uint16_t RecorderFramPointer;   //fram中记录数据指针
+    uint32_t RecorderFlashPointer;  //flash中记录数据指针
+    uint32_t FlashSectorPointer;	//flash中扇区指针
 };
 //! \brief 配置表
 /*!< 基本配置数据地址表   1 (Display="Hex",ADDRESS_OFFSET=0x0000):

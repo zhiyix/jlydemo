@@ -140,113 +140,11 @@ static void LOWorNomal_Mode(void)
     }
 }
 /******************************************************************************
-  * @brief  Description 记录仪工作状态处理
-  * @param  无  		
-  * @retval 无		
-  *****************************************************************************/
-static void WorkornotMode(void)
-{
-    if(Conf.Jly.WorkStatueIsStop <1)//停止工作
-    {
-		/*关掉外设电源*/
-		AVCC1_POWER(OFF);	/* 关传感器电源 */
-        BEEP(OFF);			/* 关蜂鸣器 */
-		AlarmLed2_OFF;		/* 关报警灯 */
-		
-		lcd_OFF(JlyParam.ShowOffCode);
-		
-        if(JlyParam.LastErrorCode!=0)
-        {
-            displayErr(JlyParam.LastErrorCode);
-		}
-        if(Flag.MucReset==1)
-        {
-            Flag.MucReset=0;
-            
-        }
-        return;
-    }
-    else
-    {
-        
-        LOWorNomal_Mode();
-        
-//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
-//        {
-            Display_ChannelValue(StartedChannelForDisplay);  //LCD 
-//        }
-        Display_Signal(2);/*显示信号强度*/
-        Display_Mem();	  /*显示存储容量*/
-//         SaveData();
-        Flag.IsDisplayRightNow=1;
-        
-    } 
-}
-
-
-/******************************************************************************
-  * @brief  Description 记录仪1s处理标志
-  * @param  无  		
-  * @retval 无		
-  *****************************************************************************/
-static void OneSec_Timedeal(void)
-{
-    
-    //LCD显示处理
-    display_ct++;          
-    if(display_ct>=36)
-    {
-        display_ct = 0;
-         
-    }
-   /*检测外接电接入*/
-	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_ACtest) == 0)         
-    {
-        PManage.HaveExternalPower++;
-        if(PManage.HaveExternalPower >= ExternalPowerchecktime)
-        {
-            Flag.Powerdowncountflag=1;
-            PManage.HaveExternalPower=0;
-        }
-    }    
-	/*****************************************************************
-	 *有外接电的情况
-	 *(1)接锂电池，检测其充满电
-	 *(2)未接锂电池
-	 *****************************************************************/
-	if(Flag.ExPwOn == 1)	
-	{
-		if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_Deal_CHGtest) == 1)         
-		{
-			PManage.BatChargeFullCount++;
-			
-			if(PManage.BatChargeFullCount >= ExternalPowerchecktime)/*检测60s*/
-			{
-				PManage.BatChargeFullCount=0;
-				Flag.BatChargeFull=1;/*接外接电，电池充满标志*/
-				
-				Flag.BatCharging = 0;/*接外接电未接电池，电池未充电*/
-			}			
-		}
-		else
-		{
-			Flag.BatChargeFull=0;
-			Flag.BatCharging = 1;/*接外接电，电池正在充电中*/
-		}
-	}
-	else
-	{
-		Flag.BatChargeFull=0;
-		Flag.BatCharging = 0;/*外接电未接*/
-	}
-	
-}
-/******************************************************************************
   * @brief  Description 记录仪
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
-void SaveDataOnTimeDeal(void)
+static void SaveDataOnTimeDeal(void)
 {
     
     read_time();
@@ -290,6 +188,130 @@ void SaveDataOnTimeDeal(void)
 	
 }
 /******************************************************************************
+  * @brief  Description 记录仪工作状态处理
+  * @param  无  		
+  * @retval 无		
+  *****************************************************************************/
+static void WorkornotMode(void)
+{
+    if(Conf.Jly.WorkStatueIsStop < 1)//停止工作
+    {
+		OffPowerSupply();//关设备电源
+		
+		lcd_OFF(JlyParam.ShowOffCode);
+		
+        if(JlyParam.LastErrorCode!=0)
+        {
+            displayErr(JlyParam.LastErrorCode);
+		}
+        if(Flag.MucReset==1)
+        {
+            Flag.MucReset=0;
+            
+        }
+        return;
+    }
+    else
+    {
+        
+        LOWorNomal_Mode();
+        
+//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
+//        {
+            Display_ChannelValue(StartedChannelForDisplay);  //LCD 
+//        }
+        Display_Signal(2);/*显示信号强度*/
+        Display_Mem();	  /*显示存储容量*/
+		
+		SaveDataOnTimeDeal();
+		
+        Flag.IsDisplayRightNow=1;
+        
+    } 
+}
+
+
+/******************************************************************************
+  * @brief  Description 记录仪1s处理标志
+  * @param  无  		
+  * @retval 无		
+  *****************************************************************************/
+static void OneSec_Timedeal(void)
+{
+    
+    //LCD显示处理
+    display_ct++;          
+    if(display_ct>=36)
+    {
+        display_ct = 0;
+         
+    }
+	/*****************************************************************/
+	/*机械按键 key1长按检测*/
+	if((GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)&&(Flag.Key1DuanAn == 1))
+	{
+		Delay_ms(10);//10ms 延时消抖
+		if(GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)
+		{
+			Key1ChangAnCount++;
+			if(Key1ChangAnCount >= 3)
+			{
+				Key1ChangAnCount = 0;
+				
+				Conf.Jly.RecBootMode = 0x03;/* 机械按键手动启动*/
+				BellNn(1);
+				rtc_deel();
+			}
+		}
+	}else{
+		Key1ChangAnCount = 0;
+	}
+	
+	/*****************************************************************/
+   /*检测外接电接入*/
+	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)         
+    {
+        PManage.HaveExternalPower++;
+        if(PManage.HaveExternalPower >= ExternalPowerchecktime)
+        {
+            Flag.Powerdowncountflag=1;
+            PManage.HaveExternalPower=0;
+        }
+    }    
+	/*****************************************************************
+	 *有外接电的情况
+	 *(1)接锂电池，检测其充满电
+	 *(2)未接锂电池
+	 *****************************************************************/
+	if(Flag.ExPwOn == 1)	
+	{
+		if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_CHGtest_PIN) == 1)         
+		{
+			PManage.BatChargeFullCount++;
+			
+			if(PManage.BatChargeFullCount >= ExternalPowerchecktime)/*检测60s*/
+			{
+				PManage.BatChargeFullCount=0;
+				Flag.BatChargeFull=1;/*接外接电，电池充满标志*/
+				
+				Flag.BatCharging = 0;/*接外接电未接电池，电池未充电*/
+			}			
+		}
+		else
+		{
+			Flag.BatChargeFull=0;
+			Flag.BatCharging = 1;/*接外接电，电池正在充电中*/
+		}
+	}
+	else
+	{
+		Flag.BatChargeFull=0;
+		Flag.BatCharging = 0;/*外接电未接*/
+	}
+	
+}
+
+/******************************************************************************
   * @brief  Description 记录仪处理函数
   * @param  无  		
   * @retval 无		
@@ -316,14 +338,10 @@ void JlySecDeal(void)
 		
         WorkornotMode();
         
-		SaveDataOnTimeDeal();
     }
-	if(Conf.Jly.WorkStatueIsStop == 0) /*停止工作*/
+	if(Conf.Jly.WorkStatueIsStop < 1) /*停止工作*/
     {
-		/*关掉外设电源*/
-        AVCC1_POWER(OFF);	/* 关传感器电源 */
-        BEEP(OFF);			/* 关蜂鸣器 */
-		AlarmLed2_OFF;		/* 关报警灯 */
+		OffPowerSupply();//关设备电源
 		
         lcd_OFF(JlyParam.ShowOffCode);
 

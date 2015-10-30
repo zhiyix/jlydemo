@@ -49,6 +49,9 @@ static void RCC_Config(void)
 	
 	/*关闭低速外部时钟信号功能后,PC13 PC14 PC15才可以当普通IO用*/
     RCC_LSEConfig(RCC_LSE_OFF); 
+	///*!< Wait till LSE is ready */
+    //while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET);
+		
 	/*开启低速内部时钟供LCD 使用*/
 	RCC_LSICmd(ENABLE);
 	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
@@ -71,7 +74,7 @@ static void General_GPIO_Config(void)
 	/************************GPIOF***************************/
 	/*外接电接入，充电指示完成*/
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
-	GPIO_InitStructure.GPIO_Pin = Power_Deal_ACtest | Power_Deal_CHGtest;
+	GPIO_InitStructure.GPIO_Pin = Power_ACtest_PIN | Power_CHGtest_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_Init(Power_Deal_PORT,&GPIO_InitStructure);
 	/*液晶背光 PF2*/
@@ -156,28 +159,60 @@ static void General_GPIO_Config(void)
   *****************************************************************************/
 static void FirstScanSysData(void)
 {
-	//uint8_t num=0;
-	//uint8_t tempbuf[20];
-	//tempbuf[0]=8;
-    //JlyParam.SaveDataTimeOnlyRead = 10; //采样时间
-    //JlyParam.Save_Time = JlyParam.SaveDataTimeOnlyRead;
-    
-	//test
-//	Fram_Write(buf,FRAM_WorkStatueIsStopAddr,1);
-//	num = Fram_Read(buf,FRAM_WorkStatueIsStopAddr,1);
 	
 	Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
 	
 	/*重要参数*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
 	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
+	JlyParam.NormalRecIntervalOld = JlyParam.NormalRecInterval;	  //保存上一次的记录间隔
 	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
 	
 	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
 	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
 	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
 	
+}
+/******************************************************************************
+  * @brief  Description 设置内存中记录仪参数,判断记录间隔是否已改变，改变了则
+						询问是否清楚历史数据
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+void SetJlyParamData(void)
+{
+	/*重要参数*/
+	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
+	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
+	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
+	if(JlyParam.NormalRecInterval != JlyParam.NormalRecIntervalOld)//记录间隔已改变
+	{
+		JlyParam.NormalRecIntervalOld = JlyParam.NormalRecInterval;	  //保存上一次的记录间隔
+		Queue.RecorderFramPointer = 0; //清除Fram中的历史数据
+	}
 	
+	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
+	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
+	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
+	
+}
+/******************************************************************************
+  * @brief  Description 关掉外设电源
+						1.关传感器电源
+						2.关电池电压检测电源
+						3.关蜂鸣器
+						4.关LED灯
+						5.LCD背光电源
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+void OffPowerSupply(void)
+{
+	AVCC1_POWER(OFF);     //关传感器电源
+    BATTEST_POWER(OFF);   //关电池电压检测电源
+	BEEP(OFF);
+	LED1(OFF);LED2(OFF);
+	LcdBackLight(OFF);
 }
 /******************************************************************************
   * @brief  Description 系统初始化
@@ -186,31 +221,34 @@ static void FirstScanSysData(void)
   *****************************************************************************/
 void SysInit(void)
 {
-    FirstScanSysData();
     
-	FirstCheckExternPower();	//系统上电检测外接电
+	OffPowerSupply();
+    //系统上电检测外接电
+	FirstCheckExternPower();
+	//上电显示
+    FisrtPowerOnDisplay();
 	
-    read_time();
-    while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-	displayTIME(Rtc.Hour,Rtc.Minute);
-    showTIME;	/*显示钟表符号*/
-	LCD_UpdateDisplayRequest();
-    
-	Started_Channel = GetStartChanel(Conf.Jly.ChannelNum); //通道数转换为 启动的通道
-	StartedChannelForDisplay = Started_Channel;
+	FirstScanSysData();
+	
+	//上电后判断通道数量,数量为0显示NUL
+	JudgingChannelNumberDisplay(Conf.Jly.ChannelNum);
     
 	
     Flag.MucReset = 1;
     Flag.IsDisplayRightNow = 1;    
 	
-	Queue.FlashSectorPoint = 0;
+	Queue.FlashSectorPointer = 0;
 	
-	AVCC1_POWER(OFF);     //关传感器电源
-    BATTEST_POWER(OFF);   //关电池电压检测电源
+	
 	MODEL_PWRCTRL(ON);	  //开对外接口电源
 	TOUCHKEY_POWER(ON);	  //开触摸按键电源
 	
 	BellNn(1);
+	
+	/*****************************************/
+	//测试
+	
+	/*****************************************/
 }
 /******************************************************************************
   * @brief  Description 外设初始化
@@ -230,6 +268,8 @@ void PeripheralInit(void)
 	
 	General_GPIO_Config();
 	
+	I2C_GPIO_Config();
+	
 	LCD_GLASS_Init();
 	
 	USART1_Config(115200);
@@ -242,8 +282,6 @@ void PeripheralInit(void)
     /* 8M串行flash W25Q64初始化 */
 	SPI_FLASH_Init();
 	
-	I2C_GPIO_Config();
-    
     //RX8025AC 初始化
 	RX8025_RTC_Init();
 }

@@ -35,9 +35,9 @@
 
 #define Power_Deal_PORT 	GPIOF
 /*指示 有效输入电源 ACOK*/
-#define Power_Deal_ACtest 	GPIO_Pin_4
+#define Power_ACtest_PIN 	GPIO_Pin_4
 /*指示充电完成 CHGOK*/
-#define Power_Deal_CHGtest 	GPIO_Pin_5
+#define Power_CHGtest_PIN 	GPIO_Pin_5
 //! @}
 
 /*============================ TYPES =========================================*/
