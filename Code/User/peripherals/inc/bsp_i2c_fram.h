@@ -14,12 +14,20 @@
  */
 
 
-void I2C_GPIO_Config(void);
 void Fram_Test(void);
 void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose);
 void SaveHisDataToFram(void);
 void ReadFramHisDataToRam(void);
 void Down_HisData(void);
+
+void SaveHisDataToFlash(void);
 void DownFlash_HisData(void);
 
+uint32_t ReadFlashDataPointer(void);
+
+void WriteFramRecPointer(uint16_t Pointer);
+void WriteFlashRecPointer(uint32_t Pointer);
+
+void WriteFlashSectorPointer(uint16_t Pointer);
+void WriteFlashDtatPointer(uint32_t Pointer);
 #endif /* __I2C_EE_H */

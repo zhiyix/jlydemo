@@ -1272,15 +1272,15 @@ void Display_Mem(void)
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
     if(Flag.RecordFlashOverFlow==0)/*未溢出过*/
     {
-        if(Queue.RecorderFlashPointer<=(Flash_MAX_NUM/5)) /**/
+        if(Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM/5)) /**/
             {showFlashMEM1;}
-        else if((Queue.RecorderFlashPointer<=(Flash_MAX_NUM*2/5))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM/5)))
+        else if((Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM*2/5))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM/5)))
             {showFlashMEM2;}
-        else if((Queue.RecorderFlashPointer<=(Flash_MAX_NUM*3/5))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM*2/5)))
+        else if((Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM*3/5))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM*2/5)))
             {showFlashMEM3;}
-        else if((Queue.RecorderFlashPointer<=(Flash_MAX_NUM*4/5))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM*3/5)))
+        else if((Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM*4/5))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM*3/5)))
             {showFlashMEM4;}
-        else if((Queue.RecorderFlashPointer<(Flash_MAX_NUM))&&(Queue.RecorderFlashPointer>(Flash_MAX_NUM*4/5)))
+        else if((Queue.RecFlashWritePointer<(Queue.FLASH_MAX_NUM))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM*4/5)))
             {showFlashMEM5;}
     }
     else/*溢出，显示满格*/
@@ -1501,9 +1501,9 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
     clearxiaxian;
     
     clearFUHAO;
-    clearRH;
+    //clearRH;
 	clearJINBAO;
-    clearC;
+    //clearC;
 	
     if(Conf.Sensor[chanel-1].SensorType ==0x00 )    
 	{

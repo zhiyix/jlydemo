@@ -35,7 +35,7 @@ void KEY_GPIO_Config(void)
 	/*´¥Ãþ°´¼ü*/
 	RCC_AHBPeriphClockCmd(TouchKey_CLK ,ENABLE);
 	/*´¥Ãþ°´¼ü touchkey1 ÅäÖÃ*/
-	GPIO_InitStructure.GPIO_Pin = TouchKey1_PIN;
+	GPIO_InitStructure.GPIO_Pin = TouchKey1_PIN | TouchKey2_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	
 	GPIO_Init(TouchKey_PORT,&GPIO_InitStructure);
@@ -68,15 +68,19 @@ void EXTI15_10_Config(void)
 	/**************************************************************/
 	
 	 /**************************************************************/
+	/* Connect EXTI14 Line to PC14 pin */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource14);
+	/* Configure EXTI14 line */
+	EXTI_InitStructure.EXTI_Line = EXTI_Line14;
+	EXTI_Init(&EXTI_InitStructure);
+	
 	/* Connect EXTI15 Line to PC15 pin */
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource15);
 	/* Configure EXTI15 line */
 	EXTI_InitStructure.EXTI_Line = EXTI_Line15;
-
 //	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 //	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
 //	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	
 	EXTI_Init(&EXTI_InitStructure);
   
 	/* Enable and set EXTI15_10 Interrupt to the lowest priority */

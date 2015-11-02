@@ -166,8 +166,9 @@ static void SaveDataOnTimeDeal(void)
 		{
 			
 			read_time();
-			ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
-			SaveHisDataToFram();
+			ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
+			//SaveHisDataToFram();
+			SaveHisDataToFlash();
 		}
 	}
 	else
@@ -180,8 +181,9 @@ static void SaveDataOnTimeDeal(void)
 				Rtc.TCPS=Rtc.TMPS;
 				
 				read_time();
-				ChannelDataDeal(Channel_count,Clock_choose,Gps_choose);
-				SaveHisDataToFram();
+				ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
+				//SaveHisDataToFram();
+				SaveHisDataToFlash();
 			}
 		}
 	}

@@ -41,13 +41,16 @@
 #define  Gps_choose          0
 #define  Clock_choose        1
 
-#define  Channel_count       2
 //对应通道
 #define  CH_1                0
 #define  CH_2                1
 #define  CH_3                2
 #define  CH_4                3
 
+#define  Headend_BYTES       2 //数据包头尾各一个字节
+#define  ID_BYTES            2 //SN号2个字节
+//通道数为32时一包数据字节数(一个通道2个字节)
+#define  HIS_ONE_MAX_BYTES   (uint16_t)(32*2+8*Gps_choose+5+Clock_choose)
 //! \brief 外接电池宏定义   
 #define  VOLTAGE 
 #define  vtest_cnt           7
@@ -63,14 +66,6 @@
 //! \brief AD最小、最大值
 #define  ADC_ERR_L           10
 #define  ADC_ERR_H           4090
-
-#define  Headend_BYTES       2
-#define  ID_BYTES            2
-//----------------------------------------------------------
-/*Fram中存储数据的最大条数 (1000-2000)4096*/
-#define  HIS_MAX_NUM              ((uint16_t)4096/HIS_ONE_BYTES)//1540 ((u16)360/HIS_ONE_BYTES)
-//#define HIS_ONE_BYTES            (uint16_t)(Channel_count*8+(5+Clock_choose)+2)//24  72
-#define  HIS_ONE_BYTES            (uint16_t)(Channel_count*2+8*Gps_choose+5+Clock_choose) 
 
 /****************************************************************************************/
 //! \brief 协议中对应的虚拟地址
@@ -105,25 +100,35 @@
 #define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+34	//工作状态地址
 
 //! \brief FRAM中存放fram记录指针地址
-#define FRAM_RecAddr_Lchar          0x0CA0      
-#define FRAM_RecAddr_Hchar          0x0CA1
+#define FRAM_RecWriteAddr_Lchar          0x0CA0      
+#define FRAM_RecWriteAddr_Hchar          0x0CA1
 
-#define FLASH_RecAddr_Lchar         0x0CA2     //存放flash记录指针
-#define FLASH_RecAddr_MidLchar      0x0CA3
-#define FLASH_RecAddr_MidHchar      0x0CA4
-#define FLASH_RecAddr_Hchar         0x0CA5
+#define FLASH_SectorWriteAddr_Lchar		 0x0CA2		//Flash扇区写指针
+#define FLASH_SectorWriteAddr_Hchar		 0x0CA3
 
+#define FLASH_RecWriteAddr_Lchar         0x0CA4     //存放flash记录指针
+#define FLASH_RecWriteAddr_MidLchar      0x0CA5
+#define FLASH_RecWriteAddr_MidHchar      0x0CA6
+#define FLASH_RecWriteAddr_Hchar         0x0CA7
+
+#define FLASH_ReadDataAddr_Lchar		 0x0CA8		//flash读数据指针
+#define FLASH_ReadDataAddr_MidLchar	     0x0CA8
+#define FLASH_ReadDataAddr_MidHchar		 0x0CA8
+#define FLASH_ReadDataAddr_Hchar		 0x0CA8
 //! \brief FRAM中地址定义
 #define FRAM_RecFirstAddr           0x1000      //Fram中存放历史数据的首地址
-
+#define FRAM_RecMaxSize				4096		//Fram中存储数据的字节总数 (1000-2000)4096
 
 //----------------------------------------------------------
 //! \brief
 #define FLASH_PAGE_NUM              32768   //flash总的页数
-#define Flash_MAX_NUM               ((uint32_t)8388608/HIS_ONE_BYTES) //flash总的字节数
+//测试 用两个扇区模拟数据存储
+#define FLASH_RecMaxSize            8192  //flash中存储数据的字节总数 (800000) 8M  8388608
 
 #define FLASH_RecFirstAddr           0x000000   //Flash中存放数据的首地址
 #define FLASH_SectorFirstAddr		 0x000000
+//测试 2个扇区
+#define FLASH_SectorNum				 2		//8M的flash有2048 sector 2048
 #define FLASH_SectorPerSize          4096		//Flash每个扇区的大小
 
 //! @}
@@ -174,6 +179,7 @@ struct FLAG
     __IO uint8_t SysTickSec:1;      	//系统滴答时钟
 	__IO uint8_t Key1DuanAn:1;       	//机械按键key1 短按
 	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
+	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
          uint8_t RecordFramOverFlow:1; 	//Fram中记录数据溢出标志，溢出置1
          uint8_t RecordFlashOverFlow:1; //Flash中记录数据溢出标志，溢出置1
 	
@@ -217,15 +223,15 @@ struct JLYPARAMETER
     uint8_t  WorkStatueIsStop:1; 	//记录仪工作状态，0停止工作
     uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
     uint8_t  LastErrorCode:1;		//错误码 
-	
 	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
+	
+	
 	uint16_t NormalRecIntervalMin;	//正常记录间隔 单位：min 
 	
 	uint32_t SampleInterval;    	//采集时间间隔 单位：s
     uint32_t SampleTime;			//采集时间 单位：s
 	
     uint32_t NormalRecInterval;  	//正常记录间隔 单位：s
-	uint32_t NormalRecIntervalOld;  //保存上一次的记录间隔 单位：s
     //uint32_t SaveHisDataTime;       //存储间隔
 	
 	int32_t delay_start_time;		// 延时启动时间 
@@ -236,7 +242,7 @@ struct JLYPARAMETER
 extern uint8_t      rtc_pt;
 extern uint8_t      display_ct;
 extern uint8_t 	    Key1ChangAnCount;
-extern uint8_t  	DataBuf[HIS_ONE_BYTES+Headend_BYTES+ID_BYTES];
+extern uint8_t  	DataBuf[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES];
 extern uint16_t     adc[32];
 extern uint16_t     adcCopy[32];
 extern uint16_t	    MsCount;

@@ -253,9 +253,17 @@ struct TempHumiAdjustConfDataStr
 //! \brief fram flash存储指针结构
 struct CircularQueue
 {
-    uint16_t RecorderFramPointer;   //fram中记录数据指针
-    uint32_t RecorderFlashPointer;  //flash中记录数据指针
-    uint32_t FlashSectorPointer;	//flash中扇区指针
+	uint16_t HIS_ONE_BYTES;			//一包数据大小
+	uint16_t FRAM_MAX_NUM;			//fram中存储数据的最大包数
+	
+    uint16_t RecFramWritePointer;   //fram中记录数据指针
+	uint16_t FLASH_SECTOR_PER_NUM;  //flash中一个扇区存储数据条数
+	uint16_t FlashSectorPointer;	//flash中扇区指针
+	
+	uint32_t FLASH_MAX_NUM;			//flash中存储数据的最大包数
+	
+    uint32_t RecFlashWritePointer;  //flash中记录数据指针
+    uint32_t FlashReadDataPointer;  //flash中读数据指针
 };
 //! \brief 配置表
 /*!< 基本配置数据地址表   1 (Display="Hex",ADDRESS_OFFSET=0x0000):

@@ -61,6 +61,29 @@ static void RCC_Config(void)
 	/* Wait for RTC APB registers synchronisation */
 	RTC_WaitForSynchro();
 }
+
+/******************************************************************************
+  * @brief  Description 配置I2C总线的GPIO，采用模拟IO的方式实现
+						fram、rx8025用到I2C
+  * @param  无			
+  * @retval 无		
+  *****************************************************************************/
+static void I2C_GPIO_Config(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	RCC_AHBPeriphClockCmd(RCC_I2C_PORT, ENABLE);	/* 打开GPIO时钟 */
+
+	GPIO_InitStructure.GPIO_Pin = BSP_I2C_SCL | BSP_I2C_SDA;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;/* 开漏输出 */
+    
+	GPIO_Init(BSP_I2C_PORT, &GPIO_InitStructure);
+
+	/* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
+//	i2c_Stop();
+}
 /*****************************************************************************
  * 函数名：General_GPIO_Config
  * 描述  ：配置用到的I/O口
@@ -162,34 +185,26 @@ static void FirstScanSysData(void)
 	
 	Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
 	
-	/*重要参数*/
-	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
-	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
-	JlyParam.NormalRecIntervalOld = JlyParam.NormalRecInterval;	  //保存上一次的记录间隔
-	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
-	
-	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
-	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
-	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
-	
+
+	SetJlyParamData();
 }
 /******************************************************************************
-  * @brief  Description 设置内存中记录仪参数,判断记录间隔是否已改变，改变了则
-						询问是否清楚历史数据
+  * @brief  Description 设置内存中记录仪参数
   * @param  None
   * @retval None
   *****************************************************************************/
 void SetJlyParamData(void)
 {
-	/*重要参数*/
+	//重要参数
+	/*------------------------------------------------------*/
+	Queue.HIS_ONE_BYTES = (uint16_t)(Conf.Jly.ChannelNum*2+8*Gps_choose+5+Clock_choose); //一包数据大小
+	Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
+	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	/*------------------------------------------------------*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
 	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
 	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
-	if(JlyParam.NormalRecInterval != JlyParam.NormalRecIntervalOld)//记录间隔已改变
-	{
-		JlyParam.NormalRecIntervalOld = JlyParam.NormalRecInterval;	  //保存上一次的记录间隔
-		Queue.RecorderFramPointer = 0; //清除Fram中的历史数据
-	}
 	
 	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
 	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
@@ -214,6 +229,7 @@ void OffPowerSupply(void)
 	LED1(OFF);LED2(OFF);
 	LcdBackLight(OFF);
 }
+
 /******************************************************************************
   * @brief  Description 系统初始化
   * @param  None
@@ -225,10 +241,11 @@ void SysInit(void)
 	OffPowerSupply();
     //系统上电检测外接电
 	FirstCheckExternPower();
-	//上电显示
-    FisrtPowerOnDisplay();
 	
 	FirstScanSysData();
+	
+	//上电显示
+    FisrtPowerOnDisplay();
 	
 	//上电后判断通道数量,数量为0显示NUL
 	JudgingChannelNumberDisplay(Conf.Jly.ChannelNum);
@@ -236,8 +253,6 @@ void SysInit(void)
 	
     Flag.MucReset = 1;
     Flag.IsDisplayRightNow = 1;    
-	
-	Queue.FlashSectorPointer = 0;
 	
 	
 	MODEL_PWRCTRL(ON);	  //开对外接口电源

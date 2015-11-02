@@ -97,9 +97,26 @@ int main(void)
 	  }
       if(Flag.TouchKey1DuanAn ==1)
       {
-         Down_HisData();
-//		  DownFlash_HisData();
+//         Down_HisData();
+		  printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
+		  printf("Queue.RecFlashWritePointer %d\r\n",Queue.RecFlashWritePointer);
+		  printf("Queue.FlashReadDataPointer %d\r\n",Queue.FlashReadDataPointer);
+		  DownFlash_HisData();
+		  rtc_deel();
       }
+	  if(Flag.TouchKey2DuanAn ==1)
+	  {
+		  Flag.TouchKey2DuanAn =0;
+		  Queue.RecFramWritePointer = 0;//存储在Fram中的数据清除
+		  WriteFramRecPointer(0);
+		  
+		  Queue.FlashSectorPointer = 0;
+		  Queue.RecFlashWritePointer =0;
+		  Queue.FlashReadDataPointer =0;
+		  WriteFlashSectorPointer(0);
+		  WriteFlashRecPointer(0);
+		  WriteFlashDtatPointer(0);
+	  }
 	  freemodbus_main();
   }
 }

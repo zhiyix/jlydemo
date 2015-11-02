@@ -176,7 +176,7 @@ void USART1_IRQHandler(void)
   */
 void EXTI15_10_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(EXTI_Line13) != RESET)
+	if(EXTI_GetITStatus(EXTI_Line13) != RESET) //»úÐµ°´¼ükey1
 	{
 		/* Toggle LED1 */
 		LED1_TOGGLE;
@@ -184,7 +184,15 @@ void EXTI15_10_IRQHandler(void)
 		/* Clear the EXTI line 13 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line13);
 	}
-	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
+	if(EXTI_GetITStatus(EXTI_Line14) != RESET) //´¥Ãþ°´¼ükey2
+	{
+		AlarmLed2_TOGGLE;
+		Flag.TouchKey2DuanAn = 1;
+		/* Clear the EXTI line 14 pending bit */
+		EXTI_ClearITPendingBit(EXTI_Line14);
+	}
+	
+	if(EXTI_GetITStatus(EXTI_Line15) != RESET) //´¥Ãþ°´¼ükey1
 	{
 		LED1_TOGGLE;
 		Flag.TouchKey1DuanAn = 1;

@@ -185,6 +185,57 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	}
 	return true;
 }
+
+/******************************************************************************
+  * @brief  Description 读取历史数据
+  * @param  pucBuffer   存放读出数据的指针
+  * @param  usAddress	读出数据的地址
+  * @param  usNRegs		读的数量
+  * @retval 无
+  *****************************************************************************/
+bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+{
+	uint32_t RecorderPoint_temp,RecorderNum_temp,read_eeOffset_temp;
+	//usAddress *= 2;
+	//usNRegs *= 2;
+	
+	if(Queue.FlashReadDataPointer >=1)
+	{
+		//-----当前记录条数 Queue.FlashReadDataPointer, 即待读取条数
+		Queue.FlashReadDataPointer = ReadFlashDataPointer();
+		RecorderPoint_temp = Queue.RecFlashWritePointer;
+		RecorderNum_temp = Queue.FlashReadDataPointer;
+		
+		//指针还原:存储指针保存的是下一条数据的指针
+		if(RecorderPoint_temp>0)
+		{
+			RecorderPoint_temp--;
+		}
+		else
+		{
+			RecorderPoint_temp = Queue.FLASH_MAX_NUM - 1;
+		}
+		//根据 存储数量 记录指针 记录容量 计算读取指针
+		if(RecorderNum_temp <= (RecorderPoint_temp+1))
+		{
+			RecorderPoint_temp = RecorderPoint_temp-(RecorderNum_temp - 1);
+		}
+		else
+		{
+			RecorderPoint_temp = RecorderPoint_temp+(Queue.FLASH_MAX_NUM-RecorderNum_temp + 1);
+		}
+		
+		read_eeOffset_temp = RecorderPoint_temp * Queue.HIS_ONE_BYTES;//偏移量计算
+		
+		SPI_FLASH_BufferRead(pucBuffer,(FLASH_RecFirstAddr + read_eeOffset_temp),usNRegs*Queue.HIS_ONE_BYTES);
+		
+		Queue.FlashReadDataPointer = Queue.FlashReadDataPointer - usNRegs;
+	}
+	
+	rtc_deel();
+	return true;
+}
+
 /******************************************************************************
   * @brief  Description 
   * @param  无
