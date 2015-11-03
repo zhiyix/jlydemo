@@ -167,7 +167,7 @@ static void SaveDataOnTimeDeal(void)
 			
 			read_time();
 			ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
-			//SaveHisDataToFram();
+//			SaveHisDataToFram();
 			SaveHisDataToFlash();
 		}
 	}
@@ -182,7 +182,7 @@ static void SaveDataOnTimeDeal(void)
 				
 				read_time();
 				ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
-				//SaveHisDataToFram();
+//				SaveHisDataToFram();
 				SaveHisDataToFlash();
 			}
 		}

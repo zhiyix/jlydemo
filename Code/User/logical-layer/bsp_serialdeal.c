@@ -195,16 +195,18 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
   *****************************************************************************/
 bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
+	uint8_t serialbuf[10];
 	uint32_t RecorderPoint_temp,RecorderNum_temp,read_eeOffset_temp;
+	
 	//usAddress *= 2;
 	//usNRegs *= 2;
 	
-	if(Queue.FlashReadDataPointer >=1)
+	if(Queue.FlashNoReadingDataNum >=1)
 	{
-		//-----当前记录条数 Queue.FlashReadDataPointer, 即待读取条数
-		Queue.FlashReadDataPointer = ReadFlashDataPointer();
-		RecorderPoint_temp = Queue.RecFlashWritePointer;
-		RecorderNum_temp = Queue.FlashReadDataPointer;
+		//-----当前记录条数 Queue.FlashNoReadingDataNum, 即未读取条数
+		Queue.FlashNoReadingDataNum = ReadFlashNoReadingDataNum();
+		RecorderPoint_temp = Queue.RecFlashWritePointer;	//记录数据指针
+		RecorderNum_temp = Queue.FlashNoReadingDataNum;	//未读条数
 		
 		//指针还原:存储指针保存的是下一条数据的指针
 		if(RecorderPoint_temp>0)
@@ -227,9 +229,15 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		
 		read_eeOffset_temp = RecorderPoint_temp * Queue.HIS_ONE_BYTES;//偏移量计算
 		
-		SPI_FLASH_BufferRead(pucBuffer,(FLASH_RecFirstAddr + read_eeOffset_temp),usNRegs*Queue.HIS_ONE_BYTES);
+		SPI_FLASH_BufferRead(pucBuffer,(Queue.FlashReadDataBeginPointer + read_eeOffset_temp),usNRegs);
+		//Queue.FlashReadDataBeginPointer
 		
-		Queue.FlashReadDataPointer = Queue.FlashReadDataPointer - usNRegs;
+		Queue.FlashNoReadingDataNum = Queue.FlashNoReadingDataNum - usNRegs/Queue.HIS_ONE_BYTES; //未读条数减
+		if(Queue.FlashNoReadingDataNum <= 0)
+		{
+			Queue.FlashReadDataBeginPointer = 0;
+		}
+		WriteFlashNoReadingDataNum(Queue.FlashNoReadingDataNum);
 	}
 	
 	rtc_deel();

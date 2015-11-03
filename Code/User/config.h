@@ -112,9 +112,14 @@
 #define FLASH_RecWriteAddr_Hchar         0x0CA7
 
 #define FLASH_ReadDataAddr_Lchar		 0x0CA8		//flash读数据指针
-#define FLASH_ReadDataAddr_MidLchar	     0x0CA8
-#define FLASH_ReadDataAddr_MidHchar		 0x0CA8
-#define FLASH_ReadDataAddr_Hchar		 0x0CA8
+#define FLASH_ReadDataAddr_MidLchar	     0x0CA9
+#define FLASH_ReadDataAddr_MidHchar		 0x0CA10
+#define FLASH_ReadDataAddr_Hchar		 0x0CA11
+
+#define FLASH_NoReadingDataNumAddr_Lchar 	0x0CA12	//flash未读数据地址
+#define FLASH_NoReadingDataNumAddr_MidLchar 0x0CA12
+#define FLASH_NoReadingDataNumAddr_MidHchar 0x0CA12
+#define FLASH_NoReadingDataNumAddr_Hchar 	0x0CA12
 //! \brief FRAM中地址定义
 #define FRAM_RecFirstAddr           0x1000      //Fram中存放历史数据的首地址
 #define FRAM_RecMaxSize				4096		//Fram中存储数据的字节总数 (1000-2000)4096

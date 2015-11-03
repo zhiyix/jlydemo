@@ -1270,7 +1270,7 @@ void Display_Mem(void)
 {
 	/*!< Wait Until the last LCD RAM update finish */
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
-    if(Flag.RecordFlashOverFlow==0)/*未溢出过*/
+    if(Flag.RecordFlashOverFlow == 0)/*未溢出过*/
     {
         if(Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM/5)) /**/
             {showFlashMEM1;}

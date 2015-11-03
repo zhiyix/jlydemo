@@ -201,6 +201,7 @@ void SetJlyParamData(void)
 	Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
 	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
 	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	Queue.SectorHeadBytes = Queue.HIS_ONE_BYTES - (FLASH_SectorPerSize - Queue.FLASH_SECTOR_PER_NUM*Queue.HIS_ONE_BYTES);
 	/*------------------------------------------------------*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
 	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
