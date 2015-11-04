@@ -143,7 +143,7 @@ void SysTick_Handler(void)
 {
 	TimingDelay_Decrement();
 	MsCount++;
-	if(MsCount>=60000)
+	if(MsCount >=60000)
 	{
 		MsCount = 0;
 		Flag.SysTickSec = 1;

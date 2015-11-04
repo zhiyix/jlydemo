@@ -85,16 +85,16 @@ int main(void)
 //	  Fram_Test();
 //	  Delay_ms(1000);
       
-	  JlySerialDeal();
+	  //JlySerialDeal();
 	  
       JlySecDeal();
-	  if(Flag.SysTickSec ==1)//模拟10s 数据
-	  {
-         Flag.SysTickSec = 0;
-         
-         ReadFramHisDataToRam();
+//	  if(Flag.SysTickSec ==1)//模拟10s 数据
+//	  {
+//         Flag.SysTickSec = 0;
+//         
+//         ReadFramHisDataToRam();
 //         Down_HisData();
-	  }
+//	  }
       if(Flag.TouchKey1DuanAn ==1)
       {
          //Down_HisData();
@@ -120,6 +120,9 @@ int main(void)
 		  WriteFlashSectorPointer(0);
 		  WriteFlashRecPointer(0);
 		  WriteFlashDataPointer(0);
+		  
+		  Flag.RecordFlashOverFlow = 0;
+		  Fram_Write(&Flag.RecordFlashOverFlow,FLASH_RecordFlashOverFlow,1);//存储flash溢出标志
 	  }
 	  freemodbus_main();
   }

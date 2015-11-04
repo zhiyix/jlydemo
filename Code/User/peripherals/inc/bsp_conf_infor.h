@@ -79,7 +79,18 @@ struct BasicConfDataStr
 	 */
 	uint16_t BatteryState;	/*!< 后备电池状态 */
 	union    Si2Char BatVoltage;/*!< 电池电压,  */
-	uint8_t  Reserv[42];	/*!< Reserv */
+	//22byte
+	uint8_t  :8;		  /*!< 保留 */
+	uint8_t  RecordFlashOverFlow; 	//flash记录溢出标志
+	
+	uint16_t RecFramWritePointer;	//fram中数据记录指针
+	uint16_t FlashSectorPointer;	//flash中扇区指针
+	
+	uint32_t FlashDataMaxNum;  	    /*!< flash存储最大组数*/		
+	uint32_t FlashNoReadingDataNum;	//flash中未读数据条数
+	uint32_t FlashReadDataBeginPointer;//flash中读数据指针
+	uint32_t RecFlashWritePointer;	   /*!< flash存储数据指针(当前条数) */
+	uint8_t  Reserv[20];	/*!< Reserv */
 };
 //! \brief记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
 /*!< 总共56个byte */
@@ -141,8 +152,8 @@ struct JlyConfDataStr
 									0x00：正常模式 
 									0x01：低功耗模式(省电模式) */
     /*!< 36个byte */								
-	uint32_t StorageCapacity;  /*!< flash存储容量 */										 
-	uint32_t StorageGroup;	   /*!< flash存储数据组数(条数) */
+	uint32_t :32;   /*!< Reserv */										 
+	uint32_t :32;	/*!< Reserv */
 	
 	uint8_t	 ChannelNum;	   /*!< 通道数 */
 	uint8_t	 Reserv[11];

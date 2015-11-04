@@ -96,30 +96,36 @@
 #define FRAM_TempHumiAdjustOffset    0x0020	/* 传感器校准，64byte/2 offset*2,每一通道之间的物理(Fram)偏移量 */
 
 //! \brief 配置信息表中成员  在Fram中的地址 
-#define FRAM_BatVoltageAddr			 FRAM_BasicConfAddr+20	//电池电压地址
+#define FRAM_BatVoltageAddr			 FRAM_BasicConfAddr+20	//电池电压地址 低8位
 #define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+34	//工作状态地址
 
+//flash记录数据溢出标志
+#define FLASH_RecordFlashOverFlow	 	 FRAM_BasicConfAddr+22 //低8位
 //! \brief FRAM中存放fram记录指针地址
-#define FRAM_RecWriteAddr_Lchar          0x0CA0      
-#define FRAM_RecWriteAddr_Hchar          0x0CA1
+#define FRAM_RecWriteAddr_Lchar          FRAM_BasicConfAddr+24      
+#define FRAM_RecWriteAddr_Hchar          
+//Flash扇区写指针
+#define FLASH_SectorWriteAddr_Lchar		 FRAM_BasicConfAddr+26 		
+#define FLASH_SectorWriteAddr_Hchar		 
+//flash存储最大数据组数
+#define FLASH__DataMaxNum				 FRAM_BasicConfAddr+28
+//flash未读数据地址
+#define FLASH_NoReadingDataNumAddr_Lchar 	FRAM_BasicConfAddr+32	
+#define FLASH_NoReadingDataNumAddr_MidLchar 
+#define FLASH_NoReadingDataNumAddr_MidHchar 
+#define FLASH_NoReadingDataNumAddr_Hchar 	
+//flash读数据指针
+#define FLASH_ReadDataAddr_Lchar		 FRAM_BasicConfAddr+36		
+#define FLASH_ReadDataAddr_MidLchar	     
+#define FLASH_ReadDataAddr_MidHchar		 
+#define FLASH_ReadDataAddr_Hchar		 
+//存放flash记录指针
+#define FLASH_RecWriteAddr_Lchar         FRAM_BasicConfAddr+40     
+#define FLASH_RecWriteAddr_MidLchar      
+#define FLASH_RecWriteAddr_MidHchar      
+#define FLASH_RecWriteAddr_Hchar         
 
-#define FLASH_SectorWriteAddr_Lchar		 0x0CA2		//Flash扇区写指针
-#define FLASH_SectorWriteAddr_Hchar		 0x0CA3
 
-#define FLASH_RecWriteAddr_Lchar         0x0CA4     //存放flash记录指针
-#define FLASH_RecWriteAddr_MidLchar      0x0CA5
-#define FLASH_RecWriteAddr_MidHchar      0x0CA6
-#define FLASH_RecWriteAddr_Hchar         0x0CA7
-
-#define FLASH_ReadDataAddr_Lchar		 0x0CA8		//flash读数据指针
-#define FLASH_ReadDataAddr_MidLchar	     0x0CA9
-#define FLASH_ReadDataAddr_MidHchar		 0x0CA10
-#define FLASH_ReadDataAddr_Hchar		 0x0CA11
-
-#define FLASH_NoReadingDataNumAddr_Lchar 	0x0CA12	//flash未读数据地址
-#define FLASH_NoReadingDataNumAddr_MidLchar 0x0CA12
-#define FLASH_NoReadingDataNumAddr_MidHchar 0x0CA12
-#define FLASH_NoReadingDataNumAddr_Hchar 	0x0CA12
 //! \brief FRAM中地址定义
 #define FRAM_RecFirstAddr           0x1000      //Fram中存放历史数据的首地址
 #define FRAM_RecMaxSize				4096		//Fram中存储数据的字节总数 (1000-2000)4096
@@ -180,13 +186,13 @@ struct RTCRX8025
 //! \brief 全局标志
 struct FLAG
 {
+		 uint8_t RecordFlashOverFlow; //Flash中记录数据溢出标志，溢出置1
     __IO uint8_t Sec:1;             	//TIM2定时1s时间
     __IO uint8_t SysTickSec:1;      	//系统滴答时钟
 	__IO uint8_t Key1DuanAn:1;       	//机械按键key1 短按
 	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
 	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
-         uint8_t RecordFramOverFlow:1; 	//Fram中记录数据溢出标志，溢出置1
-         uint8_t RecordFlashOverFlow:1; //Flash中记录数据溢出标志，溢出置1
+         uint8_t RecordFramOverFlow:1; 	//Fram中记录数据溢出标志，溢出置1       
 	
 		 uint8_t Powerdowncountflag:1;	//接入外接电标志
          uint8_t Low_Voltage:1;     	//电池低电压标志
@@ -208,6 +214,7 @@ struct FLAG
 		 uint8_t RecTimeDingShiBoot:1;	//记录仪时间点定时启动
 		 uint8_t RecTimeDingDianBoot:1; //记录仪时间点定点启动
 		 uint8_t RecTimeDingDianStop:1; //记录仪时间点定点停止
+		 
 };
 //! \brief 电源管理
 struct PowerManagement

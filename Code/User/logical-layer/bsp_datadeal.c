@@ -147,14 +147,6 @@ static void LOWorNomal_Mode(void)
 static void SaveDataOnTimeDeal(void)
 {
     
-    read_time();
-    
-    RtcBcdToD10(&Rtc);
-    
-    Rtc.TMPS=DateToSeconds(&Rtc);
-    
-    RtcD10ToBcd(&Rtc);
-    
 	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
 	{
 		Rtc.SCount++;
@@ -173,6 +165,14 @@ static void SaveDataOnTimeDeal(void)
 	}
 	else
 	{
+		read_time();
+    
+		RtcBcdToD10(&Rtc);
+		
+		Rtc.TMPS=DateToSeconds(&Rtc);
+		
+		RtcD10ToBcd(&Rtc);
+		
 		Rtc.TMPS = Rtc.TMPS/60;	//分钟
 		if(Rtc.TMPS % JlyParam.NormalRecIntervalMin ==0)//1分钟-
 		{   
@@ -223,9 +223,9 @@ static void WorkornotMode(void)
             Display_ChannelValue(StartedChannelForDisplay);  //LCD 
 //        }
         Display_Signal(2);/*显示信号强度*/
-        Display_Mem();	  /*显示存储容量*/
+        
 		
-		SaveDataOnTimeDeal();
+		//SaveDataOnTimeDeal();
 		
         Flag.IsDisplayRightNow=1;
         
@@ -246,7 +246,7 @@ static void OneSec_Timedeal(void)
     if(display_ct>=36)
     {
         display_ct = 0;
-         
+        Display_Mem();	  /*显示存储容量*/ 
     }
 	/*****************************************************************/
 	/*机械按键 key1长按检测*/
@@ -326,6 +326,10 @@ void JlySecDeal(void)
         
         Display_SN();   /*显示SN号*/
         
+		if(Conf.Jly.WorkStatueIsStop >= 1)
+		{
+			SaveDataOnTimeDeal();
+		}
         OneSec_Timedeal();
         
         

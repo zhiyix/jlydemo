@@ -196,6 +196,7 @@ static void FirstScanSysData(void)
 void SetJlyParamData(void)
 {
 	//重要参数
+	Flag.RecordFlashOverFlow = Conf.Basic.RecordFlashOverFlow; //读出flash溢出标志
 	/*------------------------------------------------------*/
 	Queue.HIS_ONE_BYTES = (uint16_t)(Conf.Jly.ChannelNum*2+8*Gps_choose+5+Clock_choose); //一包数据大小
 	Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
