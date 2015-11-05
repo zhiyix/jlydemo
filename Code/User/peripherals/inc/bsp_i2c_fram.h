@@ -24,16 +24,9 @@ void SaveHisDataToFlash(void);
 void DownFlash_HisData(void);
 
 
-void WriteFramRecPointer(uint16_t Pointer);
+uint16_t ReadU16Pointer(const uint16_t PointerAddr);
+void WriteU16Pointer(const uint16_t PointerAddr,uint16_t Pointer);
 
-uint32_t ReadFlashDataPointer(void);
-void WriteFlashRecPointer(uint32_t Pointer);
-
-uint32_t ReadFlashNoReadingDataNum(void);
-void WriteFlashNoReadingDataNum(uint32_t Pointer);
-
-
-
-void WriteFlashSectorPointer(uint16_t Pointer);
-void WriteFlashDataPointer(uint32_t Pointer);
+uint32_t ReadU32Pointer(const uint32_t PointerAddr);
+void WriteU32Pointer(const uint32_t PointerAddr,uint32_t Pointer);
 #endif /* __I2C_EE_H */

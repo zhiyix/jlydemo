@@ -114,18 +114,21 @@
 #define FLASH_NoReadingDataNumAddr_MidLchar 
 #define FLASH_NoReadingDataNumAddr_MidHchar 
 #define FLASH_NoReadingDataNumAddr_Hchar 	
+//flash读数据起始指针
+#define FLASH_ReadDataBeginAddr_Lchar		 FRAM_BasicConfAddr+36		
+#define FLASH_ReadDataBeginAddr_MidLchar	     
+#define FLASH_ReadDataBeginAddr_MidHchar		 
+#define FLASH_ReadDataBeginAddr_Hchar		 
+//存放flash写数据指针
+#define FLASH_WriteDataAddr_Lchar            FRAM_BasicConfAddr+40     
+#define FLASH_WriteDataAddr_MidLchar      
+#define FLASH_WriteDataAddr_MidHchar      
+#define FLASH_WriteDataAddr_Hchar         
 //flash读数据指针
-#define FLASH_ReadDataAddr_Lchar		 FRAM_BasicConfAddr+36		
-#define FLASH_ReadDataAddr_MidLchar	     
-#define FLASH_ReadDataAddr_MidHchar		 
-#define FLASH_ReadDataAddr_Hchar		 
-//存放flash记录指针
-#define FLASH_RecWriteAddr_Lchar         FRAM_BasicConfAddr+40     
-#define FLASH_RecWriteAddr_MidLchar      
-#define FLASH_RecWriteAddr_MidHchar      
-#define FLASH_RecWriteAddr_Hchar         
-
-
+#define FLASH_ReadDataAddr_Lchar             FRAM_BasicConfAddr+44     
+#define FLASH_ReadDataAddr_MidLchar      
+#define FLASH_ReadDataAddr_MidHchar      
+#define FLASH_ReadDataAddr_Hchar         
 //! \brief FRAM中地址定义
 #define FRAM_RecFirstAddr           0x1000      //Fram中存放历史数据的首地址
 #define FRAM_RecMaxSize				4096		//Fram中存储数据的字节总数 (1000-2000)4096
@@ -134,12 +137,12 @@
 //! \brief
 #define FLASH_PAGE_NUM              32768   //flash总的页数
 //测试 用两个扇区模拟数据存储
-#define FLASH_RecMaxSize            8192  //flash中存储数据的字节总数 (800000) 8M  8388608
+#define FLASH_RecMaxSize            12288  //flash中存储数据的字节总数 (800000) 8M  8388608
 
 #define FLASH_RecFirstAddr           0x000000   //Flash中存放数据的首地址
 #define FLASH_SectorFirstAddr		 0x000000
 //测试 2个扇区
-#define FLASH_SectorNum				 2		//8M的flash有2048 sector 2048
+#define FLASH_SectorNum				 3		//8M的flash有2048 sector 2048
 #define FLASH_SectorPerSize          4096		//Flash每个扇区的大小
 
 //! @}
@@ -186,12 +189,12 @@ struct RTCRX8025
 //! \brief 全局标志
 struct FLAG
 {
-		 uint8_t RecordFlashOverFlow; //Flash中记录数据溢出标志，溢出置1
     __IO uint8_t Sec:1;             	//TIM2定时1s时间
     __IO uint8_t SysTickSec:1;      	//系统滴答时钟
 	__IO uint8_t Key1DuanAn:1;       	//机械按键key1 短按
 	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
 	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
+	__IO uint8_t RecordFlashOverFlow:1; //Flash中记录数据溢出标志，溢出置1
          uint8_t RecordFramOverFlow:1; 	//Fram中记录数据溢出标志，溢出置1       
 	
 		 uint8_t Powerdowncountflag:1;	//接入外接电标志

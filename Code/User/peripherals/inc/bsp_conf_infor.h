@@ -88,9 +88,10 @@ struct BasicConfDataStr
 	
 	uint32_t FlashDataMaxNum;  	    /*!< flash存储最大组数*/		
 	uint32_t FlashNoReadingDataNum;	//flash中未读数据条数
-	uint32_t FlashReadDataBeginPointer;//flash中读数据指针
-	uint32_t RecFlashWritePointer;	   /*!< flash存储数据指针(当前条数) */
-	uint8_t  Reserv[20];	/*!< Reserv */
+	uint32_t FlashReadDataBeginPointer;//flash中读数据起始指针
+	uint32_t WriteFlashDataPointer;	   /*!< Flash写数据指针(当前条数) */
+	uint32_t ReadFlashDataPointer;	//flash读数据指针
+	uint8_t  Reserv[16];	/*!< Reserv */
 };
 //! \brief记录仪配置数据地址表 2 (Display="Hex" ,ADDRESS_OFFSET=0x0100):
 /*!< 总共56个byte */
@@ -270,12 +271,13 @@ struct CircularQueue
 	
     uint16_t RecFramWritePointer;   //fram中记录数据指针
 	uint16_t FLASH_SECTOR_PER_NUM;  //flash中一个扇区存储数据条数
-	uint16_t FlashSectorPointer;	//flash中扇区指针
+	__IO uint16_t FlashSectorPointer;	//flash中扇区指针
 	
 	uint32_t FLASH_MAX_NUM;			//flash中存储数据的最大包数
 	uint32_t FlashNoReadingDataNum;	//flash中未读数据条数
-    uint32_t RecFlashWritePointer;  //flash中记录数据指针
-    uint32_t FlashReadDataBeginPointer;  //flash中读数据指针
+    uint32_t WriteFlashDataPointer;  //flash中记录数据指针
+    uint32_t FlashReadDataBeginPointer;  //flash中读数据起始指针
+	uint32_t ReadFlashDataPointer;		 //flash中读数据指针
 };
 //! \brief 配置表
 /*!< 基本配置数据地址表   1 (Display="Hex",ADDRESS_OFFSET=0x0000):

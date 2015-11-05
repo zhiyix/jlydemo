@@ -195,11 +195,12 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
   *****************************************************************************/
 bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
-	uint8_t serialbuf[10];
-	uint32_t RecorderPoint_temp,RecorderNum_temp,read_eeOffset_temp;
 	uint32_t NoReadingDataNumTemp;
 	//usAddress *= 2;
 	//usNRegs *= 2;
+	Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
+	Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
+	
 	NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
 	if(NoReadingDataNumTemp > Queue.FlashNoReadingDataNum)//要读的数据包数大于flash中未读数据包数
 	{
@@ -208,47 +209,91 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	}
 	if(Queue.FlashNoReadingDataNum >=1)
 	{
-		//-----当前记录条数 Queue.FlashNoReadingDataNum, 即未读取条数
-		Queue.FlashNoReadingDataNum = ReadFlashNoReadingDataNum();
-		RecorderPoint_temp = Queue.RecFlashWritePointer;	//记录数据指针
-		RecorderNum_temp = Queue.FlashNoReadingDataNum;	//未读条数
 		
-		//指针还原:存储指针保存的是下一条数据的指针
-		if(RecorderPoint_temp>0)
+		SPI_FLASH_BufferRead(pucBuffer,Queue.ReadFlashDataPointer,usNRegs);
+		Queue.ReadFlashDataPointer += usNRegs;
+		if(Queue.ReadFlashDataPointer >= FLASH_RecMaxSize)
 		{
-			RecorderPoint_temp--;
+			Queue.ReadFlashDataPointer = 0;
 		}
-		else
-		{	
-			RecorderPoint_temp = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM - 1;
-		}
-		//根据 存储数量 记录指针 记录容量 计算读取指针
-		if(RecorderNum_temp <= (RecorderPoint_temp+1))
-		{
-			RecorderPoint_temp = RecorderPoint_temp-(RecorderNum_temp - 1);
-		}
-		else
-		{
-			RecorderPoint_temp = RecorderPoint_temp+(Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM - RecorderNum_temp + 1);
-		}
+		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);
 		
-		read_eeOffset_temp = RecorderPoint_temp * Queue.HIS_ONE_BYTES;//偏移量计算
 		
-		SPI_FLASH_BufferRead(pucBuffer,(Queue.FlashReadDataBeginPointer + read_eeOffset_temp),usNRegs);
-		//Queue.FlashReadDataBeginPointer
-		
-		Queue.FlashNoReadingDataNum = Queue.FlashNoReadingDataNum - NoReadingDataNumTemp; //未读条数减
+		Queue.FlashNoReadingDataNum -= NoReadingDataNumTemp; //未读条数减
 		if(Queue.FlashNoReadingDataNum <= 0)
 		{
-			Queue.FlashNoReadingDataNum = 1;
+			Queue.FlashNoReadingDataNum = 0;
 		}
-		WriteFlashNoReadingDataNum(Queue.FlashNoReadingDataNum);
+		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);
 	}
 	
 	rtc_deel();
 	
 	return true;
 }
+/******************************************************************************
+  * @brief  Description 读取历史数据
+  * @param  pucBuffer   存放读出数据的指针
+  * @param  usAddress	读出数据的地址
+  * @param  usNRegs		读的数量
+  * @retval 无
+  *****************************************************************************/
+//bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+//{
+//	uint8_t serialbuf[10];
+//	uint32_t RecorderPoint_temp,RecorderNum_temp,read_eeOffset_temp;
+//	uint32_t NoReadingDataNumTemp;
+//	//usAddress *= 2;
+//	//usNRegs *= 2;
+//	NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
+//	if(NoReadingDataNumTemp > Queue.FlashNoReadingDataNum)//要读的数据包数大于flash中未读数据包数
+//	{
+//		usNRegs = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;
+//		NoReadingDataNumTemp = Queue.FlashNoReadingDataNum;
+//	}
+//	if(Queue.FlashNoReadingDataNum >=1)
+//	{
+//		//-----当前记录条数 Queue.FlashNoReadingDataNum, 即未读取条数
+//		Queue.FlashNoReadingDataNum = ReadFlashNoReadingDataNum();
+//		RecorderPoint_temp = Queue.WriteFlashDataPointer;	//记录数据指针
+//		RecorderNum_temp = Queue.FlashNoReadingDataNum;	//未读条数
+//		
+//		//指针还原:存储指针保存的是下一条数据的指针
+//		if(RecorderPoint_temp>0)
+//		{
+//			RecorderPoint_temp--;
+//		}
+//		else
+//		{	
+//			RecorderPoint_temp = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM - 1;
+//		}
+//		//根据 存储数量 记录指针 记录容量 计算读取指针
+//		if(RecorderNum_temp <= (RecorderPoint_temp+1))
+//		{
+//			RecorderPoint_temp = RecorderPoint_temp-(RecorderNum_temp - 1);
+//		}
+//		else
+//		{
+//			RecorderPoint_temp = RecorderPoint_temp+(Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM - RecorderNum_temp + 1);
+//		}
+//		
+//		read_eeOffset_temp = RecorderPoint_temp * Queue.HIS_ONE_BYTES;//偏移量计算
+//		
+//		SPI_FLASH_BufferRead(pucBuffer,(Queue.FlashReadDataBeginPointer + read_eeOffset_temp),usNRegs);
+//		//Queue.FlashReadDataBeginPointer
+//		
+//		Queue.FlashNoReadingDataNum = Queue.FlashNoReadingDataNum - NoReadingDataNumTemp; //未读条数减
+//		if(Queue.FlashNoReadingDataNum <= 0)
+//		{
+//			Queue.FlashNoReadingDataNum = 1;
+//		}
+//		WriteFlashNoReadingDataNum(Queue.FlashNoReadingDataNum);
+//	}
+//	
+//	rtc_deel();
+//	
+//	return true;
+//}
 
 /******************************************************************************
   * @brief  Description 

@@ -43,7 +43,7 @@
 //	   <9600=> 9600 波特率    
 //	   <38400=> 38400 波特率    
 //	   <115200=> 115200 波特率
-#define MB_DefaultDeviceBaudRate		9600
+#define MB_DefaultDeviceBaudRate		115200
 //	</e>
 
 //	<e> (01) Coils Register

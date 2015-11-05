@@ -101,28 +101,34 @@ int main(void)
 		  printf("Flag.RecordFlashOverFlow %d\r\n",Flag.RecordFlashOverFlow);
 		  printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
 		  printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
-		  printf("Queue.RecFlashWritePointer %d\r\n",Queue.RecFlashWritePointer);
+		  printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
 		  printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
+		  printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
 		  DownFlash_HisData();
 		  rtc_deel();
       }
 	  if(Flag.TouchKey2DuanAn ==1)
 	  {
+		  uint8_t buf[1];
 		  Flag.TouchKey2DuanAn =0;
 		  Queue.RecFramWritePointer = 0;//存储在Fram中的数据清除
-		  WriteFramRecPointer(0);
+		  WriteU16Pointer(FRAM_RecWriteAddr_Lchar,0);
 		  
 		  Queue.FlashNoReadingDataNum = 0;
 		  Queue.FlashSectorPointer = 0;
-		  Queue.RecFlashWritePointer =0;
+		  Queue.WriteFlashDataPointer =0;
 		  Queue.FlashReadDataBeginPointer =0;
-		  WriteFlashNoReadingDataNum(0);
-		  WriteFlashSectorPointer(0);
-		  WriteFlashRecPointer(0);
-		  WriteFlashDataPointer(0);
+		  Queue.ReadFlashDataPointer = 0;
+		  
+		  WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
+		  WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
+		  WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
+		  WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
+		  WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
 		  
 		  Flag.RecordFlashOverFlow = 0;
-		  Fram_Write(&Flag.RecordFlashOverFlow,FLASH_RecordFlashOverFlow,1);//存储flash溢出标志
+		  buf[0] = 0;
+		  Fram_Write(buf,FLASH_RecordFlashOverFlow,1);//存储flash溢出标志
 	  }
 	  freemodbus_main();
   }

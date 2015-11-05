@@ -1,0 +1,15 @@
+flash数据存储、读取算法(假设一帧数据为 10Byte，一个sector存409帧)
+
+flash扇区的最后几个字节也使用，当数据溢出过读取数据时，从每个扇区的Queue.SectorHeadBytes开始
+
+数据存储(从第一个setor开始)
+当flash数据写到Queue.FLASH_SECTOR_PER_NUM - 1时(4080)，Queue.WriteFlashDataPointer++,此时
+Queue.WriteFlashDataPointer % Queue.FLASH_SECTOR_PER_NUM，擦除下一个扇区
+
+数据读取
+当读指针-写指针大于0且读指针和写指针在一个扇区内，此时读指针
+Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
+读取数据时，读指针+读取的字节数
+
+未读数据数用 Queue.FlashNoReadingDataNum
+

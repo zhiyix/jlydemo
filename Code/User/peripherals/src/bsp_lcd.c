@@ -1272,15 +1272,15 @@ void Display_Mem(void)
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
     if(Flag.RecordFlashOverFlow == 0)/*未溢出过*/
     {
-        if(Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM/5)) /**/
+        if(Queue.WriteFlashDataPointer<=(FLASH_RecMaxSize/5)) /**/
             {showFlashMEM1;}
-        else if((Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM*2/5))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM/5)))
+        else if((Queue.WriteFlashDataPointer<=(FLASH_RecMaxSize*2/5))&&(Queue.WriteFlashDataPointer>(FLASH_RecMaxSize/5)))
             {showFlashMEM2;}
-        else if((Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM*3/5))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM*2/5)))
+        else if((Queue.WriteFlashDataPointer<=(FLASH_RecMaxSize*3/5))&&(Queue.WriteFlashDataPointer>(FLASH_RecMaxSize*2/5)))
             {showFlashMEM3;}
-        else if((Queue.RecFlashWritePointer<=(Queue.FLASH_MAX_NUM*4/5))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM*3/5)))
+        else if((Queue.WriteFlashDataPointer<=(FLASH_RecMaxSize*4/5))&&(Queue.WriteFlashDataPointer>(FLASH_RecMaxSize*3/5)))
             {showFlashMEM4;}
-        else if((Queue.RecFlashWritePointer<(Queue.FLASH_MAX_NUM))&&(Queue.RecFlashWritePointer>(Queue.FLASH_MAX_NUM*4/5)))
+        else if((Queue.WriteFlashDataPointer<(FLASH_RecMaxSize))&&(Queue.WriteFlashDataPointer>(FLASH_RecMaxSize*4/5)))
             {showFlashMEM5;}
     }
     else/*溢出，显示满格*/
