@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @file    Project/STM32L1xx_StdPeriph_Templates/main.c 
+  * @file    Project/STM32L1xx_JLY/main.c 
   * @author  MCD Application Team
-  * @version V1.2.0
-  * @date    16-May-2015
+  * @version V
+  * @date    
   * @brief   Main program body
   ******************************************************************************
   * @attention
@@ -43,11 +43,11 @@
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
-/**
+/******************************************************************************
   * @brief  Main program.
   * @param  None
   * @retval None
-  */
+  *****************************************************************************/
 int main(void)
 {
   /*!< At this stage the microcontroller clock setting is already configured, 
@@ -65,25 +65,11 @@ int main(void)
   /* Add your application code here
      */
 
-//    SPI_FLASH_Test();
-//    SPI_Flash_PowerDown();  
-//    Fram_Test();
-	
 	freemodbus_init();
   /* Infinite loop */
   while (1)
   {
 	  
-//	  LED1_ON;Delay_ms(1000);LED1_OFF;
-//	  
-//	  LED2_ON;Delay_ms(1000);LED2_OFF;
-	  
-//	  printf("\r\n 温度 0x%04X,%f",ADC_ConvertedValue[0],ChannelDataFloat[0]);
-//	  printf("\r\n 湿度 0x%04X,%f",ADC_ConvertedValue[1],ChannelDataFloat[1]);
-//	  printf("\r\n 电压 0x%04X,%f",ADC_ConvertedValue[2],ChannelDataFloat[2]);
-	  
-//	  Fram_Test();
-//	  Delay_ms(1000);
       
 	  //JlySerialDeal();
 	  
@@ -109,7 +95,7 @@ int main(void)
       }
 	  if(Flag.TouchKey2DuanAn ==1)
 	  {
-		  uint8_t buf[1];
+		  
 		  Flag.TouchKey2DuanAn =0;
 		  Queue.RecFramWritePointer = 0;//存储在Fram中的数据清除
 		  WriteU16Pointer(FRAM_RecWriteAddr_Lchar,0);
@@ -126,9 +112,7 @@ int main(void)
 		  WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
 		  WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
 		  
-		  Flag.RecordFlashOverFlow = 0;
-		  buf[0] = 0;
-		  Fram_Write(buf,FLASH_RecordFlashOverFlow,1);//存储flash溢出标志
+		  SetFlashOverFlow(0);//清除flash溢出标志
 	  }
 	  freemodbus_main();
   }
@@ -136,13 +120,13 @@ int main(void)
 
 #ifdef  USE_FULL_ASSERT
 
-/**
+/******************************************************************************
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
   * @param  file: pointer to the source file name
   * @param  line: assert_param error line source number
   * @retval None
-  */
+  *****************************************************************************/
 void assert_failed(uint8_t* file, uint32_t line)
 { 
   /* User can add his own implementation to report the file name and line number,

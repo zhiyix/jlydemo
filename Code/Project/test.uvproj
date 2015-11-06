@@ -594,11 +594,6 @@
               <FilePath>..\User\peripherals\src\bsp_spi_flash.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_i2c_fram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\peripherals\src\bsp_i2c_fram.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\peripherals\src\bsp_i2c.c</FilePath>
@@ -647,6 +642,11 @@
               <FileName>bsp_bootstop.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\logical-layer\bsp_bootstop.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_storagedata.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_storagedata.c</FilePath>
             </File>
           </Files>
         </Group>

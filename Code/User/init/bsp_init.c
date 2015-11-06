@@ -176,25 +176,13 @@ static void General_GPIO_Config(void)
 }
 
 /******************************************************************************
-  * @brief  Description 读取记录仪参数
-  * @param  None
-  * @retval None
-  *****************************************************************************/
-static void FirstScanSysData(void)
-{
-	
-	Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
-	
-
-	SetJlyParamData();
-}
-/******************************************************************************
   * @brief  Description 设置内存中记录仪参数
   * @param  None
   * @retval None
   *****************************************************************************/
-void SetJlyParamData(void)
+static void SetJlyParamData(void)
 {
+	uint8_t i;
 	//重要参数
 	Flag.RecordFlashOverFlow = Conf.Basic.RecordFlashOverFlow; //读出flash溢出标志
 	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
@@ -212,7 +200,102 @@ void SetJlyParamData(void)
 	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
 	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
 	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
+	/*------------------------------------------------------*/
+	JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//备份通道数量
+	for(i=0; i<Conf.Jly.ChannelNum; i++)
+	{
+		JlyParam.SensorTypeOld[i] = Conf.Sensor[i].SensorType; //备份各个通道类型
+	}
+}
+/******************************************************************************
+  * @brief  Description 读取记录仪参数
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+static void FirstScanSysData(void)
+{
 	
+	Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
+	
+
+	SetJlyParamData();
+}
+
+
+/******************************************************************************
+  * @brief  Description 设置内存中记录仪参数,判断通道数量、通道类型是否修改
+						如果修改了就清除历史数据
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+void SetJlyParamJudgeChannelNumSensorType(void)
+{
+	uint8_t i;
+	//重要参数
+	Flag.RecordFlashOverFlow = Conf.Basic.RecordFlashOverFlow; //读出flash溢出标志
+	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
+	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
+	/*------------------------------------------------------*/
+	Queue.HIS_ONE_BYTES = (uint16_t)(Conf.Jly.ChannelNum*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
+	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
+	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	/*------------------------------------------------------*/
+	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
+	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
+	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
+	
+	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
+	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
+	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
+	/*------------------------------------------------------*/
+	if(JlyParam.ChannelNumOld != Conf.Jly.ChannelNum)
+	{
+		JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//备份通道数量
+		
+		Queue.FlashSectorPointer = 0;
+		Queue.FlashNoReadingDataNum = 0;
+		Queue.FlashReadDataBeginPointer =0;
+		Queue.WriteFlashDataPointer =0;
+		Queue.ReadFlashDataPointer = 0;
+
+		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
+		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
+		WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
+
+		SetFlashOverFlow(0);//清除flash溢出标志
+	}else{
+		for(i=0; i<Conf.Jly.ChannelNum; i++)
+		{
+			if(JlyParam.SensorTypeOld[i] != Conf.Sensor[i].SensorType)
+			{
+				//通道数循环完，并且备份新的通道类型，如果有改变的则清除历史数据
+				JlyParam.SensorTypeOld[i] = Conf.Sensor[i].SensorType;
+				Flag.SensorTypeIsChange = 1;
+			}
+		}
+		//循环完所有通道再执行
+		if(Flag.SensorTypeIsChange == 1)
+		{
+			Flag.SensorTypeIsChange = 0; //标志清除
+			
+			Queue.FlashSectorPointer = 0;
+			Queue.FlashNoReadingDataNum = 0;
+			Queue.FlashReadDataBeginPointer =0;
+			Queue.WriteFlashDataPointer =0;
+			Queue.ReadFlashDataPointer = 0;
+
+			WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
+			WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
+			WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
+			WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
+			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
+
+			SetFlashOverFlow(0);//清除flash溢出标志
+		}
+	}
 }
 /******************************************************************************
   * @brief  Description 关掉外设电源
@@ -290,14 +373,14 @@ void PeripheralInit(void)
 	
 	LCD_GLASS_Init();
 	
-	USART1_Config(115200);
+	USART1_Config(Usart1_DefaultBaudRate);
     
 //	Delay_ms(10);   //开启滴答定时
 	LCD_GLASS_Clear();
 	
 	ADC1_Init();
     
-    /* 8M串行flash W25Q64初始化 */
+    // 8M串行flash W25Q64初始化 
 	SPI_FLASH_Init();
 	
     //RX8025AC 初始化

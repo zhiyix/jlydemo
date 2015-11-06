@@ -1,10 +1,10 @@
-#ifndef __I2CFRAM_H
-#define	__I2CFRAM_H
+#ifndef __STORAGEDATA_H
+#define	__STORAGEDATA_H
 
 #include "stm32l1xx.h"
 
 /* 
- * FM24CL16B 16kb = 16384bit = 16384/8 Byte = 2048 Byte
+ * FM24CL64B 64kb = 65536bit = 65536/8 Byte = 8192 Byte
  *  pages of 8 bytes each
  *
  * Device Address
@@ -13,14 +13,11 @@
  * 1 0 1 0 0  0  0  1 = 0XA1 
  */
 
+void SetFlashOverFlow(uint8_t flowvalue);
 
-void Fram_Test(void);
-void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose);
-void SaveHisDataToFram(void);
 void ReadFramHisDataToRam(void);
 void Down_HisData(void);
 
-void SaveHisDataToFlash(void);
 void DownFlash_HisData(void);
 
 
@@ -29,4 +26,6 @@ void WriteU16Pointer(const uint16_t PointerAddr,uint16_t Pointer);
 
 uint32_t ReadU32Pointer(const uint32_t PointerAddr);
 void WriteU32Pointer(const uint32_t PointerAddr,uint32_t Pointer);
-#endif /* __I2C_EE_H */
+
+void StorageHistoryData(void);
+#endif /* __STORAGEDATA_H */

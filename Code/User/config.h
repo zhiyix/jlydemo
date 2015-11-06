@@ -41,11 +41,6 @@
 #define  Gps_choose          0
 #define  Clock_choose        1
 
-//对应通道
-#define  CH_1                0
-#define  CH_2                1
-#define  CH_3                2
-#define  CH_4                3
 
 #define  Headend_BYTES       2 //数据包头尾各一个字节
 #define  ID_BYTES            2 //SN号2个字节
@@ -136,12 +131,12 @@
 //----------------------------------------------------------
 //! \brief
 #define FLASH_PAGE_NUM              32768   //flash总的页数
-//测试 用两个扇区模拟数据存储
+//测试 用3个扇区模拟数据存储
 #define FLASH_RecMaxSize            12288  //flash中存储数据的字节总数 (800000) 8M  8388608
 
 #define FLASH_RecFirstAddr           0x000000   //Flash中存放数据的首地址
 #define FLASH_SectorFirstAddr		 0x000000
-//测试 2个扇区
+//测试 3个扇区
 #define FLASH_SectorNum				 3		//8M的flash有2048 sector 2048
 #define FLASH_SectorPerSize          4096		//Flash每个扇区的大小
 
@@ -212,11 +207,13 @@ struct FLAG
          uint8_t StartSample:1;         //开始采样
          uint8_t EndSample:1;           //结束采样
          uint8_t MucReset:1;            //上电复位？？
-         uint8_t RtcShan:1;             //rtc
+         uint8_t RtcShan:1;             //时钟 : 闪烁
 	
 		 uint8_t RecTimeDingShiBoot:1;	//记录仪时间点定时启动
 		 uint8_t RecTimeDingDianBoot:1; //记录仪时间点定点启动
 		 uint8_t RecTimeDingDianStop:1; //记录仪时间点定点停止
+		 
+		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
 		 
 };
 //! \brief 电源管理
@@ -239,16 +236,16 @@ struct JLYPARAMETER
     uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
     uint8_t  LastErrorCode:1;		//错误码 
 	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
-	
+	uint8_t  ChannelNumOld;			//未重新配置之前的通道数
+	uint8_t  SensorTypeOld[32];		//未重新配置之前的通道类型
 	
 	uint16_t NormalRecIntervalMin;	//正常记录间隔 单位：min 
 	
+	
 	uint32_t SampleInterval;    	//采集时间间隔 单位：s
     uint32_t SampleTime;			//采集时间 单位：s
-	
     uint32_t NormalRecInterval;  	//正常记录间隔 单位：s
     //uint32_t SaveHisDataTime;       //存储间隔
-	
 	int32_t delay_start_time;		// 延时启动时间 
 	
 };

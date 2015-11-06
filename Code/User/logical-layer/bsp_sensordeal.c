@@ -588,7 +588,7 @@ void DoGatherChannelDataFloat(uint8_t ChannelCode)
 }
 
 /******************************************************************************
-  * @brief  Description  
+  * @brief  Description  判断通道数量并显示
   * @param  chanel_num   
   * @retval start_chanel 
   *****************************************************************************/

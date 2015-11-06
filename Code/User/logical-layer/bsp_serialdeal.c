@@ -86,8 +86,8 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = usAddress - VirtJlyConfAddr;
 		Fram_Write(pucBuffer, ConfMap_Address[1][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_JlyConfAddr],ConfMap_Address[1][1] + offset * 2,size);
-		/*记录间隔变化时做相应处理*/
-		SetJlyParamData();
+		/*通道数量、通道类型变化时做相应处理*/
+		SetJlyParamJudgeChannelNumSensorType();
 		JudgingChannelNumberDisplay(Conf.Jly.ChannelNum);//修改通道数量
 		//if(Conf.)
 		
@@ -197,7 +197,7 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
 	uint32_t NoReadingDataNumTemp;
 	//usAddress *= 2;
-	//usNRegs *= 2;
+	usNRegs *= 2;
 	Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
 	Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
 	

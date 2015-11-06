@@ -8,6 +8,24 @@
 
 static void NVIC_Configuration(void);
 
+/**
+ * @brief 配置USART1接收中断
+ * @param 无
+ * @tetval 无
+ */
+static void NVIC_Configuration(void)
+{
+    NVIC_InitTypeDef NVIC_InitStructure;
+    /* Configure the NVIC Preemption Priority Bits */
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+    
+    /* Enable the USARTy Interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority =3;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+}
 
 void USART1_Config(uint32_t BaudRats)
 {
@@ -55,24 +73,6 @@ void USART1_Config(uint32_t BaudRats)
     USART_Cmd(USART1, ENABLE);
 }
 
-/**
- * @brief 配置USART1接收中断
- * @param 无
- * @tetval 无
- */
-static void NVIC_Configuration(void)
-{
-    NVIC_InitTypeDef NVIC_InitStructure;
-    /* Configure the NVIC Preemption Priority Bits */
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-    
-    /* Enable the USARTy Interrupt */
-    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority =3;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
-}
 /**
  * @brief 重定向c库函数printf到usart1
  * @param 无

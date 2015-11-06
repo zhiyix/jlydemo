@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    bsp_i2c_fram.c
+  * @file    bsp_storagedata.c
   * @author  
   * @version V1.0
   * @date    2015-xx-xx
-  * @brief   i2c FRAM (FM24CL64B)应用函数bsp
+  * @brief   存储历史数据
   ******************************************************************************
   * @attention
   *
@@ -14,7 +14,7 @@
   */ 
 
 #include "main.h"
-//#include "dev_i2c.h"
+
 
 const char temp_unit[2]={0xA1,0xE6};//"温度符号"
 const char shidu_unit[3]={0x25,0x52,0x48};//"%RH"
@@ -27,7 +27,7 @@ const char shidu_unit[3]={0x25,0x52,0x48};//"%RH"
   * @param  Gpschoose	选择GPS
   * @retval 无		
   *****************************************************************************/
-void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose)
+static void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose)
 {
     //-------------
 	uint8_t zhuangtai_temp;
@@ -128,6 +128,7 @@ void WriteU16Pointer(const uint16_t PointerAddr,uint16_t Pointer)
 	Fram_Write(myu16.Byte,PointerAddr,2); //保存 u16 2字节
 }
 
+
 /******************************************************************************
   * @brief  Description 
   * @param  PointerAddr	读指针地址 		 	
@@ -153,6 +154,19 @@ void WriteU32Pointer(const uint32_t PointerAddr,uint32_t Pointer)
 }
 
 /******************************************************************************
+  * @brief  Description  设置flash溢出、未溢出标志
+  * @param  flowvalue    0/1 1表示溢出
+  * @retval 无		
+  *****************************************************************************/
+void SetFlashOverFlow(uint8_t flowvalue)
+{
+	uint8_t OverFlowBuf[1];
+	
+	Flag.RecordFlashOverFlow = flowvalue;	
+	OverFlowBuf[0] = flowvalue;
+	Fram_Write(OverFlowBuf,FLASH_RecordFlashOverFlow,1);//存储flash有未溢出标志
+}
+/******************************************************************************
   * @brief  Description 保存数据到flash,先用2k 模拟实现
 						未读条数减少，记录最大地址不变
 写满一个扇区时擦除下一个扇区
@@ -162,11 +176,9 @@ flash中每个扇区的字节都利用起来
   * @param  无  		 	
   * @retval 无		
   *****************************************************************************/
-void SaveHisDataToFlash(void)
+static void SaveHisDataToFlash(void)
 {
-	uint8_t OverFlowBuf[1];
-    //uint32_t FlashOffset;
-    
+	
 	Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
 	Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar); //读未读条数
 	
@@ -192,12 +204,11 @@ void SaveHisDataToFlash(void)
 		
 		if(Flag.RecordFlashOverFlow ==1)	//数据溢出，擦除当前扇区，读指针偏移 Queue.FLASH_SECTOR_PER_NUM
 		{
-			//倒数第二个扇区
 			if(Queue.WriteFlashDataPointer < (FLASH_RecMaxSize - FLASH_SectorPerSize - Queue.HIS_ONE_BYTES))//数据记录指针小于8192-4096-10
 			{
 				Queue.SectorHeadBytes = Queue.HIS_ONE_BYTES - (Queue.FlashSectorPointer * FLASH_SectorPerSize )%Queue.HIS_ONE_BYTES;
 				Queue.FlashReadDataBeginPointer = Queue.FlashSectorPointer * FLASH_SectorPerSize + Queue.SectorHeadBytes;//Queue.FlashSectorPointer++之后 
-			}else{
+			}else{//写最后一个扇区时
 				Queue.FlashReadDataBeginPointer = 0;
 				Queue.ReadFlashDataPointer = 0;
 				WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);//保存读指针
@@ -217,9 +228,7 @@ void SaveHisDataToFlash(void)
 		Queue.WriteFlashDataPointer = 0;
 		if(Flag.RecordFlashOverFlow ==0)
 		{
-			Flag.RecordFlashOverFlow = 1;	//flash存满 溢出
-			OverFlowBuf[0] = 1;
-			Fram_Write(OverFlowBuf,FLASH_RecordFlashOverFlow,1);//存储flash溢出标志
+			SetFlashOverFlow(1);//设置flash溢出标志
 		}
 	}
 	WriteU32Pointer(FLASH_WriteDataAddr_Lchar,Queue.WriteFlashDataPointer); //保存Flash写数据指针
@@ -231,14 +240,14 @@ void SaveHisDataToFlash(void)
 			Queue.FlashNoReadingDataNum++;
 		}
 	}else{		
-		if(Queue.FlashNoReadingDataNum < ((Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM) + Queue.WriteFlashDataPointer%FLASH_SectorPerSize)) //已经擦除了一个扇区
+		if(Queue.FlashNoReadingDataNum < Queue.FLASH_MAX_NUM ) //测试ok
 		{
 			Queue.FlashNoReadingDataNum++;
-		}else{//819-409+x/409=410+x/409
-			Queue.FlashNoReadingDataNum = (Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM) + Queue.WriteFlashDataPointer%FLASH_SectorPerSize;
+		}else{//819-409
+			Queue.FlashNoReadingDataNum = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM;//此时刚好写下一个扇区
 		}
 		
-		if(((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer)>0) &&((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer) < FLASH_SectorPerSize))
+		if(((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer)>0) &&((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer) < Queue.HIS_ONE_BYTES*2))
 		{
 			Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
 			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);//保存读指针
@@ -252,7 +261,7 @@ void SaveHisDataToFlash(void)
   * @param  无  		 	
   * @retval 无		
   *****************************************************************************/
-void SaveHisDataToFram(void)
+static void SaveHisDataToFram(void)
 {
     uint8_t TempBuf[FLASH_SectorPerSize];
     uint16_t eeOffset;
@@ -494,22 +503,67 @@ void DownFlash_HisData(void)
         Flag.TouchKey1DuanAn = 0;            
     }
 }
+
 /******************************************************************************
-  * @brief  Description 测试
+  * @brief  Description 到记录间隔保存数据到flash
+  * @param  无  		
+  * @retval 无		
+  *****************************************************************************/
+static void SaveDataOnTimeDeal(void)
+{
+    
+	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
+	{
+		Rtc.SCount++;
+		if(Rtc.SCount >= 60)
+		{
+			Rtc.SCount = 0;
+		}
+		if(Rtc.SCount % JlyParam.NormalRecInterval ==0)
+		{
+			
+			read_time();
+			ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
+//			SaveHisDataToFram();
+			SaveHisDataToFlash();
+		}
+	}
+	else
+	{
+		read_time();
+    
+		RtcBcdToD10(&Rtc);
+		
+		Rtc.TMPS=DateToSeconds(&Rtc);
+		
+		RtcD10ToBcd(&Rtc);
+		
+		Rtc.TMPS = Rtc.TMPS/60;	//分钟
+		if(Rtc.TMPS % JlyParam.NormalRecIntervalMin ==0)//1分钟-
+		{   
+			if(Rtc.TMPS!=Rtc.TCPS)
+			{
+				Rtc.TCPS=Rtc.TMPS;
+				
+				read_time();
+				ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
+//				SaveHisDataToFram();
+				SaveHisDataToFlash();
+			}
+		}
+	}
+	
+}
+/******************************************************************************
+  * @brief  Description 存储历史数据
   * @param    		
   * @retval 		
   *****************************************************************************/
-void Fram_Test(void)
+void StorageHistoryData(void)
 {
-	char i=0;
-	uint8_t Buf[15]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-    uint8_t value[20]={0};
-	AI2C_Write(&Buf[0], FRAM_RecWriteAddr_Hchar+2,10);
-	
-	AI2C_Read(&value[0],FRAM_RecWriteAddr_Hchar+2,10);
-    printf("\r\n");
-    for(i=0;i<10;i++)
-        printf("%d ",value[i]);
-    
-    printf("\r\n");
+	if(Conf.Jly.WorkStatueIsStop >= 1)
+	{
+		SaveDataOnTimeDeal();
+	}
 }
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -140,56 +140,6 @@ static void LOWorNomal_Mode(void)
     }
 }
 /******************************************************************************
-  * @brief  Description 记录仪
-  * @param  无  		
-  * @retval 无		
-  *****************************************************************************/
-static void SaveDataOnTimeDeal(void)
-{
-    
-	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
-	{
-		Rtc.SCount++;
-		if(Rtc.SCount >= 60)
-		{
-			Rtc.SCount = 0;
-		}
-		if(Rtc.SCount % JlyParam.NormalRecInterval ==0)
-		{
-			
-			read_time();
-			ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
-//			SaveHisDataToFram();
-			SaveHisDataToFlash();
-		}
-	}
-	else
-	{
-		read_time();
-    
-		RtcBcdToD10(&Rtc);
-		
-		Rtc.TMPS=DateToSeconds(&Rtc);
-		
-		RtcD10ToBcd(&Rtc);
-		
-		Rtc.TMPS = Rtc.TMPS/60;	//分钟
-		if(Rtc.TMPS % JlyParam.NormalRecIntervalMin ==0)//1分钟-
-		{   
-			if(Rtc.TMPS!=Rtc.TCPS)
-			{
-				Rtc.TCPS=Rtc.TMPS;
-				
-				read_time();
-				ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
-//				SaveHisDataToFram();
-				SaveHisDataToFlash();
-			}
-		}
-	}
-	
-}
-/******************************************************************************
   * @brief  Description 记录仪工作状态处理
   * @param  无  		
   * @retval 无		
@@ -324,14 +274,11 @@ void JlySecDeal(void)
     {
         Flag.Sec = 0;
         
-        Display_SN();   /*显示SN号*/
+        Display_SN();   
         
-		if(Conf.Jly.WorkStatueIsStop >= 1)
-		{
-			SaveDataOnTimeDeal();
-		}
+		StorageHistoryData();
+		
         OneSec_Timedeal();
-        
         
         rtc_deel();
         

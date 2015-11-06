@@ -100,6 +100,6 @@
 
 void SysInit(void);
 void PeripheralInit(void);
-void SetJlyParamData(void);
 void OffPowerSupply(void);
+void SetJlyParamJudgeChannelNumSensorType(void);
 #endif
