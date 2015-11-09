@@ -181,6 +181,7 @@ void EXTI15_10_IRQHandler(void)
 		/* Toggle LED1 */
 		LED1_TOGGLE;
         Flag.Key1DuanAn = 1;
+		Flag.AlarmXiaoYin = 1;
 		/* Clear the EXTI line 13 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line13);
 	}

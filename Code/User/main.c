@@ -61,7 +61,7 @@ int main(void)
     SysInit();
 	
 	printf("\r\n this is a 32bits  demo \r\n");
-	printf("struct BasicConfDataStr size:%d",sizeof(struct BasicConfDataStr));
+	printf("struct SensorChanelConfDataStr size:%d",sizeof(struct SensorChanelConfDataStr));
   /* Add your application code here
      */
 
@@ -84,7 +84,7 @@ int main(void)
       if(Flag.TouchKey1DuanAn ==1)
       {
          //Down_HisData();
-		  printf("Flag.RecordFlashOverFlow %d\r\n",Flag.RecordFlashOverFlow);
+		  printf("Queue.FlashRecOverFlow %d\r\n",Queue.FlashRecOverFlow);
 		  printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
 		  printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
 		  printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
@@ -95,10 +95,7 @@ int main(void)
       }
 	  if(Flag.TouchKey2DuanAn ==1)
 	  {
-		  
 		  Flag.TouchKey2DuanAn =0;
-		  Queue.RecFramWritePointer = 0;//存储在Fram中的数据清除
-		  WriteU16Pointer(FRAM_RecWriteAddr_Lchar,0);
 		  
 		  Queue.FlashNoReadingDataNum = 0;
 		  Queue.FlashSectorPointer = 0;

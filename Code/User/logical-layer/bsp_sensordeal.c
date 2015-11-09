@@ -594,12 +594,16 @@ void DoGatherChannelDataFloat(uint8_t ChannelCode)
   *****************************************************************************/
 void JudgingChannelNumberDisplay(uint8_t ChannelNum)
 {
-	if(ChannelNum <= 0)
+	if(JlyParam.LastErrorCode != 1)
 	{
-		Display_NUL();//配置的通道数为0,显示NUL
-	}else{
-		Started_Channel = GetStartChanel(ChannelNum); //通道数转换为 启动的通道
-		StartedChannelForDisplay = Started_Channel;
+		if(ChannelNum <= 0)
+		{
+			Display_NUL();//配置的通道数为0,显示NUL
+		}else{
+			Started_Channel = GetStartChanel(ChannelNum); //通道数转换为 启动的通道
+			StartedChannelForDisplay = Started_Channel;
+		}
+
 	}
 }
 #endif /* __BSPSENSORDEAL_C */

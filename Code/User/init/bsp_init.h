@@ -101,5 +101,8 @@
 void SysInit(void);
 void PeripheralInit(void);
 void OffPowerSupply(void);
+void WriteSetFramFlag(void);
+int16_t ReadSetFramFlag(void);
+
 void SetJlyParamJudgeChannelNumSensorType(void);
 #endif

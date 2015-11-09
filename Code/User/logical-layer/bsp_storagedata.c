@@ -162,9 +162,9 @@ void SetFlashOverFlow(uint8_t flowvalue)
 {
 	uint8_t OverFlowBuf[1];
 	
-	Flag.RecordFlashOverFlow = flowvalue;	
+	Queue.FlashRecOverFlow = flowvalue;	
 	OverFlowBuf[0] = flowvalue;
-	Fram_Write(OverFlowBuf,FLASH_RecordFlashOverFlow,1);//存储flash有未溢出标志
+	Fram_Write(OverFlowBuf,FLASH_FlashRecOverFlowAddr,1);//存储flash有未溢出标志
 }
 /******************************************************************************
   * @brief  Description 保存数据到flash,先用2k 模拟实现
@@ -173,6 +173,10 @@ void SetFlashOverFlow(uint8_t flowvalue)
 flash写到 Queue.FLASH_SECTOR_PER_NUM - 1时，Queue.WriteFlashDataPointer++，
 此时Queue.WriteFlashDataPointer % Queue.FLASH_SECTOR_PER_NUM，擦除下一个扇区
 flash中每个扇区的字节都利用起来
+测试：
+	(1)做实验反复测试存储，8通道测试ok
+	(2)反复测试未读条数的正确性，8通道测试ok
+	(3)测试复位溢出标志
   * @param  无  		 	
   * @retval 无		
   *****************************************************************************/
@@ -202,7 +206,7 @@ static void SaveHisDataToFlash(void)
 		}
 		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,Queue.FlashSectorPointer);	//保存Flash Sector存储指针 
 		
-		if(Flag.RecordFlashOverFlow ==1)	//数据溢出，擦除当前扇区，读指针偏移 Queue.FLASH_SECTOR_PER_NUM
+		if(Queue.FlashRecOverFlow ==1)	//数据溢出，擦除当前扇区，读指针偏移 Queue.FLASH_SECTOR_PER_NUM
 		{
 			if(Queue.WriteFlashDataPointer < (FLASH_RecMaxSize - FLASH_SectorPerSize - Queue.HIS_ONE_BYTES))//数据记录指针小于8192-4096-10
 			{
@@ -210,13 +214,17 @@ static void SaveHisDataToFlash(void)
 				Queue.FlashReadDataBeginPointer = Queue.FlashSectorPointer * FLASH_SectorPerSize + Queue.SectorHeadBytes;//Queue.FlashSectorPointer++之后 
 			}else{//写最后一个扇区时
 				Queue.FlashReadDataBeginPointer = 0;
-				Queue.ReadFlashDataPointer = 0;
+			}
+			//当读和写都为0时,包括两种情况
+			//情况1：一条数据也未读，Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
+			//情况2：当数据存满溢出读和写都为0，Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
+			if(((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer) >= 0) &&((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer) < FLASH_SectorPerSize))
+			{
+				Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
 				WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);//保存读指针
 			}
 		}else{
 			Queue.FlashReadDataBeginPointer = 0;
-			Queue.ReadFlashDataPointer = 0;
-			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);//保存读指针
 		}
 		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,Queue.FlashReadDataBeginPointer);//保存读数据起始指针
 	}
@@ -226,85 +234,33 @@ static void SaveHisDataToFlash(void)
 	if(Queue.WriteFlashDataPointer >= FLASH_RecMaxSize)
 	{
 		Queue.WriteFlashDataPointer = 0;
-		if(Flag.RecordFlashOverFlow ==0)
+		if(Queue.FlashRecOverFlow ==0)//上电已读取
 		{
 			SetFlashOverFlow(1);//设置flash溢出标志
 		}
 	}
 	WriteU32Pointer(FLASH_WriteDataAddr_Lchar,Queue.WriteFlashDataPointer); //保存Flash写数据指针
 		
-	if(Flag.RecordFlashOverFlow == 0)
+	if(Queue.FlashRecOverFlow == 0)
 	{
 		if(Queue.FlashNoReadingDataNum < Queue.FLASH_MAX_NUM)
 		{
 			Queue.FlashNoReadingDataNum++;
 		}
-	}else{		
+	}else{
+		/*
 		if(Queue.FlashNoReadingDataNum < Queue.FLASH_MAX_NUM ) //测试ok
 		{
 			Queue.FlashNoReadingDataNum++;
 		}else{//819-409
 			Queue.FlashNoReadingDataNum = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM;//此时刚好写下一个扇区
-		}
-		
-		if(((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer)>0) &&((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer) < Queue.HIS_ONE_BYTES*2))
-		{
-			Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
-			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);//保存读指针
-		}
+		}*/
+		Queue.FlashNoReadingDataNum = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM + (Queue.WriteFlashDataPointer%FLASH_SectorPerSize)/Queue.HIS_ONE_BYTES;//此时刚好写下一个扇区
 	}
 		
 	WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);//保存未读数据指针
 }
-/******************************************************************************
-  * @brief  Description 保存数据到铁电,这种方法在Fram中最后有几个字节没有使用
-  * @param  无  		 	
-  * @retval 无		
-  *****************************************************************************/
-static void SaveHisDataToFram(void)
-{
-    uint8_t TempBuf[FLASH_SectorPerSize];
-    uint16_t eeOffset;
 
-	Queue.RecFramWritePointer = ReadU16Pointer(FRAM_RecWriteAddr_Lchar);	//读取Fram指针
-    //ReadFlashRecAddr();
-    
-    eeOffset = Queue.RecFramWritePointer * Queue.HIS_ONE_BYTES; 
-	//Queue.RecFramWritePointer = 408,写完这一条 此时Fram已写满
-	Fram_Write(&DataBuf[3], (FRAM_RecFirstAddr+eeOffset), Queue.HIS_ONE_BYTES); //写历史数据到Fram中
-	
-    Queue.RecFramWritePointer++;	//数据在Fram中存完一条指针加1
-    Queue.WriteFlashDataPointer++;
-	//Queue.FRAM_MAX_NUM = 409 ,这时清除Fram写指针
-    if(Queue.RecFramWritePointer >= Queue.FRAM_MAX_NUM )
-    {
-        Queue.RecFramWritePointer = 0;
-        Flag.RecordFramOverFlow = 1;
-        
-        Fram_Read(TempBuf,FRAM_RecFirstAddr,Queue.FRAM_MAX_NUM*Queue.HIS_ONE_BYTES);
-		
-		SPI_FLASH_SectorErase(FLASH_SectorFirstAddr + (Queue.FlashSectorPointer * FLASH_SectorPerSize));//考虑边界问题
-		
-		Queue.FlashSectorPointer++;
-		
-		//fram第一次存储满，从flash中0地址开始存储,
-        SPI_FLASH_BufferWrite(TempBuf, (FLASH_RecFirstAddr + Queue.FlashSectorPointer * FLASH_SectorPerSize), Queue.FRAM_MAX_NUM*Queue.HIS_ONE_BYTES);
-    
-    }
-	if(Queue.FlashSectorPointer >= FLASH_SectorNum)
-	{
-		Queue.FlashSectorPointer = 0;	//Flash扇区指针清零
-	}
-	
-	if(Queue.WriteFlashDataPointer >= (Queue.FLASH_MAX_NUM + 1))
-	{
-		Queue.WriteFlashDataPointer = 0;
-		Flag.RecordFlashOverFlow =1;
-		
-	}
-    WriteU16Pointer(FRAM_RecWriteAddr_Lchar,Queue.RecFramWritePointer); //保存完数据，保存当前Fram中的记录指针
-    WriteU32Pointer(FLASH_WriteDataAddr_Lchar,Queue.WriteFlashDataPointer); //保存Flash写指针
-}
 /******************************************************************************
   * @brief  Description 读铁电数据到内存中
   * @param  无   			
@@ -348,83 +304,7 @@ void ReadFramHisDataToRam(void)
         
     }
 }
-/******************************************************************************
-  * @brief  Description 下载数据处理
-  * @param    		
-  * @retval 		
-  *****************************************************************************/
-static void HisData_Tidy(uint16_t RecorderPoint_Begin,uint16_t RecorderPoint)
-{   
-    uint8_t Buf[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES];
-    uint8_t BufTemp[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES];
-    uint8_t i=0;
-    uint16_t  down_hisdata_count,down_eeOffset,Temp;
-    
-    for(down_hisdata_count=RecorderPoint_Begin;down_hisdata_count<RecorderPoint;down_hisdata_count++)
-    {
-        down_eeOffset = down_hisdata_count*Queue.HIS_ONE_BYTES;
-        
-        AI2C_Read(BufTemp,(FRAM_RecFirstAddr+down_eeOffset),Queue.HIS_ONE_BYTES);
-        
-        i=0;
-        Buf[i++]=BufTemp[4]; 
-        Buf[i++]=BufTemp[5];
-        Buf[i++]=BufTemp[6];
-        Buf[i++]=BufTemp[7];
-        Buf[i++]=BufTemp[8];
-        Buf[i++]=BufTemp[9];
-        
-        //Buf[i++]=BufTemp[0];
-        //Buf[i++]=BufTemp[1];
-        Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
-        Buf[i++]=Temp/100;
-        Buf[i++]=(Temp%100)/10;
-        Buf[i++]=Temp%10;
-        
-        //Buf[i++]=BufTemp[2];
-        //Buf[i++]=BufTemp[3];
-        Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
-        Buf[i++]=Temp/100;
-        Buf[i++]=(Temp%100)/10;
-        Buf[i++]=Temp%10;
-        
-        printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[0],Buf[1],Buf[2],Buf[3],Buf[4],Buf[5]);
-        printf("%d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11]);
-        
-    }
-}
-/******************************************************************************
-  * @brief  Description 下载Fram中的数据
-  * @param    		
-  * @retval 		
-  *****************************************************************************/
-void Down_HisData(void)
-{
-    uint16_t  RecorderPoint_temp;
-    
-    Queue.RecFramWritePointer = ReadU16Pointer(FRAM_RecWriteAddr_Lchar); //
-	
-    RecorderPoint_temp = Queue.RecFramWritePointer;
-    
-    //RecorderPoint_temp=3;
-    //Flag.Record_BelowMax =0;
-    if(RecorderPoint_temp==0)
-    {
-        Flag.TouchKey1DuanAn = 0;
-    }
-    if(Flag.RecordFramOverFlow ==0)
-    {
-        HisData_Tidy(0,RecorderPoint_temp);
-        Flag.TouchKey1DuanAn = 0;
-    }
-    if(Flag.RecordFramOverFlow >=1)
-    {
-        HisData_Tidy(RecorderPoint_temp,Queue.FRAM_MAX_NUM); 
-        
-        HisData_Tidy(0,RecorderPoint_temp);
-        Flag.TouchKey1DuanAn = 0;            
-    }
-}
+
 /******************************************************************************
   * @brief  Description 读flash中的数据
   * @param    		
@@ -440,33 +320,61 @@ void ReadFlashHisData(uint32_t RecPointerBeginAddr,uint32_t RecPointerEndAddr)
     
     for(down_hisdata_count=RecPointerBeginAddr;down_hisdata_count < (RecPointerEndAddr - Queue.HIS_ONE_BYTES);)
     {
-		down_hisdata_count += Queue.HIS_ONE_BYTES;
         SPI_FLASH_BufferRead(BufTemp,(FLASH_RecFirstAddr+down_hisdata_count),Queue.HIS_ONE_BYTES);
-        
-        i=0;
-        Buf[i++]=BufTemp[4]; 
-        Buf[i++]=BufTemp[5];
-        Buf[i++]=BufTemp[6];
-        Buf[i++]=BufTemp[7];
-        Buf[i++]=BufTemp[8];
-        Buf[i++]=BufTemp[9];
-        
-        //Buf[i++]=BufTemp[0];
-        //Buf[i++]=BufTemp[1];
-        Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
-        Buf[i++]=Temp/100;
-        Buf[i++]=(Temp%100)/10;
-        Buf[i++]=Temp%10;
-        
-        //Buf[i++]=BufTemp[2];
-        //Buf[i++]=BufTemp[3];
-        Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
-        Buf[i++]=Temp/100;
-        Buf[i++]=(Temp%100)/10;
-        Buf[i++]=Temp%10;
-        
-        printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
-        printf("%d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11]);
+        down_hisdata_count += Queue.HIS_ONE_BYTES;
+		
+		if(Conf.Jly.ChannelNum == 2)
+		{
+			i=0;
+			Buf[i++]=BufTemp[4]; 
+			Buf[i++]=BufTemp[5];
+			Buf[i++]=BufTemp[6];
+			Buf[i++]=BufTemp[7];
+			Buf[i++]=BufTemp[8];
+			Buf[i++]=BufTemp[9];
+			
+			//Buf[i++]=BufTemp[0];
+			//Buf[i++]=BufTemp[1];
+			Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+			Buf[i++]=Temp/100;
+			Buf[i++]=(Temp%100)/10;
+			Buf[i++]=Temp%10;
+			
+			//Buf[i++]=BufTemp[2];
+			//Buf[i++]=BufTemp[3];
+			Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+			Buf[i++]=Temp/100;
+			Buf[i++]=(Temp%100)/10;
+			Buf[i++]=Temp%10;
+			
+			printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+			printf("%d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11]);
+		}else if(Conf.Jly.ChannelNum == 8){
+			i=0;
+			Buf[i++]=BufTemp[16];
+			Buf[i++]=BufTemp[17];
+			Buf[i++]=BufTemp[18]; 
+			Buf[i++]=BufTemp[19];
+			Buf[i++]=BufTemp[20];
+			Buf[i++]=BufTemp[21];
+			
+			//Buf[i++]=BufTemp[0];
+			//Buf[i++]=BufTemp[1];
+			Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+			Buf[i++]=Temp/100;
+			Buf[i++]=(Temp%100)/10;
+			Buf[i++]=Temp%10;
+			
+			//Buf[i++]=BufTemp[2];
+			//Buf[i++]=BufTemp[3];
+			Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+			Buf[i++]=Temp/100;
+			Buf[i++]=(Temp%100)/10;
+			Buf[i++]=Temp%10;
+			
+			printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+			printf("%d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+		}
         
     }
 }
@@ -488,12 +396,12 @@ void DownFlash_HisData(void)
     {
         Flag.TouchKey1DuanAn = 0;
     }
-    if(Flag.RecordFlashOverFlow ==0)
+    if(Queue.FlashRecOverFlow ==0)
     {
         ReadFlashHisData(0,RecorderPoint_temp);
         Flag.TouchKey1DuanAn = 0;
     }
-    if(Flag.RecordFlashOverFlow >=1)
+    if(Queue.FlashRecOverFlow >=1)
     {
 		if(Queue.WriteFlashDataPointer < (FLASH_RecMaxSize - FLASH_SectorPerSize - Queue.HIS_ONE_BYTES))//如果正在写数据到最后一个扇区，如数据起始地址为0
 		{

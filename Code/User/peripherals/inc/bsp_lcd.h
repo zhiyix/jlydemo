@@ -197,7 +197,7 @@ void Display_Signal(uint8_t signal_value);
 void Display_Mem(void);
 void Display_SN(void);
 void Display_NUL(void);
-void displayErr(uint8_t Err);
+void displayErr(uint8_t Er);
 void lcd_OFF(uint8_t offcode);
 void displayYEAR(unsigned char year);
 void displayDAY(uint8_t month,uint8_t day);

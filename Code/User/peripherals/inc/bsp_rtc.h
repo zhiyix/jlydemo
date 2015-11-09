@@ -69,7 +69,8 @@
 /*============================ PROTOTYPES ====================================*/
 // MCU:
 /*============================ EXTERN FUNCTIONS ==============================*/
-uint8_t RX8025_RTC_Init(void);
+bool RX8025_RTC_Init(void);
+
 void read_time(void);
 void serialread_time(void);
 void rtc_deel(void);

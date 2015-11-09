@@ -58,8 +58,11 @@ static void  Reset_Time(void)
 	setbuf[0] = 0x00;
 	RTC8025_Write(setbuf,RX8025_DigitalOffsetAddr,1);	/*不使用精度调整功能*/
 	
-	setbuf[0] = 0x20;
-	RTC8025_Write(setbuf,RX8025_Control1Addr,1);   /*设置24小时制*/
+	setbuf[0] = 0x30;
+	RTC8025_Write(setbuf,RX8025_Control1Addr,1);   /*设置24小时制,设置BIT4 为1表示设置过RX8025*/
+	
+	setbuf[0] = 0x08;
+	RTC8025_Write(setbuf,RX8025_Control2Addr,1);  //清除RX8025 PON位，设置BIT3 为1表示设置过RX8025
 	
 	/*写入出厂时间*/
 	setbuf[6] = 0x15;	/*年*/
@@ -71,42 +74,55 @@ static void  Reset_Time(void)
 	setbuf[0] = 0x30;	/*秒*/
 	RTC8025_Write(setbuf,RX8025_SecondsAddr,7);	/*写入RX8025*/ 
 }
+
+/******************************************************************************
+  * @brief  Description 读取设置过RX8025 Control1标志
+  * @param  无
+  * @retval 无		
+  *****************************************************************************/
+static int8_t ReadRX8025Control1(void)
+{
+	uint8_t TempBuf[1];
+	int8_t  RX8025Flag;
+	
+	RTC8025_Read(TempBuf,RX8025_Control1Addr,1);
+	
+	RX8025Flag = TempBuf[0];
+	return RX8025Flag;
+}
+/******************************************************************************
+  * @brief  Description 读取设置过RX8025 Control2标志
+  * @param  无
+  * @retval 无		
+  *****************************************************************************/
+static int8_t ReadRX8025Control2(void)
+{
+	uint8_t TempBuf[1];
+	int8_t  RX8025Flag;
+	
+	RTC8025_Read(TempBuf,RX8025_Control2Addr,1);
+	
+	RX8025Flag = TempBuf[0];
+	return RX8025Flag;
+}
 /******************************************************************************
   * @brief  Description RX8025初始化
   * @param  无
   * @retval 无		
   *****************************************************************************/
-uint8_t RX8025_RTC_Init(void)
+bool RX8025_RTC_Init(void)
 {
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);	/*使能PWR和BKP外设时钟*/  
-	PWR_RTCAccessCmd(ENABLE);	                   		/*使能后备寄存器访问*/
-	/* Wait for RTC APB registers synchronisation */
-    RTC_WaitForSynchro();
-    /*检查是不是第一次配置时钟 ，这里MCU自带RTC未接备份电池*/
-	/*从指定的后备寄存器中读出数据：读出了与写入的指定数据不相乎*/
-	if (RTC_ReadBackupRegister(RTC_BKP_DR0) != 0x5050)//BKP_DR1 
+    /*检查是不是第一次配置时钟 */
+	/*从指定的寄存器中读出数据：读出了与写入的指定数据不相乎,RX8025掉电复位时间到出厂日期*/
+	if((ReadRX8025Control1() != 0x30) && (ReadRX8025Control2() != 0x08))// 
 	{
 		printf("\r\n\r\n RX8025_RTC configured....");
-		Reset_Time();	/*设置时间出厂时间*/
+		Reset_Time();	/*设置时间出厂时间,设置配置RX8025标志*/
 		
-		/*向指定的后备寄存器中写入用户程序数据*/
-		RTC_WriteBackupRegister(RTC_BKP_DR0, 0x5050);
 		return 1;	/*返回1，第一次初始化*/
 	}
 	else
 	{
-		/*启动无需设置新时钟*/
-		/*检查是否掉电重启*/
-		if (RCC_GetFlagStatus(RCC_FLAG_PORRST) != RESET)
-		{
-		  printf("\r\n Power On Reset occurred....\n\r");
-		}
-		/*检查是否Reset复位*/
-		else if (RCC_GetFlagStatus(RCC_FLAG_PINRST) != RESET)
-		{
-		  printf("\r\n External Reset occurred....\n\r");
-		}
-
 		printf("\n\r No need to configure RX8025_RTC....\n\r");
 	}
     return 0;	/*返回0，已经初始化过*/
@@ -180,7 +196,7 @@ void set_time(void)
 	RTC8025_Write(setbuf,RX8025_SecondsAddr,7);	/*写入RX8025*/ 
 }
 /******************************************************************************
-  * @brief  Description rtc 处理
+  * @brief  Description rtc 显示处理
   * @param  无
   * @retval 无		
   *****************************************************************************/

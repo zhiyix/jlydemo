@@ -80,8 +80,8 @@ struct BasicConfDataStr
 	uint16_t BatteryState;	/*!< 后备电池状态 */
 	union    Si2Char BatVoltage;/*!< 电池电压,  */
 	//22byte
-	uint8_t  :8;		  /*!< 保留 */
 	uint8_t  RecordFlashOverFlow; 	//flash记录溢出标志
+	uint8_t  :8;		  /*!< 保留 */
 	
 	uint16_t RecFramWritePointer;	//fram中数据记录指针
 	uint16_t FlashSectorPointer;	//flash中扇区指针
@@ -227,6 +227,7 @@ struct SensorChanelConfDataStr
 	
 	union FISI2CH4 SensorAlarm_High;  /*!< 报警上限 [IEEE-754_1二进制浮点操作数] 0x0000 0000*/ 
     union FISI2CH4 SensorAlarm_Low;   /*!< 报警下限 [IEEE-754_1二进制浮点操作数]0x0000 0000*/
+	
 	uint8_t Reserv[12];	/*!< Reserv */
 };
 //! \brief温湿度传感器校准配置数据地址表 6 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
@@ -266,12 +267,13 @@ struct TempHumiAdjustConfDataStr
 struct CircularQueue
 {
 	uint8_t  SectorHeadBytes;		
+	uint8_t  FlashRecOverFlow;		//flash存储数据溢出
 	uint16_t HIS_ONE_BYTES;			//一包数据大小
 	uint16_t FRAM_MAX_NUM;			//fram中存储数据的最大包数
 	
     uint16_t RecFramWritePointer;   //fram中记录数据指针
 	uint16_t FLASH_SECTOR_PER_NUM;  //flash中一个扇区存储数据条数
-	__IO uint16_t FlashSectorPointer;	//flash中扇区指针
+    uint16_t FlashSectorPointer;	//flash中扇区指针
 	
 	uint32_t FLASH_MAX_NUM;			//flash中存储数据的最大包数
 	uint32_t FlashNoReadingDataNum;	//flash中未读数据条数

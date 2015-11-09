@@ -1270,7 +1270,7 @@ void Display_Mem(void)
 {
 	/*!< Wait Until the last LCD RAM update finish */
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
-    if(Flag.RecordFlashOverFlow == 0)/*未溢出过*/
+    if(Queue.FlashRecOverFlow == 0)/*未溢出过*/
     {
         if(Queue.WriteFlashDataPointer<=(FLASH_RecMaxSize/5)) /**/
             {showFlashMEM1;}
@@ -1395,7 +1395,7 @@ void Display_SN(void)
   * @param  None
   * @retval None
   ******************************************************************************/
-void displayErr(uint8_t Err)
+void displayErr(uint8_t Er)
 {
 	/*!< Wait Until the last LCD RAM update finish */
 	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
@@ -1414,8 +1414,8 @@ void displayErr(uint8_t Err)
         //clearRH;
 		showC;
 		clearP1;clearP2;
-        /* 显示 2Er */
-        Lcd_Dis2Value(2);
+        /* 显示 Er */
+        Lcd_Dis2Value(Er);
         Lcd_Dis3Value('E');
         Lcd_Dis4Value('r');
 //    }

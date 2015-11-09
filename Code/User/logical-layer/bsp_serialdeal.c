@@ -77,7 +77,7 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = usAddress - VirtBasicConfAddr;
 		/*写配置表数据到Fram，每个地址有两个字节数据，offset * 2*/
 		Fram_Write(pucBuffer,ConfMap_Address[0][1] + offset * 2,size);
-//		Fram_Read(Buf,ConfMap_Address[0][1] + offset * 2,size);
+		WriteSetFramFlag();//设置过fram标志
 		/*更新配置表数据 */
 		Fram_Read(Conf.Buf,ConfMap_Address[0][1] + offset * 2,size);
 	} else if (usAddress < VirJlyTimeConfAddr)
@@ -188,6 +188,9 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 
 /******************************************************************************
   * @brief  Description 读取历史数据
+						(1)读数据测试ok
+						(2)读最新数据时测试ok，
+						(3)当读取数据大于Queue.FlashNoReadingDataNum,反复测试
   * @param  pucBuffer   存放读出数据的指针
   * @param  usAddress	读出数据的地址
   * @param  usNRegs		读的数量
@@ -207,9 +210,8 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		usNRegs = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;
 		NoReadingDataNumTemp = Queue.FlashNoReadingDataNum;
 	}
-	if(Queue.FlashNoReadingDataNum >=1)
+	if(Queue.FlashNoReadingDataNum >=2) //读最新的两条数据
 	{
-		
 		SPI_FLASH_BufferRead(pucBuffer,Queue.ReadFlashDataPointer,usNRegs);
 		Queue.ReadFlashDataPointer += usNRegs;
 		if(Queue.ReadFlashDataPointer >= FLASH_RecMaxSize)
@@ -225,6 +227,14 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 			Queue.FlashNoReadingDataNum = 0;
 		}
 		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);
+		
+		//测试
+		printf("Flag.RecordFlashOverFlow %d\r\n",Queue.FlashRecOverFlow);
+		printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
+		printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
+		printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
+		printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
+		printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
 	}
 	
 	rtc_deel();

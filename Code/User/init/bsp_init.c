@@ -184,7 +184,7 @@ static void SetJlyParamData(void)
 {
 	uint8_t i;
 	//重要参数
-	Flag.RecordFlashOverFlow = Conf.Basic.RecordFlashOverFlow; //读出flash溢出标志
+	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow ; //读出flash溢出标志
 	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
 	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
 	/*------------------------------------------------------*/
@@ -214,13 +214,50 @@ static void SetJlyParamData(void)
   *****************************************************************************/
 static void FirstScanSysData(void)
 {
-	
-	Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
-	
-
-	SetJlyParamData();
+	if(JlyParam.LastErrorCode != 1)//Fram is ok
+	{
+		if(ReadSetFramFlag() == 0x5050)
+		{
+			Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
+		}else{
+			
+			Conf.Jly.ChannelNum = 0;//默认设置0个通道
+		}
+		SetJlyParamData();
+	}else{//fram出错
+		Conf.Jly.WorkStatueIsStop = 0;//停止工作
+		Conf.Jly.ChannelNum = 0;
+	}
 }
 
+/******************************************************************************
+  * @brief  Description 设置 配置Fram标志位 0x5050
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+void WriteSetFramFlag(void)
+{
+	uint8_t TempBuf[2];
+	
+	TempBuf[0] = 0x50;
+	TempBuf[1] = 0x50;
+	
+	Fram_Write(TempBuf,FRAM_AlreadySetFlagAddr,2);//2 Byte
+}
+/******************************************************************************
+  * @brief  Description 读 配置Fram标志位
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+int16_t ReadSetFramFlag(void)
+{
+	uint8_t  TempBuf[2];
+	uint16_t Flag;
+	
+	Fram_Read(TempBuf,FRAM_AlreadySetFlagAddr,2);//2 Byte
+	Flag = (TempBuf[0]<<8) + TempBuf[1];
+	return Flag;
+}
 
 /******************************************************************************
   * @brief  Description 设置内存中记录仪参数,判断通道数量、通道类型是否修改
@@ -232,7 +269,7 @@ void SetJlyParamJudgeChannelNumSensorType(void)
 {
 	uint8_t i;
 	//重要参数
-	Flag.RecordFlashOverFlow = Conf.Basic.RecordFlashOverFlow; //读出flash溢出标志
+	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow; //读出flash溢出标志
 	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
 	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
 	/*------------------------------------------------------*/
@@ -297,6 +334,48 @@ void SetJlyParamJudgeChannelNumSensorType(void)
 		}
 	}
 }
+
+/******************************************************************************
+  * @brief  Description 检测Fram是否有问题,有问题记录仪停止工作显示1Er
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+static void TestFramIsOrNotOk(void)
+{
+	uint8_t Fram_Buf_Write[256];
+	uint8_t Fram_Buf_Read[256];
+	uint16_t i;
+ 
+	for ( i=0; i<=255; i++ ) //填充缓冲
+	{   
+		Fram_Buf_Write[i] = i;
+		//printf("0x%02X ", Fram_Buf_Write[i]);
+		//if(i%16 == 15)    
+		//printf("\r\n");    
+	}
+
+	//将Fram_Buf_Write中顺序递增的数据写入FRAM中 
+	Fram_Write( Fram_Buf_Write, FRAM_TestIsOkAddr, 256);
+	
+	//将FRAM读出数据顺序存储到Fram_Buf_Read
+	Fram_Read(Fram_Buf_Read, FRAM_TestIsOkAddr, 256); 
+
+	//将I2c_Buf_Read中的数据通过串口打印
+	for (i=0; i<256; i++)
+	{	
+		if(Fram_Buf_Read[i] != Fram_Buf_Write[i])
+		{
+			//printf("0x%02X ", Fram_Buf_Read[i]);
+			//printf("错误:I2C EEPROM写入与读出的数据不一致\r\n");
+			JlyParam.LastErrorCode = 1;
+			return;
+		}
+		//printf("0x%02X ", Fram_Buf_Read[i]);
+		//if(i%16 == 15)    
+		//	printf("\r\n");
+	}
+}
+
 /******************************************************************************
   * @brief  Description 关掉外设电源
 						1.关传感器电源
@@ -315,7 +394,6 @@ void OffPowerSupply(void)
 	LED1(OFF);LED2(OFF);
 	LcdBackLight(OFF);
 }
-
 /******************************************************************************
   * @brief  Description 系统初始化
   * @param  None
@@ -323,10 +401,12 @@ void OffPowerSupply(void)
   *****************************************************************************/
 void SysInit(void)
 {
-    
+    //关外设电源
 	OffPowerSupply();
     //系统上电检测外接电
 	FirstCheckExternPower();
+	//检测Fram
+	TestFramIsOrNotOk();
 	
 	FirstScanSysData();
 	
@@ -367,8 +447,7 @@ void PeripheralInit(void)
 	KEY_GPIO_Config();
 	EXTI15_10_Config();
 	
-	General_GPIO_Config();
-	
+	General_GPIO_Config();	
 	I2C_GPIO_Config();
 	
 	LCD_GLASS_Init();

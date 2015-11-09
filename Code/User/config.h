@@ -75,7 +75,9 @@
 #define VirtOffset					0x0080	/* 传感器通道和校准，每一通道之间的虚拟偏移量 */
 /****************************************************************************************/
 /**Fram使用说明:0-CA0(3232),配置信息表已使用
-  *			    CA0-1000(4096),供开发者使用
+  *			    CA0-E00(3584),供开发者使用
+  *             E00(3584)-FFE(4094),作为测试fram是否有问题使用
+  *             FFE(4094)-1000(4096),作为配置Fram标志使用 2 Byte
   * 			1000-2000(8192),作为历史数据缓存已使用
   */
 //! \brief 配置信息表在Fram中的地址
@@ -95,7 +97,7 @@
 #define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+34	//工作状态地址
 
 //flash记录数据溢出标志
-#define FLASH_RecordFlashOverFlow	 	 FRAM_BasicConfAddr+22 //低8位
+#define FLASH_FlashRecOverFlowAddr	 	 FRAM_BasicConfAddr+22 //低8位
 //! \brief FRAM中存放fram记录指针地址
 #define FRAM_RecWriteAddr_Lchar          FRAM_BasicConfAddr+24      
 #define FRAM_RecWriteAddr_Hchar          
@@ -124,11 +126,17 @@
 #define FLASH_ReadDataAddr_MidLchar      
 #define FLASH_ReadDataAddr_MidHchar      
 #define FLASH_ReadDataAddr_Hchar         
+
+//检测fram是否焊接好
+#define FRAM_TestIsOkAddr					 0xE00
+//配置过Fram标志 2 Byte
+#define FRAM_AlreadySetFlagAddr				 0xFFE
 //! \brief FRAM中地址定义
 #define FRAM_RecFirstAddr           0x1000      //Fram中存放历史数据的首地址
 #define FRAM_RecMaxSize				4096		//Fram中存储数据的字节总数 (1000-2000)4096
 
 //----------------------------------------------------------
+//8m flash全部用来存储历史数据
 //! \brief
 #define FLASH_PAGE_NUM              32768   //flash总的页数
 //测试 用3个扇区模拟数据存储
@@ -189,9 +197,7 @@ struct FLAG
 	__IO uint8_t Key1DuanAn:1;       	//机械按键key1 短按
 	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
 	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
-	__IO uint8_t RecordFlashOverFlow:1; //Flash中记录数据溢出标志，溢出置1
-         uint8_t RecordFramOverFlow:1; 	//Fram中记录数据溢出标志，溢出置1       
-	
+		
 		 uint8_t Powerdowncountflag:1;	//接入外接电标志
          uint8_t Low_Voltage:1;     	//电池低电压标志
 		 uint8_t BatLowShan:1;     	    //电池低电压闪烁
@@ -215,6 +221,9 @@ struct FLAG
 		 
 		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
 		 
+		 uint8_t AlarmXiaoYin:1;        //报警消音标志
+		 uint8_t AlarmHuiFu[32];		//报警消音恢复标志-------可以优化为4个字节，每个标志占一个bit
+		 		 
 };
 //! \brief 电源管理
 struct PowerManagement
