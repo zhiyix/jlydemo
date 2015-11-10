@@ -116,7 +116,7 @@ bool RX8025_RTC_Init(void)
 	/*从指定的寄存器中读出数据：读出了与写入的指定数据不相乎,RX8025掉电复位时间到出厂日期*/
 	if((ReadRX8025Control1() != 0x30) && (ReadRX8025Control2() != 0x08))// 
 	{
-		printf("\r\n\r\n RX8025_RTC configured....");
+		printf("\r\n\r\n RX8025_RTC configured....\n\r");
 		Reset_Time();	/*设置时间出厂时间,设置配置RX8025标志*/
 		
 		return 1;	/*返回1，第一次初始化*/
@@ -276,7 +276,7 @@ void rtc_deel(void)
   * @param  无
   * @retval 无		
   *****************************************************************************/
-unsigned long DateToSeconds(struct   RTCRX8025 *Rtc)
+unsigned long DateToSeconds(struct   RTCRX8025Str *Rtc)
 {
     static uint32_t month[12]=
     {
@@ -312,7 +312,7 @@ unsigned long DateToSeconds(struct   RTCRX8025 *Rtc)
   * @param  无
   * @retval 无		
   *****************************************************************************/
-void RtcBcdToD10(struct   RTCRX8025 *Rtc)
+void RtcBcdToD10(struct   RTCRX8025Str *Rtc)
 {
     Rtc->Second=(uint8_t)(BCD_TO_D10(Rtc->Second));
     Rtc->Minute=(uint8_t)(BCD_TO_D10(Rtc->Minute));
@@ -326,7 +326,7 @@ void RtcBcdToD10(struct   RTCRX8025 *Rtc)
   * @param  无
   * @retval 无		
   *****************************************************************************/
-void RtcD10ToBcd(struct   RTCRX8025 *Rtc)
+void RtcD10ToBcd(struct   RTCRX8025Str *Rtc)
 {
     Rtc->Second=(uint8_t)(D10_TO_BCD(Rtc->Second));
     Rtc->Minute=(uint8_t)(D10_TO_BCD(Rtc->Minute));

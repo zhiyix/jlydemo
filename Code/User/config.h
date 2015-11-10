@@ -171,7 +171,7 @@ union MyU32Data
     uint8_t Byte[4];
 };
 //! \brief rtc结构
-struct RTCRX8025
+struct RTCRX8025Str
 {
 //    #define RTC_MK_SEC          5 
 //    #define RTC_MK_MIN          11
@@ -190,14 +190,20 @@ struct RTCRX8025
     uint8_t Year;  	 //--
 };
 //! \brief 全局标志
-struct FLAG
+struct FLAGStr
 {
     __IO uint8_t Sec:1;             	//TIM2定时1s时间
     __IO uint8_t SysTickSec:1;      	//系统滴答时钟
-	__IO uint8_t Key1DuanAn:1;       	//机械按键key1 短按
+	
+	__IO uint8_t Key1AnXia:1;       	//机械按键key1 按下
+	
+	__IO uint8_t AlarmXiaoYin:1;        //报警消音标志
 	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
 	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
 		
+		 uint8_t Keyflag:1;				//机械按键长短按标志
+		 uint8_t Key1DuanAn:1;			//机械按键Key1短按
+		 uint8_t Key1ChangAn:1;			//机械按键Key1长按
 		 uint8_t Powerdowncountflag:1;	//接入外接电标志
          uint8_t Low_Voltage:1;     	//电池低电压标志
 		 uint8_t BatLowShan:1;     	    //电池低电压闪烁
@@ -209,7 +215,7 @@ struct FLAG
 		 uint8_t ExPwShan:1; 			//电池符号闪烁标志
 	     uint8_t ExPwFirstDown:1;		//外接电首次断掉
 	
-         uint8_t IsDisplayRightNow:1;   //LCD显示
+         uint8_t IsDisplayRightNow:1;   //LCD显示,第一次采样完成后显示，检索报警
          uint8_t StartSample:1;         //开始采样
          uint8_t EndSample:1;           //结束采样
          uint8_t MucReset:1;            //上电复位？？
@@ -221,12 +227,13 @@ struct FLAG
 		 
 		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
 		 
-		 uint8_t AlarmXiaoYin:1;        //报警消音标志
+		 //uint8_t FirstSampleOkAlarm:1;	//第一次采样完成后，
+		 
 		 uint8_t AlarmHuiFu[32];		//报警消音恢复标志-------可以优化为4个字节，每个标志占一个bit
 		 		 
 };
 //! \brief 电源管理
-struct PowerManagement
+struct PowerManagementStr
 {
 		 uint8_t  BatChargeFullCount;	   //电池充满电检测计数
 	     uint8_t  HaveExternalPower;	   //接入外接电检测计数
@@ -239,7 +246,7 @@ struct PowerManagement
 };
 
 //! \brief 记录仪工作状态等参数
-struct JLYPARAMETER
+struct JLYPARAMETERStr
 {
     uint8_t  WorkStatueIsStop:1; 	//记录仪工作状态，0停止工作
     uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
@@ -258,7 +265,13 @@ struct JLYPARAMETER
 	int32_t delay_start_time;		// 延时启动时间 
 	
 };
-
+//按键
+struct KEYStr
+{
+	uint8_t DuanAnCount;	//机械按键key1短按计数
+	uint8_t ChangAnCount;	//机械按键key1长按计数
+	uint8_t KeyNum;			//按键识别码
+};
 //----------------------------
 extern uint8_t      rtc_pt;
 extern uint8_t      display_ct;
@@ -268,12 +281,12 @@ extern uint16_t     adc[32];
 extern uint16_t     adcCopy[32];
 extern uint16_t	    MsCount;
 
-extern struct 		CircularQueue   Queue;
-extern struct 		FLAG			Flag;
-extern struct       RTCRX8025       Rtc;
-extern struct       PowerManagement PManage;
-extern struct       JLYPARAMETER    JlyParam;
-
+extern struct 		CircularQueueStr   Queue;
+extern struct 		FLAGStr			   Flag;
+extern struct       RTCRX8025Str       Rtc;
+extern struct       PowerManagementStr PManage;
+extern struct       JLYPARAMETERStr    JlyParam;
+extern struct 		KEYStr			   Key;
 extern const char RESET_CHANNEL_SETUP_TABLE[104];
 extern const unsigned char *AdjustCurveFirAddress[];
 extern const uint32_t ConfMap_Address[6][2];

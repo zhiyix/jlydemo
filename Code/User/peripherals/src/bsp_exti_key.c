@@ -55,26 +55,26 @@ void EXTI15_10_Config(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 	
     /**************************************************************/
-	/* Connect EXTI13 Line to PF13 pin */
+	/* Connect EXTI13 Line to PF13 pin »úÐµ°´¼ü key1*/
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOF, EXTI_PinSource13);
 	/* Configure EXTI13 line */
 	EXTI_InitStructure.EXTI_Line = EXTI_Line13;
 
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	
 	EXTI_Init(&EXTI_InitStructure);
 	/**************************************************************/
 	
 	 /**************************************************************/
-	/* Connect EXTI14 Line to PC14 pin */
+	/* Connect EXTI14 Line to PC14 pin ´¥Ãþ°´¼ükey2*/
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource14);
 	/* Configure EXTI14 line */
 	EXTI_InitStructure.EXTI_Line = EXTI_Line14;
 	EXTI_Init(&EXTI_InitStructure);
 	
-	/* Connect EXTI15 Line to PC15 pin */
+	/* Connect EXTI15 Line to PC15 pin ´¥Ãþ°´¼ükey1*/
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource15);
 	/* Configure EXTI15 line */
 	EXTI_InitStructure.EXTI_Line = EXTI_Line15;

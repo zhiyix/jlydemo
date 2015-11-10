@@ -61,7 +61,9 @@ int main(void)
     SysInit();
 	
 	printf("\r\n this is a 32bits  demo \r\n");
-	printf("struct SensorChanelConfDataStr size:%d",sizeof(struct SensorChanelConfDataStr));
+	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
+	printf("\r\n Conf.Sensor[0].SensorAlarm_High.wd:%d \r\n",Conf.Sensor[0].SensorAlarm_High.wd);
+	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
   /* Add your application code here
      */
 
@@ -85,11 +87,11 @@ int main(void)
       {
          //Down_HisData();
 		  printf("Queue.FlashRecOverFlow %d\r\n",Queue.FlashRecOverFlow);
-		  printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
 		  printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
 		  printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
 		  printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
 		  printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
+		  printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
 		  DownFlash_HisData();
 		  rtc_deel();
       }
@@ -97,19 +99,18 @@ int main(void)
 	  {
 		  Flag.TouchKey2DuanAn =0;
 		  
-		  Queue.FlashNoReadingDataNum = 0;
 		  Queue.FlashSectorPointer = 0;
 		  Queue.WriteFlashDataPointer =0;
 		  Queue.FlashReadDataBeginPointer =0;
 		  Queue.ReadFlashDataPointer = 0;
+		  Queue.FlashNoReadingDataNum = 0;
 		  
+		  SetFlashOverFlow(0);//清除flash溢出标志
 		  WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
-		  WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
 		  WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
 		  WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
 		  WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
-		  
-		  SetFlashOverFlow(0);//清除flash溢出标志
+		  WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
 	  }
 	  freemodbus_main();
   }

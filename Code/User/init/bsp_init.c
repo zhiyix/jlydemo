@@ -186,7 +186,10 @@ static void SetJlyParamData(void)
 	//重要参数
 	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow ; //读出flash溢出标志
 	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
+	Queue.WriteFlashDataPointer = Conf.Basic.WriteFlashDataPointer;
+	Queue.FlashReadDataBeginPointer = Conf.Basic.FlashReadDataBeginPointer;
 	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
+	Queue.FlashNoReadingDataNum = Conf.Basic.FlashNoReadingDataNum;
 	/*------------------------------------------------------*/
 	Queue.HIS_ONE_BYTES = (uint16_t)(Conf.Jly.ChannelNum*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
 	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
@@ -418,7 +421,6 @@ void SysInit(void)
     
 	
     Flag.MucReset = 1;
-    Flag.IsDisplayRightNow = 1;    
 	
 	
 	MODEL_PWRCTRL(ON);	  //开对外接口电源

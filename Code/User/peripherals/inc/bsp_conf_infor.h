@@ -264,7 +264,7 @@ struct TempHumiAdjustConfDataStr
 	int8_t Reserv[16];	/*!< Reserv */
 };
 //! \brief fram flash存储指针结构
-struct CircularQueue
+struct CircularQueueStr
 {
 	uint8_t  SectorHeadBytes;		
 	uint8_t  FlashRecOverFlow;		//flash存储数据溢出

@@ -15,13 +15,14 @@
 
 #include "main.h"
 
-struct PowerManagement	PManage;
-struct FLAG			  	Flag;
-struct RTCRX8025      	Rtc;
-struct CircularQueue  	Queue;
-struct JLYPARAMETER   	JlyParam;
+struct PowerManagementStr	PManage;
+struct FLAGStr			  	Flag;
+struct RTCRX8025Str      	Rtc;
+struct CircularQueueStr  	Queue;
+struct JLYPARAMETERStr   	JlyParam;
+struct KEYStr			    Key;
 
-union ConfDataTable 	 Conf;
+union ConfDataTable 	    Conf;
 
 uint8_t        rtc_pt;          //√Îº∆ ˝
 uint8_t        display_ct = 5;  //œ‘ æ

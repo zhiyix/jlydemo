@@ -63,7 +63,7 @@ static void LOWorNomal_Mode(void)
         {
             Flag.StartSample=0;
             Flag.EndSample=1;
-			
+			Flag.IsDisplayRightNow = 1; //第一次采样完显示
 			
             Dealing_Gather(Started_Channel);
             AVCC1_POWER(OFF);
@@ -196,10 +196,74 @@ static void OneSec_Timedeal(void)
     if(display_ct>=36)
     {
         display_ct = 0;
-        Display_Mem();	  /*显示存储容量*/ 
+        Display_Mem();	  //显示存储容量 
     }
 	/*****************************************************************/
-	/*机械按键 key1长按检测*/
+	/*机械按键 key1短按长按检测*/
+	//短按1s点亮lcd背光，消除报警声音
+	//长按5s开关机
+	if((GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)&&(Flag.Key1AnXia == 1))
+	{//判断是否有键按下
+		if(++Key.DuanAnCount >=1)//1s计数消抖
+		{
+			Key.DuanAnCount = 0;
+			
+			if(++Key.ChangAnCount >=3)//3s长按识别
+			{
+				 Flag.Keyflag = 0;//短按无效
+				 Key.ChangAnCount = 3;//锁定长按
+				 switch(Key.KeyNum)
+				 {
+					  case 1:Flag.Key1ChangAn = 1;BellNn(1);rtc_deel();break;
+					  //case 2:Flag.key2anxia  = 1;break;
+					  //case 3:Flag.key3anxia  = 1;break;
+					  //case 4:key_ret = 8;break;
+				 } 
+			}
+			else//短按有效
+			{
+				 Flag.Keyflag = 1;//短按标志位
+				 if(GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)Key.KeyNum = 1;//以下用于识别按键
+				 //if((~KeyIn)&Key2)key_num = 2;
+                 //if((~KeyIn)&Key3)key_num = 3;
+			}  
+		} 
+	}
+	else//松手之后
+	{
+		Key.ChangAnCount = 0;
+		if(Flag.Keyflag)//松手
+		{
+			Flag.Keyflag = 0;
+			switch(Key.KeyNum)
+			{
+				case 1: Flag.Key1DuanAn = 1;
+						while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
+						clearJINBAO;
+						LCD_UpdateDisplayRequest();	/*!< 清除喇叭符号 */	
+						BEEP(OFF);
+				
+						break;
+				//case 2:Flag.key2anxia  = 1;break;
+				//case 3:Flag.key3anxia  = 1;break;
+				//case 4:key_ret = 4;break;    
+			}
+		 }
+	}
+	
+	if(Flag.Key1DuanAn == 1)
+	{
+		Flag.Key1DuanAn = 0;
+		
+		Flag.AlarmXiaoYin = 1;
+	}
+	if(Flag.Key1ChangAn == 1)
+	{
+		Flag.Key1ChangAn = 0;
+		
+		Conf.Jly.RecBootMode = 0x03;// 机械按键手动启动
+	}
+	/*
 	if((GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)&&(Flag.Key1DuanAn == 1))
 	{
 		Delay_ms(10);//10ms 延时消抖
@@ -209,8 +273,9 @@ static void OneSec_Timedeal(void)
 			if(Key1ChangAnCount >= 3)
 			{
 				Key1ChangAnCount = 0;
+				Flag.Key1DuanAn = 0;
 				
-				Conf.Jly.RecBootMode = 0x03;/* 机械按键手动启动*/
+				Conf.Jly.RecBootMode = 0x03;// 机械按键手动启动
 				BellNn(1);
 				rtc_deel();
 			}
@@ -218,6 +283,7 @@ static void OneSec_Timedeal(void)
 	}else{
 		Key1ChangAnCount = 0;
 	}
+	*/
 	
 	/*****************************************************************/
    /*检测外接电接入*/

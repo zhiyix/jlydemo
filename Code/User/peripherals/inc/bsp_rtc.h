@@ -75,9 +75,9 @@ void read_time(void);
 void serialread_time(void);
 void rtc_deel(void);
 void set_time(void);
-unsigned long DateToSeconds(struct   RTCRX8025 *Rtc);
-void RtcBcdToD10(struct   RTCRX8025 *Rtc);
-void RtcD10ToBcd(struct   RTCRX8025 *Rtc);
+unsigned long DateToSeconds(struct   RTCRX8025Str *Rtc);
+void RtcBcdToD10(struct   RTCRX8025Str *Rtc);
+void RtcD10ToBcd(struct   RTCRX8025Str *Rtc);
 //#ifdef __cplusplus
 //}
 //#endif

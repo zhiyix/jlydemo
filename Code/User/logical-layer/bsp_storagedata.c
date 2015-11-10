@@ -208,6 +208,7 @@ static void SaveHisDataToFlash(void)
 		
 		if(Queue.FlashRecOverFlow ==1)	//数据溢出，擦除当前扇区，读指针偏移 Queue.FLASH_SECTOR_PER_NUM
 		{
+			//擦倒数第二个扇区
 			if(Queue.WriteFlashDataPointer < (FLASH_RecMaxSize - FLASH_SectorPerSize - Queue.HIS_ONE_BYTES))//数据记录指针小于8192-4096-10
 			{
 				Queue.SectorHeadBytes = Queue.HIS_ONE_BYTES - (Queue.FlashSectorPointer * FLASH_SectorPerSize )%Queue.HIS_ONE_BYTES;
@@ -388,7 +389,7 @@ void DownFlash_HisData(void)
     uint32_t  RecorderPoint_temp;
     
     Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar);
-	
+	Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
     RecorderPoint_temp = Queue.WriteFlashDataPointer;
     
     

@@ -143,14 +143,14 @@ void RecorderBootModeHandle(void)
 	}
 	else if(Conf.Jly.RecBootMode == 0x03 )	/* 机械按键手动启动*/
     {
-		if(Conf.Jly.WorkStatueIsStop >= 1)
+		if(Conf.Jly.WorkStatueIsStop >= 1)//由工作到停止
 		{
 			Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
 			Conf.Jly.RecBootMode = 0xFF;
             //写入fram
 			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
 			JlyParam.ShowOffCode = 0xFF;
-		}else{
+		}else{//由停止到工作
 			Conf.Jly.WorkStatueIsStop = 1;
 			Conf.Jly.RecBootMode = 0xFF;
 			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
