@@ -26,6 +26,10 @@ static void FirstScanSysData(void);
   ******************************************************************************/
 static void RCC_Config(void)
 {  
+	/*STOP模式下，调试使能*/
+//	DBGMCU_Config(DBGMCU_STOP,ENABLE);
+	DBGMCU_Config(DBGMCU_STOP,DISABLE);
+	//使能电源管理单元时钟
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
 
 	/* Allow access to the RTC */
@@ -35,11 +39,10 @@ static void RCC_Config(void)
 //	RCC_RTCResetCmd(ENABLE);
 //	RCC_RTCResetCmd(DISABLE);
 	
-//  /*!< Wait till LSE is ready */
-//  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
-//  {}
-//  /*!< LCD Clock Source Selection */
-//  RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
+	/* 使能内部 HSI */
+	RCC_HSICmd(ENABLE);	//ADC使用
+	/* Check that HSI oscillator is ready */
+	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
 	
 //	PWR_BackupAccessCmd(ENABLE);//允许修改RTC和后备寄存器
 //	BKP_TamperPinCmd(DISABLE);//关闭入检测功能，也就是PC13，也可以当普通IO使用
@@ -109,7 +112,7 @@ static void General_GPIO_Config(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(LcdVccCtrl_PORT,&GPIO_InitStructure);
 	
-	GPIO_ResetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN); 
+	GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN); 
 	/*触摸按键控制电源 PF3*/
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = TouchVccCtrl_PIN;

@@ -129,10 +129,6 @@ static void ADC1_Mode_Config(void)
   ******************************************************************************/
 void ADC1_Init(void)
 {
-	/* Enable the HSI oscillator */
-	RCC_HSICmd(ENABLE);	//ADC π”√
-	/* Check that HSI oscillator is ready */
-	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
 	
 	ADC1_GPIO_Config();
 	ADC1_Mode_Config();

@@ -142,12 +142,12 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
 	TimingDelay_Decrement();
-	MsCount++;
-	if(MsCount >=60000)
-	{
-		MsCount = 0;
-		Flag.SysTickSec = 1;
-	}
+//	MsCount++;
+//	if(MsCount >=60000)
+//	{
+//		MsCount = 0;
+//		Flag.SysTickSec = 1;
+//	}
 }
 
 /******************************************************************************/
@@ -178,9 +178,12 @@ void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line13) != RESET) //机械按键key1
 	{
-		/* Toggle LED1 */
-		LED1_TOGGLE;
         Flag.Key1AnXia = 1;
+		Flag.AlarmXiaoYin = 1;	//按键消音标志
+		Flag.LcdBackLightOn = 1; //Lcd背光点亮
+		LcdBackLight(ON);
+		// Toggle LED1 
+		LED1_TOGGLE;
 		/* Clear the EXTI line 13 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line13);
 	}

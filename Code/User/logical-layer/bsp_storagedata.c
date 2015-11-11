@@ -256,7 +256,13 @@ static void SaveHisDataToFlash(void)
 		}else{//819-409
 			Queue.FlashNoReadingDataNum = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM;//此时刚好写下一个扇区
 		}*/
-		Queue.FlashNoReadingDataNum = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM + (Queue.WriteFlashDataPointer%FLASH_SectorPerSize)/Queue.HIS_ONE_BYTES;//此时刚好写下一个扇区
+		//Queue.FlashNoReadingDataNum = Queue.FLASH_MAX_NUM - Queue.FLASH_SECTOR_PER_NUM + (Queue.WriteFlashDataPointer%FLASH_SectorPerSize)/Queue.HIS_ONE_BYTES;//此时刚好写下一个扇区
+		if(Queue.FlashReadDataBeginPointer !=0 )
+		{
+			Queue.FlashNoReadingDataNum = Queue.WriteFlashDataPointer/Queue.HIS_ONE_BYTES + (FLASH_RecMaxSize - Queue.FlashReadDataBeginPointer)/Queue.HIS_ONE_BYTES;//此时刚好写下一个扇区
+		}else{
+			Queue.FlashNoReadingDataNum = Queue.WriteFlashDataPointer/Queue.HIS_ONE_BYTES;
+		}
 	}
 		
 	WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);//保存未读数据指针

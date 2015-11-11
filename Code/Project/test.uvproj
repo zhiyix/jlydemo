@@ -503,6 +503,11 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\src\stm32l1xx_spi.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32l1xx_dbgmcu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\src\stm32l1xx_dbgmcu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

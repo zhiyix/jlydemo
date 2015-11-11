@@ -53,6 +53,8 @@
 #define  voltagetesttimenum1  60//600 10分钟检测一次
 
 #define  ExternalPowerchecktime 60 //外接电源检测时间
+//Lcd背光点亮时间 10 s
+#define  LcdBackLightTime	 10
 //! \brief LCD显示的时间
 #define  channeldisplaytime  2       //display_ct%channeldisplaytime 
 
@@ -193,11 +195,12 @@ struct RTCRX8025Str
 struct FLAGStr
 {
     __IO uint8_t Sec:1;             	//TIM2定时1s时间
-    __IO uint8_t SysTickSec:1;      	//系统滴答时钟
+//    __IO uint8_t SysTickSec:1;      	//系统滴答时钟
 	
 	__IO uint8_t Key1AnXia:1;       	//机械按键key1 按下
 	
 	__IO uint8_t AlarmXiaoYin:1;        //报警消音标志
+	__IO uint8_t LcdBackLightOn:1;		//Lcd背光点亮标志
 	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
 	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
 		
@@ -226,7 +229,7 @@ struct FLAGStr
 		 uint8_t RecTimeDingDianStop:1; //记录仪时间点定点停止
 		 
 		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
-		 
+		
 		 //uint8_t FirstSampleOkAlarm:1;	//第一次采样完成后，
 		 
 		 uint8_t AlarmHuiFu[32];		//报警消音恢复标志-------可以优化为4个字节，每个标志占一个bit
@@ -252,6 +255,8 @@ struct JLYPARAMETERStr
     uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
     uint8_t  LastErrorCode:1;		//错误码 
 	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
+	
+	uint8_t  LcdBackLightCount;		//Lcd亮多长时间计数
 	uint8_t  ChannelNumOld;			//未重新配置之前的通道数
 	uint8_t  SensorTypeOld[32];		//未重新配置之前的通道类型
 	

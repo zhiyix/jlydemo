@@ -33,7 +33,7 @@ uint8_t        StartedChannelForDisplay;    //显示启动的通道
 uint8_t        Started_Channel;
 uint8_t  	   DataBuf[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES]={0}; //32通道
 
-uint16_t	   MsCount; //系统滴答计数
+//uint16_t	   MsCount; //系统滴答计数
 
 uint16_t       adc[32];
 uint16_t       adcCopy[32];

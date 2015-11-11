@@ -202,6 +202,7 @@ static void OneSec_Timedeal(void)
 	/*机械按键 key1短按长按检测*/
 	//短按1s点亮lcd背光，消除报警声音
 	//长按5s开关机
+	/*
 	if((GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)&&(Flag.Key1AnXia == 1))
 	{//判断是否有键按下
 		if(++Key.DuanAnCount >=1)//1s计数消抖
@@ -240,9 +241,9 @@ static void OneSec_Timedeal(void)
 				case 1: Flag.Key1DuanAn = 1;
 						while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
 						clearJINBAO;
-						LCD_UpdateDisplayRequest();	/*!< 清除喇叭符号 */	
+						LCD_UpdateDisplayRequest();	// 清除喇叭符号	
 						BEEP(OFF);
-				
+						LcdBackLight(ON);
 						break;
 				//case 2:Flag.key2anxia  = 1;break;
 				//case 3:Flag.key3anxia  = 1;break;
@@ -255,7 +256,9 @@ static void OneSec_Timedeal(void)
 	{
 		Flag.Key1DuanAn = 0;
 		
-		Flag.AlarmXiaoYin = 1;
+		Flag.AlarmXiaoYin = 1;	//按键消音标志
+		Flag.LcdBackLightOn = 1; //Lcd背光点亮
+		
 	}
 	if(Flag.Key1ChangAn == 1)
 	{
@@ -263,8 +266,21 @@ static void OneSec_Timedeal(void)
 		
 		Conf.Jly.RecBootMode = 0x03;// 机械按键手动启动
 	}
-	/*
-	if((GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)&&(Flag.Key1DuanAn == 1))
+	*/
+	/*****************************************************************/
+	//Lcd背光
+	if(Flag.LcdBackLightOn == 1)
+	{
+		JlyParam.LcdBackLightCount++;
+		if(JlyParam.LcdBackLightCount >= LcdBackLightTime)
+		{
+			Flag.LcdBackLightOn = 0;
+			JlyParam.LcdBackLightCount = 0;
+			LcdBackLight(OFF);
+		}
+	}
+	//机械按键长按
+	if((GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)&&(Flag.Key1AnXia == 1))
 	{
 		Delay_ms(10);//10ms 延时消抖
 		if(GPIO_ReadInputDataBit(Key_PORT,Key1_PIN) == 0)
@@ -273,7 +289,7 @@ static void OneSec_Timedeal(void)
 			if(Key1ChangAnCount >= 3)
 			{
 				Key1ChangAnCount = 0;
-				Flag.Key1DuanAn = 0;
+				Flag.Key1AnXia = 0;
 				
 				Conf.Jly.RecBootMode = 0x03;// 机械按键手动启动
 				BellNn(1);
@@ -283,7 +299,7 @@ static void OneSec_Timedeal(void)
 	}else{
 		Key1ChangAnCount = 0;
 	}
-	*/
+	
 	
 	/*****************************************************************/
    /*检测外接电接入*/

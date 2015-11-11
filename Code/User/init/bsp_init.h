@@ -68,9 +68,9 @@
 					GPIO_ResetBits(GPIOF,GPIO_Pin_15)
 //液晶背光控制开关
 #define LcdBackLight(a)	if (a)	\
-					GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN);\
+					GPIO_ResetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN);\
 					else		\
-					GPIO_ResetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN)				
+					GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN)				
 					
 /* 直接操作寄存器的方法控制IO */
 #define	digitalHi(p,i)			{p->BSRRL=i;}			//设置为高电平		

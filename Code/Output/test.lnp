@@ -15,6 +15,7 @@
 "..\output\stm32l1xx_tim.o"
 "..\output\stm32l1xx_syscfg.o"
 "..\output\stm32l1xx_spi.o"
+"..\output\stm32l1xx_dbgmcu.o"
 "..\BTBusLibraries\MDK-ARM\STM32L152_EVAL\BTBUS_Library.lib"
 "..\output\stm32l1xx_hal_msp.o"
 "..\output\freemodbus.o"

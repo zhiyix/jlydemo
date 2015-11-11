@@ -61,9 +61,9 @@ int main(void)
     SysInit();
 	
 	printf("\r\n this is a 32bits  demo \r\n");
-	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
-	printf("\r\n Conf.Sensor[0].SensorAlarm_High.wd:%d \r\n",Conf.Sensor[0].SensorAlarm_High.wd);
-	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
+//	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
+//	printf("\r\n Conf.Sensor[0].SensorAlarm_High.wd:%d \r\n",Conf.Sensor[0].SensorAlarm_High.wd);
+//	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
   /* Add your application code here
      */
 
@@ -76,13 +76,7 @@ int main(void)
 	  //JlySerialDeal();
 	  
       JlySecDeal();
-//	  if(Flag.SysTickSec ==1)//模拟10s 数据
-//	  {
-//         Flag.SysTickSec = 0;
-//         
-//         ReadFramHisDataToRam();
-//         Down_HisData();
-//	  }
+
       if(Flag.TouchKey1DuanAn ==1)
       {
          //Down_HisData();
@@ -113,6 +107,17 @@ int main(void)
 		  WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
 	  }
 	  freemodbus_main();
+	  
+	  //PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+	  //PWR_EnterSTANDBYMode();
+	  //测试
+	if(ReadRX8025Control2() & RX8025_Control2CTFG)
+	{
+		uint8_t setbuf[1];
+		setbuf[0] = 0x08 ;
+		//RTC8025_Write(setbuf,RX8025_Control2Addr,1);  //清除RX8025 PON位，设置BIT3 为1表示设置过RX8025
+		PWR_EnterSTANDBYMode();
+	}
   }
 }
 

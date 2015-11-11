@@ -58,10 +58,10 @@ static void  Reset_Time(void)
 	setbuf[0] = 0x00;
 	RTC8025_Write(setbuf,RX8025_DigitalOffsetAddr,1);	/*不使用精度调整功能*/
 	
-	setbuf[0] = 0x30;
+	setbuf[0] = 0x20 + 0x05;// 0011 0101 1分一次
 	RTC8025_Write(setbuf,RX8025_Control1Addr,1);   /*设置24小时制,设置BIT4 为1表示设置过RX8025*/
 	
-	setbuf[0] = 0x08;
+	setbuf[0] = 0x20;
 	RTC8025_Write(setbuf,RX8025_Control2Addr,1);  //清除RX8025 PON位，设置BIT3 为1表示设置过RX8025
 	
 	/*写入出厂时间*/
@@ -95,7 +95,7 @@ static int8_t ReadRX8025Control1(void)
   * @param  无
   * @retval 无		
   *****************************************************************************/
-static int8_t ReadRX8025Control2(void)
+int8_t ReadRX8025Control2(void)
 {
 	uint8_t TempBuf[1];
 	int8_t  RX8025Flag;
@@ -114,7 +114,7 @@ bool RX8025_RTC_Init(void)
 {
     /*检查是不是第一次配置时钟 */
 	/*从指定的寄存器中读出数据：读出了与写入的指定数据不相乎,RX8025掉电复位时间到出厂日期*/
-	if((ReadRX8025Control1() != 0x30) && (ReadRX8025Control2() != 0x08))// 
+	if((ReadRX8025Control1() != 0x25) )// && (ReadRX8025Control2() != 0x08)
 	{
 		printf("\r\n\r\n RX8025_RTC configured....\n\r");
 		Reset_Time();	/*设置时间出厂时间,设置配置RX8025标志*/

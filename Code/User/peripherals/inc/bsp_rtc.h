@@ -48,6 +48,7 @@
 /*控制寄存器*/
 #define RX8025_Control1Addr        	   0x0E
 #define RX8025_Control2Addr        	   0x0F
+#define RX8025_Control2CTFG			   0x04
 
 //2009年1月1日0时0分0秒起到当前时间所经过的秒数
 #define xMINUTE          (uint32_t)(60                 )//1分的秒数
@@ -70,6 +71,8 @@
 // MCU:
 /*============================ EXTERN FUNCTIONS ==============================*/
 bool RX8025_RTC_Init(void);
+
+int8_t ReadRX8025Control2(void);
 
 void read_time(void);
 void serialread_time(void);
