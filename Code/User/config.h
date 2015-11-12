@@ -285,6 +285,7 @@ extern uint8_t  	DataBuf[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES];
 extern uint16_t     adc[32];
 extern uint16_t     adcCopy[32];
 extern uint16_t	    MsCount;
+extern uint32_t SYS_CLK;
 
 extern struct 		CircularQueueStr   Queue;
 extern struct 		FLAGStr			   Flag;

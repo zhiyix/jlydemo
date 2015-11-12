@@ -542,60 +542,60 @@ bool Fram_Read(uint8_t *pData, uint16_t addr, uint16_t count)
   * @param  None
   * @retval bool		RTC8025读函数是否成功
   */
-//bool RTC8025_Reset(bool need_reset)
-//{
-//	bool need_clear = 0;
-//	
-//	RTC8025_Ctrl_Typedef ctrl;
-//	RTC8025_Read((char*)&ctrl.Control, 0x0E, 2);
-//	if (ctrl.STREG.PON)
-//	{
-//		DebugOutPrintf(DEBUG_INF, "power-on reset was detected, ");
-//		DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
-//		need_reset = true;
-//	}
-//	if (ctrl.STREG.VDET)
-//	{
-//		DebugOutPrintf(DEBUG_INF, "a power voltage drop was detected, ");
-//		DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
-//		need_reset = true;
-//	}
-//	if (!ctrl.STREG.XST)
-//	{
-//		DebugOutPrintf(DEBUG_INF, "Oscillation stop was detected,");
-//		DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
-//		need_reset = true;
-//	}
-//	if (ctrl.STREG.DAFG | ctrl.STREG.WAFG)
-//	{
-//		DebugOutPrintf(DEBUG_INF, "Alarm was detected.\r\n");
-//		need_clear = true;
-//	}
-//	if (ctrl.STREG.CTFG)
-//	{
-//		DebugOutPrintf(DEBUG_INF, "Periodic interrupt output OFF status.\r\n");
-//		need_clear = true;
-//	}
-//	if (need_reset || need_clear)
-//	{
-//		/* 设置 RTC8025 固定周期中断功能 */
-//		ctrl.STREG.CT = 3;		
-//		ctrl.STREG.PON = 0;
-//		ctrl.STREG.VDET = 0;
-//		ctrl.STREG.XST = 1;
-//		ctrl.STREG.DAFG = 0;
-//		ctrl.STREG.WAFG = 0;
-//		ctrl.STREG.CTFG = 0;
-//		ctrl.STREG.H12_24 = 1;
-//		RTC8025_Write((char*)&ctrl.Control, 0x0E, 2);
-//		RTC8025_Read((char*)&ctrl.Control, 0x0E, 2);
-//	}
-//	if (need_reset)
-//	{
-//		return false;
-//	}
-//	return true;
-//}
+bool RTC8025_Reset(bool need_reset)
+{
+	bool need_clear = 0;
+	
+	RTC8025_Ctrl_Typedef ctrl;
+	RTC8025_Read((char*)&ctrl.Control, 0x0E, 2);
+	if (ctrl.STREG.PON)
+	{
+		//DebugOutPrintf(DEBUG_INF, "power-on reset was detected, ");
+		//DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
+		need_reset = true;
+	}
+	if (ctrl.STREG.VDET)
+	{
+		//DebugOutPrintf(DEBUG_INF, "a power voltage drop was detected, ");
+		//DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
+		need_reset = true;
+	}
+	if (!ctrl.STREG.XST)
+	{
+		//DebugOutPrintf(DEBUG_INF, "Oscillation stop was detected,");
+		//DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
+		need_reset = true;
+	}
+	if (ctrl.STREG.DAFG | ctrl.STREG.WAFG)
+	{
+		//DebugOutPrintf(DEBUG_INF, "Alarm was detected.\r\n");
+		need_clear = true;
+	}
+	if (ctrl.STREG.CTFG)
+	{
+		//DebugOutPrintf(DEBUG_INF, "Periodic interrupt output OFF status.\r\n");
+		need_clear = true;
+	}
+	if (need_reset || need_clear)
+	{
+		/* 设置 RTC8025 固定周期中断功能 */
+		ctrl.STREG.CT = 3;		
+		ctrl.STREG.PON = 0;
+		ctrl.STREG.VDET = 0;
+		ctrl.STREG.XST = 1;
+		ctrl.STREG.DAFG = 0;
+		ctrl.STREG.WAFG = 0;
+		ctrl.STREG.CTFG = 0;
+		ctrl.STREG.H12_24 = 1;
+		RTC8025_Write((char*)&ctrl.Control, 0x0E, 2);
+		RTC8025_Read((char*)&ctrl.Control, 0x0E, 2);
+	}
+	if (need_reset)
+	{
+		return false;
+	}
+	return true;
+}
 
 
 #endif /* __BSPI2C_C */

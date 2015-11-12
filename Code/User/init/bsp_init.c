@@ -26,12 +26,18 @@ static void FirstScanSysData(void);
   ******************************************************************************/
 static void RCC_Config(void)
 {  
+	RCC_ClocksTypeDef RCC_ClockFreq;
 	/*STOP模式下，调试使能*/
 //	DBGMCU_Config(DBGMCU_STOP,ENABLE);
 	DBGMCU_Config(DBGMCU_STOP,DISABLE);
 	//使能电源管理单元时钟
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
 
+	//获取系统时钟类型（0x00: MSI used as system clock ；0x04: HSI used as system clock ；0x08: HSE used as system clock ；0x0C: PLL used as system clock ）
+	SYS_CLK = RCC_GetSYSCLKSource();
+	//获取系统各时钟频率值
+	RCC_GetClocksFreq(&RCC_ClockFreq);
+	
 	/* Allow access to the RTC */
 	PWR_RTCAccessCmd(ENABLE);
 
@@ -429,11 +435,13 @@ void SysInit(void)
 	MODEL_PWRCTRL(ON);	  //开对外接口电源
 	TOUCHKEY_POWER(ON);	  //开触摸按键电源
 	
+	TIM2_Configuration();	//开启定时器
+	
 	BellNn(1);
 	
 	/*****************************************/
 	//测试
-	
+	Reset_Time();
 	/*****************************************/
 }
 /******************************************************************************
@@ -446,8 +454,6 @@ void PeripheralInit(void)
 	RCC_Config();
 	
 	SysTick_Init();
-	
-    TIM2_Configuration();
     
 	KEY_GPIO_Config();
 	EXTI15_10_Config();
@@ -469,4 +475,5 @@ void PeripheralInit(void)
 	
     //RX8025AC 初始化
 	RX8025_RTC_Init();
+	//RTC8025_Reset();
 }

@@ -309,6 +309,30 @@ union ConfDataTable
 	};
 	uint8_t Buf[3232];
 };
+//RX8025 ¿ØÖÆ¼Ä´æÆ÷
+struct STREGStr
+{
+	uint8_t CT:3;
+	uint8_t :1;	//TEST
+	uint8_t :1;
+	uint8_t H12_24:1;
+	uint8_t DALE:1;
+	uint8_t WALE:1;
+	
+	uint8_t DAFG:1;
+	uint8_t WAFG:1;
+	uint8_t CTFG:1;
+	uint8_t :1;
+	uint8_t PON:1;
+	uint8_t XST:1;
+	uint8_t VDET:1;
+	uint8_t VDSL:1;
+};
+typedef union
+{
+	struct STREGStr STREG;
+	uint8_t Control[2];
+}RTC8025_Ctrl_Typedef;
 
 
 

@@ -1412,7 +1412,7 @@ void displayErr(uint8_t Er)
         /* Çå·ûºÅ */
         clearFUHAO;clearAlarmStatus;clearJINBAO;
         //clearRH;
-		showC;
+		//showC;
 		clearP1;clearP2;
         /* ÏÔÊ¾ Er */
         Lcd_Dis2Value(Er);

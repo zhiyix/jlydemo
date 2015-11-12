@@ -72,7 +72,9 @@
 /*============================ EXTERN FUNCTIONS ==============================*/
 bool RX8025_RTC_Init(void);
 
+void  Reset_Time(void);
 int8_t ReadRX8025Control2(void);
+
 
 void read_time(void);
 void serialread_time(void);

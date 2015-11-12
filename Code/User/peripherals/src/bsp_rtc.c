@@ -52,27 +52,27 @@
   * @param  无
   * @retval 无		
   *****************************************************************************/
-static void  Reset_Time(void)
+void  Reset_Time(void)
 {
 	uint8_t setbuf[7];
 	setbuf[0] = 0x00;
 	RTC8025_Write(setbuf,RX8025_DigitalOffsetAddr,1);	/*不使用精度调整功能*/
 	
-	setbuf[0] = 0x20 + 0x05;// 0011 0101 1分一次
+	setbuf[0] = (0x20 + 0x05);// 0011 0101 1分一次
 	RTC8025_Write(setbuf,RX8025_Control1Addr,1);   /*设置24小时制,设置BIT4 为1表示设置过RX8025*/
 	
-	setbuf[0] = 0x20;
+	setbuf[0] = 0x20;//0x20
 	RTC8025_Write(setbuf,RX8025_Control2Addr,1);  //清除RX8025 PON位，设置BIT3 为1表示设置过RX8025
 	
 	/*写入出厂时间*/
-	setbuf[6] = 0x15;	/*年*/
-	setbuf[5] = 0x10;	/*月*/
-	setbuf[4] = 0x24;	/*日*/
-	setbuf[3] = 0x00;	/*星期*/
-	setbuf[2] = 0x10;	/*时*/
-	setbuf[1] = 0x39;	/*分*/
-	setbuf[0] = 0x30;	/*秒*/
-	RTC8025_Write(setbuf,RX8025_SecondsAddr,7);	/*写入RX8025*/ 
+//	setbuf[6] = 0x15;	/*年*/
+//	setbuf[5] = 0x10;	/*月*/
+//	setbuf[4] = 0x24;	/*日*/
+//	setbuf[3] = 0x00;	/*星期*/
+//	setbuf[2] = 0x10;	/*时*/
+//	setbuf[1] = 0x39;	/*分*/
+//	setbuf[0] = 0x30;	/*秒*/
+//	RTC8025_Write(setbuf,RX8025_SecondsAddr,7);	/*写入RX8025*/ 
 }
 
 /******************************************************************************
@@ -135,10 +135,10 @@ bool RX8025_RTC_Init(void)
 void read_time(void)
 {
 //    unsigned char i;
-	uint8_t readbuf[7];
+	uint8_t readbuf[16];
 
     //RTC8025_Read(&readbuf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);
-	RTC8025_Read(readbuf,RX8025_SecondsAddr,7);	/*读取时钟时间*/
+	RTC8025_Read(readbuf,RX8025_SecondsAddr,16);	/*读取时钟时间*/
 	
 	Rtc.Second = readbuf[0];
     Rtc.Minute = readbuf[1];

@@ -150,11 +150,11 @@ static void WorkornotMode(void)
     {
 		OffPowerSupply();//关设备电源
 		
-		lcd_OFF(JlyParam.ShowOffCode);
-		
         if(JlyParam.LastErrorCode!=0)
         {
             displayErr(JlyParam.LastErrorCode);
+		}else{
+			lcd_OFF(JlyParam.ShowOffCode);
 		}
         if(Flag.MucReset==1)
         {
@@ -358,32 +358,34 @@ void JlySecDeal(void)
         
         Display_SN();   
         
-		StorageHistoryData();
-		
-        OneSec_Timedeal();
+//		StorageHistoryData();
+//		
+//        OneSec_Timedeal();
+//        
+//        rtc_deel();
+//        
+//		OutpowerShan();
+//		
+//        VoltageTest();
+//        
+//		RecorderBootModeHandle();
+//		RecorderStopModeHandle();
+//		
+//        WorkornotMode();
         
-        rtc_deel();
-        
-		OutpowerShan();
-		
-        VoltageTest();
-        
-		RecorderBootModeHandle();
-		RecorderStopModeHandle();
-		
-        WorkornotMode();
-        
+		//----------------------测试
+//		read_time();
     }
 	if(Conf.Jly.WorkStatueIsStop < 1) /*停止工作*/
     {
 		OffPowerSupply();//关设备电源
 		
-        lcd_OFF(JlyParam.ShowOffCode);
-
         if(JlyParam.LastErrorCode!=0)
         {
             displayErr(JlyParam.LastErrorCode);
-        }
+        }else{
+			lcd_OFF(JlyParam.ShowOffCode);
+		}
     }
 }
 #endif /* __BSPDATADEAL_C */

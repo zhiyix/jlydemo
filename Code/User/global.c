@@ -41,6 +41,7 @@ uint16_t       adcCopy[32];
 __IO uint16_t  ADC_ConvertedValue[32];
 __IO uint8_t   FlagSeniorErr[32];
 float          ChannelDataFloat[32];
+uint32_t SYS_CLK;
 
 //≤‚ ‘±Ì
 const uint32_t lcd_test[] = 

@@ -73,6 +73,7 @@ int main(void)
   {
 	  
       
+	  
 	  //JlySerialDeal();
 	  
       JlySecDeal();
@@ -111,13 +112,19 @@ int main(void)
 	  //PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
 	  //PWR_EnterSTANDBYMode();
 	  //测试
-	if(ReadRX8025Control2() & RX8025_Control2CTFG)
-	{
-		uint8_t setbuf[1];
-		setbuf[0] = 0x08 ;
-		//RTC8025_Write(setbuf,RX8025_Control2Addr,1);  //清除RX8025 PON位，设置BIT3 为1表示设置过RX8025
-		PWR_EnterSTANDBYMode();
-	}
+//	if(ReadRX8025Control2() & RX8025_Control2CTFG)
+//	{
+//		uint8_t setbuf[1];
+//		setbuf[0] = 0x20 ;
+//		RTC8025_Write(setbuf,RX8025_Control2Addr,1);  //清除RX8025 PON位，设置BIT3 为1表示设置过RX8025
+//		OffPowerSupply();//关设备电源
+//		PWR_WakeUpPinCmd(PWR_WakeUpPin_1,ENABLE);
+//		PWR_EnterSTANDBYMode();
+//	}
+//	Reset_Time();
+//	PWR_WakeUpPinCmd(PWR_WakeUpPin_1,ENABLE);
+//	PWR_EnterSTANDBYMode();
+	
   }
 }
 
