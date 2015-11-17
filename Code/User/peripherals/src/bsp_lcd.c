@@ -148,9 +148,9 @@ void LCD_GLASS_Init(void)
 {
 	LCD_InitTypeDef LCD_InitStructure;
 	
-	RCC_LSICmd(ENABLE);
-	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
-	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
+//	RCC_LSICmd(ENABLE);
+//	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
+//	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
 	
 	LCD_GPIOConfig();/*!< Configure the LCD Glass GPIO pins */
 	
@@ -445,6 +445,9 @@ static void Lcd_Dis2Value(uint8_t value)
 			break;
 		case 'n':
 			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_BIT4;
+			break;
+		case 'L':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT4;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT4+D_BIT5;
 			break;
 		
 		case 0xFF:
@@ -1310,6 +1313,25 @@ void Display_NUL(void)
 	
 	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
+}
+/*******************************************************************************
+  * @brief  显示低功耗标志 LO.
+  * @param  None
+  * @retval None
+  ******************************************************************************/
+void Display_LOW(void)
+{
+	LCD_GLASS_Clear();
+	
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	/*先清数据*/
+	
+	Lcd_Dis2Value('L');
+	Lcd_Dis3Value('O');
+	showP2;
+	/*!< Requesy LCD RAM update */
+	LCD_UpdateDisplayRequest();  
+	
 }
 /*******************************************************************************
   * @brief  首次上电显示 ---,SN号,仪器时间

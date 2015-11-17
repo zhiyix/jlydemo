@@ -66,50 +66,70 @@ int main(void)
 //	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
   /* Add your application code here
      */
-
 	freemodbus_init();
+	
+	
+	//测试
+	//使能电源管理单元时钟
+	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+//	PWR_FastWakeUpCmd(ENABLE);
+//	PWR_UltraLowPowerCmd(ENABLE);
+//	printf("\r\n Enter Stop Mode \r\n");
+//	PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
   /* Infinite loop */
   while (1)
   {
-	  
-      
-	  
 	  //JlySerialDeal();
 	  
-      JlySecDeal();
+	  JlySecDeal();
 
-      if(Flag.TouchKey1DuanAn ==1)
-      {
-         //Down_HisData();
-		  printf("Queue.FlashRecOverFlow %d\r\n",Queue.FlashRecOverFlow);
-		  printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
-		  printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
-		  printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
-		  printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
-		  printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
-		  DownFlash_HisData();
-		  rtc_deel();
-      }
-	  if(Flag.TouchKey2DuanAn ==1)
-	  {
-		  Flag.TouchKey2DuanAn =0;
-		  
-		  Queue.FlashSectorPointer = 0;
-		  Queue.WriteFlashDataPointer =0;
-		  Queue.FlashReadDataBeginPointer =0;
-		  Queue.ReadFlashDataPointer = 0;
-		  Queue.FlashNoReadingDataNum = 0;
-		  
-		  SetFlashOverFlow(0);//清除flash溢出标志
-		  WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
-		  WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
-		  WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
-		  WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
-		  WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
-	  }
+	  KeyDeal();
+     
 	  freemodbus_main();
 	  
-	  //PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+	  
+//低功耗测试
+	 if(ReadRX8025Control2() & RX8025_Control2CTFG)
+	 {
+		RTC8025_Reset(true);
+	 }
+	if(Flag.FirstNotEnterStopMode ==1)
+	{
+		Flag.FirstNotEnterStopMode =0;
+	}else{
+	  read_time();
+	  if(Rtc.Second >= 0x30)
+	  {
+		  
+			/* Check and Clear the Wakeup flag */
+			if (PWR_GetFlagStatus(PWR_FLAG_WU) != RESET)
+			{
+				PWR_ClearFlag(PWR_FLAG_WU);
+			}
+			{
+				
+				printf("\r\n ... \r\n");
+				printf("\r\n Enter StopMode \r\n");
+				OffPowerSupply();
+				//Display_LOW();
+				//关闭滴答定时器
+				SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+				PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+			}
+			SysClock_ReConfig();
+			//rtc_deel();
+			printf("\r\n Exit StopMode \r\n");
+	  }
+	}
+	  
+//	  LED1(ON);LED1(OFF);//Delay_ms(500);
+//	  LED2(ON);LED2(OFF);//Delay_ms(500);
+//		printf("\r\n ... \r\n");
+//		printf("\r\n Enter StopMode \r\n");
+//		PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+//		//printf("\r\n Exit StopMode \r\n");
+//		SysClock_ReConfig();
+//		printf("\r\n Exit StopMode \r\n");
 	  //PWR_EnterSTANDBYMode();
 	  //测试
 //	if(ReadRX8025Control2() & RX8025_Control2CTFG)
@@ -122,6 +142,9 @@ int main(void)
 //		PWR_EnterSTANDBYMode();
 //	}
 //	Reset_Time();
+//	OffPowerSupply();//关设备电源
+//	PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+//	PWR_EnterSTANDBYMode();
 //	PWR_WakeUpPinCmd(PWR_WakeUpPin_1,ENABLE);
 //	PWR_EnterSTANDBYMode();
 	

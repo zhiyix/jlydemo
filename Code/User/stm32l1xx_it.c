@@ -170,6 +170,23 @@ void USART1_IRQHandler(void)
 
 }
 /**
+  * @brief  This function handles External lines 0 interrupt request.
+  * @param  None
+  * @retval None
+  */
+
+void EXTI0_IRQHandler(void)
+{
+	if(EXTI_GetITStatus(EXTI_Line0) != RESET) //PA0唤醒引脚
+	{
+		// Toggle LED1 
+		//LED1_TOGGLE;
+		/* Clear the EXTI line 0 pending bit */
+		EXTI_ClearITPendingBit(EXTI_Line0);
+	}
+}
+
+/**
   * @brief  This function handles External lines 15 to 10 interrupt request.
   * @param  None
   * @retval None
@@ -178,12 +195,16 @@ void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line13) != RESET) //机械按键key1
 	{
+		//SysClock_ReConfig();
+		printf("\r\n Sys Clock ReConfig Exit StopMode \r\n");
+		//SystemInit();
         Flag.Key1AnXia = 1;
 		Flag.AlarmXiaoYin = 1;	//按键消音标志
 		Flag.LcdBackLightOn = 1; //Lcd背光点亮
 		LcdBackLight(ON);
+		BEEP(OFF);
 		// Toggle LED1 
-		LED1_TOGGLE;
+		//LED1_TOGGLE;
 		/* Clear the EXTI line 13 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line13);
 	}

@@ -18,6 +18,7 @@
 2、结构体大小注意字节对齐 为4的倍数
 3、Configure the Pulse On Duration解决液晶显示隐影问题
 4、flash溢出标志读取不正确，高低字节写反了
+5、adc 工作不正常，HSE和HSI配置问题
 Debug版：
 低功耗时注意：
 	1.电池电压检测时间

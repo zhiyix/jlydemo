@@ -177,7 +177,7 @@ freemodbus_init(void)
     // Æô¶¯FreeModbus
     eMBEnable();
     // 
-	PARAM_DATA_READ((uint8_t *)&usRegHoldingBuf[0], usRegHoldingStart, REG_HOLDING_NREGS);
+	//PARAM_DATA_READ((uint8_t *)&usRegHoldingBuf[0], usRegHoldingStart, REG_HOLDING_NREGS);
     return 0;
 }
 /**

@@ -358,20 +358,20 @@ void JlySecDeal(void)
         
         Display_SN();   
         
-//		StorageHistoryData();
-//		
-//        OneSec_Timedeal();
-//        
-//        rtc_deel();
-//        
-//		OutpowerShan();
-//		
-//        VoltageTest();
-//        
-//		RecorderBootModeHandle();
-//		RecorderStopModeHandle();
-//		
-//        WorkornotMode();
+		StorageHistoryData();
+		
+        OneSec_Timedeal();
+        
+        rtc_deel();
+        
+		OutpowerShan();
+		
+        VoltageTest();
+        
+		RecorderBootModeHandle();
+		RecorderStopModeHandle();
+		
+        WorkornotMode();
         
 		//----------------------≤‚ ‘
 //		read_time();

@@ -58,7 +58,7 @@ void  Reset_Time(void)
 	setbuf[0] = 0x00;
 	RTC8025_Write(setbuf,RX8025_DigitalOffsetAddr,1);	/*不使用精度调整功能*/
 	
-	setbuf[0] = (0x20 + 0x05);// 0011 0101 1分一次
+	setbuf[0] = (0x20 + 0x05);// 0011 0101  1分一次
 	RTC8025_Write(setbuf,RX8025_Control1Addr,1);   /*设置24小时制,设置BIT4 为1表示设置过RX8025*/
 	
 	setbuf[0] = 0x20;//0x20

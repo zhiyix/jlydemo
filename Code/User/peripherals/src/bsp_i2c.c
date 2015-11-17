@@ -579,7 +579,7 @@ bool RTC8025_Reset(bool need_reset)
 	if (need_reset || need_clear)
 	{
 		/* 设置 RTC8025 固定周期中断功能 */
-		ctrl.STREG.CT = 3;		
+		ctrl.STREG.CT = 5;		
 		ctrl.STREG.PON = 0;
 		ctrl.STREG.VDET = 0;
 		ctrl.STREG.XST = 1;

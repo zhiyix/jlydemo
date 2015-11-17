@@ -15,7 +15,6 @@
 
 #include "main.h"
 
-static void RCC_Config(void);
 static void General_GPIO_Config(void);
 static void FirstScanSysData(void);
 
@@ -24,53 +23,149 @@ static void FirstScanSysData(void);
   * @param  None
   * @retval None
   ******************************************************************************/
-static void RCC_Config(void)
+static void SysClock_Config(void)
 {  
 	RCC_ClocksTypeDef RCC_ClockFreq;
+	
 	/*STOP模式下，调试使能*/
 //	DBGMCU_Config(DBGMCU_STOP,ENABLE);
-	DBGMCU_Config(DBGMCU_STOP,DISABLE);
-	//使能电源管理单元时钟
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-
+//	DBGMCU_Config(DBGMCU_STOP,DISABLE);
+	
+	
 	//获取系统时钟类型（0x00: MSI used as system clock ；0x04: HSI used as system clock ；0x08: HSE used as system clock ；0x0C: PLL used as system clock ）
 	SYS_CLK = RCC_GetSYSCLKSource();
 	//获取系统各时钟频率值
-	RCC_GetClocksFreq(&RCC_ClockFreq);
-	
-	/* Allow access to the RTC */
-	PWR_RTCAccessCmd(ENABLE);
+	RCC_GetClocksFreq(&RCC_ClockFreq);	
 
 	/* Reset Backup Domain */
 //	RCC_RTCResetCmd(ENABLE);
-//	RCC_RTCResetCmd(DISABLE);
-	
-	/* 使能内部 HSI */
-	RCC_HSICmd(ENABLE);	//ADC使用
-	/* Check that HSI oscillator is ready */
-	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
-	
+//	RCC_RTCResetCmd(DISABLE);	
 //	PWR_BackupAccessCmd(ENABLE);//允许修改RTC和后备寄存器
 //	BKP_TamperPinCmd(DISABLE);//关闭入检测功能，也就是PC13，也可以当普通IO使用
 //	PWR_BackupAccessCmd(DISABLE);//禁止修改后备寄存器
-
 //BKP_ITConfig(DISABLE);  
 	
+	
 	/*关闭低速外部时钟信号功能后,PC13 PC14 PC15才可以当普通IO用*/
-    RCC_LSEConfig(RCC_LSE_OFF); 
-	///*!< Wait till LSE is ready */
-    //while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET);
-		
+    RCC_LSEConfig(RCC_LSE_OFF); 		
+	
+	/* Allow access to the RTC */
+	PWR_RTCAccessCmd(ENABLE);
 	/*开启低速内部时钟供LCD 使用*/
 	RCC_LSICmd(ENABLE);
 	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
 	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
 	RCC_RTCCLKCmd(ENABLE); 
-
 	/* Wait for RTC APB registers synchronisation */
 	RTC_WaitForSynchro();
 }
 
+/*******************************************************************************
+  * @brief  Configures the different system clocks.
+  * @param  None
+  * @retval None
+  ******************************************************************************/
+void SysClock_ReConfig(void)
+{  
+	RCC_ClocksTypeDef RCC_ClockFreq;
+	ErrorStatus HSEStartUpStatus;
+	//使能 HSE
+	RCC_HSEConfig(RCC_HSE_ON);
+	HSEStartUpStatus = RCC_WaitForHSEStartUp();
+	if(HSEStartUpStatus == SUCCESS)
+	{
+		//使能 PLL
+		RCC_PLLCmd(ENABLE);
+		//等待 PLL准备就绪
+		while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET){}
+		//选择 PLL作为系统时钟源
+		RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
+		//等待 PLL被选择为系统时钟源
+		while(RCC_GetSYSCLKSource() != 0x0C){}
+	}
+	
+	/* 使能内部 HSI 注意时钟*/
+	RCC_HSICmd(ENABLE);	//ADC使用
+	/* Check that HSI oscillator is ready */
+	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
+	
+	/*STOP模式下，调试使能*/
+	DBGMCU_Config(DBGMCU_STOP,ENABLE);
+//	DBGMCU_Config(DBGMCU_STOP,DISABLE);
+	
+	//获取系统时钟类型（0x00: MSI used as system clock ；0x04: HSI used as system clock ；0x08: HSE used as system clock ；0x0C: PLL used as system clock ）
+	SYS_CLK = RCC_GetSYSCLKSource();
+	//获取系统各时钟频率值
+	RCC_GetClocksFreq(&RCC_ClockFreq);
+
+	/* Reset Backup Domain */
+//	RCC_RTCResetCmd(ENABLE);
+//	RCC_RTCResetCmd(DISABLE);
+//	PWR_BackupAccessCmd(ENABLE);//允许修改RTC和后备寄存器
+//	BKP_TamperPinCmd(DISABLE);//关闭入检测功能，也就是PC13，也可以当普通IO使用
+//	PWR_BackupAccessCmd(DISABLE);//禁止修改后备寄存器
+//BKP_ITConfig(DISABLE);  
+	
+	
+	/*关闭低速外部时钟信号功能后,PC13 PC14 PC15才可以当普通IO用*/
+    RCC_LSEConfig(RCC_LSE_OFF); 
+	
+	/* Allow access to the RTC */
+	PWR_RTCAccessCmd(ENABLE);
+	/*开启低速内部时钟供LCD 使用*/
+	RCC_LSICmd(ENABLE);
+	while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) == RESET);
+	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
+	RCC_RTCCLKCmd(ENABLE); 
+	/* Wait for RTC APB registers synchronisation */
+	//RTC_WaitForSynchro();
+	
+}
+
+/*****************************************************************************
+ * 函数名：GPIO_ReConfig
+ * 描述  ：所有的GPIO重新初始化为模拟输入，降低功耗
+ * 输入  ：无
+ * 输出  ：无
+ * 调用  ：内部调用
+ *****************************************************************************/
+static void GPIO_ReConfig(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOH, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOG, ENABLE);
+	
+	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;	//模拟输入
+    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_400KHz;//Very Low Speed
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+	GPIO_Init(GPIOE, &GPIO_InitStructure);
+	GPIO_Init(GPIOH, &GPIO_InitStructure);
+	GPIO_Init(GPIOF, &GPIO_InitStructure);
+	GPIO_Init(GPIOG, &GPIO_InitStructure);
+	
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, DISABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, DISABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, DISABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, DISABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE, DISABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOH, DISABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF, DISABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOG, DISABLE);
+}
 /******************************************************************************
   * @brief  Description 配置I2C总线的GPIO，采用模拟IO的方式实现
 						fram、rx8025用到I2C
@@ -92,6 +187,50 @@ static void I2C_GPIO_Config(void)
 
 	/* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
 //	i2c_Stop();
+}
+/*****************************************************************************
+ * 函数名：WakeUp_GPIO_Config
+ * 描述  ：配置PA0 唤醒引脚,外部中断
+ * 输入  ：无
+ * 输出  ：无
+ * 调用  ：内部调用
+ *****************************************************************************/
+static void WakeUp_GPIO_Config(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	EXTI_InitTypeDef   EXTI_InitStructure;
+	NVIC_InitTypeDef   NVIC_InitStructure;	
+	
+	/*唤醒 PA0*/
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA ,ENABLE);
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	
+	GPIO_Init(GPIOA,&GPIO_InitStructure);
+  
+	// Enable SYSCFG clock 
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    /**************************************************************/
+	// Connect EXTI0 Line to PA0 pin 
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
+	// Configure EXTI0 line 
+	EXTI_InitStructure.EXTI_Line = EXTI_Line0;
+
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	
+	EXTI_Init(&EXTI_InitStructure);
+	/**************************************************************/
+	
+	// Enable and set EXTI0_IRQn Interrupt to the lowest priority
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+
+	NVIC_Init(&NVIC_InitStructure);
 }
 /*****************************************************************************
  * 函数名：General_GPIO_Config
@@ -182,6 +321,16 @@ static void General_GPIO_Config(void)
     
     GPIO_ResetBits(GPIOD,GPIO_Pin_0);   //关闭model电源
 	
+	//HAC电源
+	RCC_AHBPeriphClockCmd(HacVccCtrl_CLK,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = HacVccCtrl_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(HacVccCtrl_PORT,&GPIO_InitStructure);
+	
+	GPIO_SetBits(HacVccCtrl_PORT,HacVccCtrl_PIN);//关闭触摸按键电源 
 }
 
 /******************************************************************************
@@ -395,16 +544,22 @@ static void TestFramIsOrNotOk(void)
 						3.关蜂鸣器
 						4.关LED灯
 						5.LCD背光电源
+						6.model
+						7.HAC
+						8.触摸按键
   * @param  None
   * @retval None
   *****************************************************************************/
 void OffPowerSupply(void)
 {
-	AVCC1_POWER(OFF);     //关传感器电源
+	//AVCC1_POWER(OFF);     //关传感器电源
     BATTEST_POWER(OFF);   //关电池电压检测电源
 	BEEP(OFF);
 	LED1(OFF);LED2(OFF);
 	LcdBackLight(OFF);
+	//MODEL_PWRCTRL(OFF);
+	TOUCHKEY_POWER(OFF);
+	HAC_POWER(OFF);
 }
 /******************************************************************************
   * @brief  Description 系统初始化
@@ -430,18 +585,16 @@ void SysInit(void)
     
 	
     Flag.MucReset = 1;
-	
+	Flag.FirstNotEnterStopMode = 1;
 	
 	MODEL_PWRCTRL(ON);	  //开对外接口电源
 	TOUCHKEY_POWER(ON);	  //开触摸按键电源
 	
-	TIM2_Configuration();	//开启定时器
-	
-	BellNn(1);
+	BellNn(1); //这里开启系统滴答时钟对进低功耗有影响
 	
 	/*****************************************/
 	//测试
-	Reset_Time();
+	//Reset_Time();
 	/*****************************************/
 }
 /******************************************************************************
@@ -451,29 +604,32 @@ void SysInit(void)
   *****************************************************************************/
 void PeripheralInit(void)
 {
-	RCC_Config();
-	
+	SysClock_Config();
+
+	//GPIO_ReConfig();//影响ADC正常工作,烧写程序时必须reset复位
+
 	SysTick_Init();
-    
+
+	TIM2_Configuration();	//开启定时器
+	
+	WakeUp_GPIO_Config();
 	KEY_GPIO_Config();
 	EXTI15_10_Config();
-	
+
 	General_GPIO_Config();	
 	I2C_GPIO_Config();
-	
+
 	LCD_GLASS_Init();
-	
+
 	USART1_Config(Usart1_DefaultBaudRate);
-    
-//	Delay_ms(10);   //开启滴答定时
+
 	LCD_GLASS_Clear();
-	
+
 	ADC1_Init();
-    
-    // 8M串行flash W25Q64初始化 
+
 	SPI_FLASH_Init();
+
+	//RX8025_RTC_Init();
+	RTC8025_Reset(true);
 	
-    //RX8025AC 初始化
-	RX8025_RTC_Init();
-	//RTC8025_Reset();
 }

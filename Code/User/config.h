@@ -229,7 +229,7 @@ struct FLAGStr
 		 uint8_t RecTimeDingDianStop:1; //记录仪时间点定点停止
 		 
 		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
-		
+		 uint8_t FirstNotEnterStopMode:1;//
 		 //uint8_t FirstSampleOkAlarm:1;	//第一次采样完成后，
 		 
 		 uint8_t AlarmHuiFu[32];		//报警消音恢复标志-------可以优化为4个字节，每个标志占一个bit

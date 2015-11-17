@@ -29,6 +29,10 @@
 #define TouchKey1_PIN	  GPIO_Pin_15
 #define TouchKey2_PIN	  GPIO_Pin_14
 #define TouchKey3_PIN	  GPIO_Pin_13
+//HAC电源控制
+#define HacVccCtrl_CLK	  RCC_AHBPeriph_GPIOD
+#define HacVccCtrl_PORT	  GPIOD
+#define HacVccCtrl_PIN	  GPIO_Pin_7
 /***********************************************/
 /* 带参宏，可以像内联函数一样使用 */
 #define LED1(a)	if (a)	\
@@ -55,7 +59,12 @@
 #define TOUCHKEY_POWER(a)	if (a)	\
 					GPIO_ResetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN);\
 					else		\
-					GPIO_SetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN)					
+					GPIO_SetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN)	
+//HAC电源开关 0打开 1关闭
+#define HAC_POWER(a)	if (a)	\
+					GPIO_ResetBits(HacVccCtrl_PORT,HacVccCtrl_PIN);\
+					else		\
+					GPIO_SetBits(HacVccCtrl_PORT,HacVccCtrl_PIN)						
 //model 对外接口
 #define MODEL_PWRCTRL(a)	if (a)	\
 					GPIO_SetBits(GPIOD,GPIO_Pin_0);\
@@ -97,7 +106,7 @@
 /*读取正常记录间隔时间*/
 #define ReadNormalRecIntervalTime  GetRecIntervalTime(Conf.Jly.NormalRec_Day,Conf.Jly.NormalRec_Hour,Conf.Jly.NormalRec_Min,Conf.Jly.NormalRec_Sec)
 
-
+void SysClock_ReConfig(void);
 void SysInit(void);
 void PeripheralInit(void);
 void OffPowerSupply(void);

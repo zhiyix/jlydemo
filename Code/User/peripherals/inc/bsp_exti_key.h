@@ -5,5 +5,5 @@
 
 void KEY_GPIO_Config(void);
 void EXTI15_10_Config(void);
-
+void KeyDeal(void);
 #endif

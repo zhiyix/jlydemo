@@ -79,7 +79,7 @@ static void ADC1_Mode_Config(void)
 	/* Enable DMA channel1 */
 	DMA_Cmd(DMA1_Channel1, ENABLE);
 	
-	/* note !!!ADC1 configuration */	
+	/* note !!!ADC1 configuration ------------------*/	
 	ADC_StructInit(&ADC_InitStructure);
     
 	/* Enable ADC1 clock */
@@ -129,6 +129,10 @@ static void ADC1_Mode_Config(void)
   ******************************************************************************/
 void ADC1_Init(void)
 {
+		/* 使能内部 HSI 注意时钟*/
+	RCC_HSICmd(ENABLE);	//ADC使用
+	/* Check that HSI oscillator is ready */
+	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
 	
 	ADC1_GPIO_Config();
 	ADC1_Mode_Config();
