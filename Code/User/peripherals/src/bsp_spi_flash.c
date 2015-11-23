@@ -131,6 +131,7 @@ void SPI_FLASH_SectorErase(uint32_t SectorAddr)
   SPI_FLASH_SendByte((SectorAddr & 0xFF00) >> 8);
   /* Send SectorAddr low nibble address byte */
   SPI_FLASH_SendByte(SectorAddr & 0xFF);
+	
   /* Deselect the FLASH: Chip Select high */
   SPI_FLASH_CS_HIGH();
   /* Wait the end of Flash writing */

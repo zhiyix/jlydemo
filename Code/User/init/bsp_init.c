@@ -90,7 +90,7 @@ void SysClock_ReConfig(void)
 	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
 	
 	/*STOP模式下，调试使能*/
-	DBGMCU_Config(DBGMCU_STOP,ENABLE);
+//	DBGMCU_Config(DBGMCU_STOP,ENABLE);
 //	DBGMCU_Config(DBGMCU_STOP,DISABLE);
 	
 	//获取系统时钟类型（0x00: MSI used as system clock ；0x04: HSI used as system clock ；0x08: HSE used as system clock ；0x0C: PLL used as system clock ）
@@ -120,6 +120,8 @@ void SysClock_ReConfig(void)
 	/* Wait for RTC APB registers synchronisation */
 	//RTC_WaitForSynchro();
 	
+	//重新开ADC
+	ADC_Cmd(ADC1, ENABLE);
 }
 
 /*****************************************************************************
@@ -226,8 +228,8 @@ static void WakeUp_GPIO_Config(void)
 	
 	// Enable and set EXTI0_IRQn Interrupt to the lowest priority
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0E;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0E;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
 	NVIC_Init(&NVIC_InitStructure);
@@ -348,11 +350,39 @@ static void SetJlyParamData(void)
 	Queue.FlashReadDataBeginPointer = Conf.Basic.FlashReadDataBeginPointer;
 	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
 	Queue.FlashNoReadingDataNum = Conf.Basic.FlashNoReadingDataNum;
+	//通道数
+	JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//首次上电备份通道数量
+	JlyParam.ChannelNumActual = JlyParam.ChannelNumOld;
+	JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;
 	/*------------------------------------------------------*/
-	Queue.HIS_ONE_BYTES = (uint16_t)(Conf.Jly.ChannelNum*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
+	for(i=0; i<Conf.Jly.ChannelNum; i++)
+	{
+		JlyParam.SensorTypeOld[i] = Conf.Sensor[i].SensorType; //备份各个通道类型
+		
+		JlyParam.ChannelSwitchOld[i] = Conf.Sensor[i].ChannelSwitch;//备份之前的通道使能位
+	}
+	//上电判断，如果仪器复位重新判断
+	for(i=0;i < JlyParam.ChannelNumOld;i++)//所有通道循环一遍
+	{
+		if(Conf.Sensor[i].ChannelSwitch == 0x01)
+		{
+			JlyParam.ChannelNumActual = JlyParam.ChannelNumOld - 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
+			if(JlyParam.ChannelNumActual <=0)
+			{
+				JlyParam.ChannelNumActual =0;//通道数保护
+			}
+		}
+	}
+	/*------------------------------------------------------*/
+	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumActual*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
+	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
+	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//一个字节 这里配置会修改通道数，即一帧数据会被修改需要写入fram
 	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
 	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
 	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	
+	Conf.Basic.FlashRecMaxSize = FLASH_RecMaxSize;//flash最大存储容量 
+	WriteU32Pointer(FLASH_RecMaxSizeAddr,Conf.Basic.FlashRecMaxSize);//flash最大存储容量 4字节保存
 	/*------------------------------------------------------*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
 	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
@@ -361,12 +391,7 @@ static void SetJlyParamData(void)
 	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
 	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
 	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
-	/*------------------------------------------------------*/
-	JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//备份通道数量
-	for(i=0; i<Conf.Jly.ChannelNum; i++)
-	{
-		JlyParam.SensorTypeOld[i] = Conf.Sensor[i].SensorType; //备份各个通道类型
-	}
+	
 }
 /******************************************************************************
   * @brief  Description 读取记录仪参数
@@ -382,12 +407,14 @@ static void FirstScanSysData(void)
 			Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
 		}else{
 			
-			Conf.Jly.ChannelNum = 0;//默认设置0个通道
+			JlyParam.ChannelNumActual = 0;//默认设置0个通道
+			JlyParam.ChannelNumOld = 0;
 		}
 		SetJlyParamData();
 	}else{//fram出错
 		Conf.Jly.WorkStatueIsStop = 0;//停止工作
-		Conf.Jly.ChannelNum = 0;
+		JlyParam.ChannelNumActual = 0;
+		JlyParam.ChannelNumOld = 0;
 	}
 }
 
@@ -418,82 +445,6 @@ int16_t ReadSetFramFlag(void)
 	Fram_Read(TempBuf,FRAM_AlreadySetFlagAddr,2);//2 Byte
 	Flag = (TempBuf[0]<<8) + TempBuf[1];
 	return Flag;
-}
-
-/******************************************************************************
-  * @brief  Description 设置内存中记录仪参数,判断通道数量、通道类型是否修改
-						如果修改了就清除历史数据
-  * @param  None
-  * @retval None
-  *****************************************************************************/
-void SetJlyParamJudgeChannelNumSensorType(void)
-{
-	uint8_t i;
-	//重要参数
-	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow; //读出flash溢出标志
-	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
-	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
-	/*------------------------------------------------------*/
-	Queue.HIS_ONE_BYTES = (uint16_t)(Conf.Jly.ChannelNum*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
-	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
-	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
-	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
-	/*------------------------------------------------------*/
-	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
-	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
-	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
-	
-	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
-	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
-	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
-	/*------------------------------------------------------*/
-	if(JlyParam.ChannelNumOld != Conf.Jly.ChannelNum)
-	{
-		JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//备份通道数量
-		
-		Queue.FlashSectorPointer = 0;
-		Queue.FlashNoReadingDataNum = 0;
-		Queue.FlashReadDataBeginPointer =0;
-		Queue.WriteFlashDataPointer =0;
-		Queue.ReadFlashDataPointer = 0;
-
-		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
-		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
-		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
-		WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
-		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
-
-		SetFlashOverFlow(0);//清除flash溢出标志
-	}else{
-		for(i=0; i<Conf.Jly.ChannelNum; i++)
-		{
-			if(JlyParam.SensorTypeOld[i] != Conf.Sensor[i].SensorType)
-			{
-				//通道数循环完，并且备份新的通道类型，如果有改变的则清除历史数据
-				JlyParam.SensorTypeOld[i] = Conf.Sensor[i].SensorType;
-				Flag.SensorTypeIsChange = 1;
-			}
-		}
-		//循环完所有通道再执行
-		if(Flag.SensorTypeIsChange == 1)
-		{
-			Flag.SensorTypeIsChange = 0; //标志清除
-			
-			Queue.FlashSectorPointer = 0;
-			Queue.FlashNoReadingDataNum = 0;
-			Queue.FlashReadDataBeginPointer =0;
-			Queue.WriteFlashDataPointer =0;
-			Queue.ReadFlashDataPointer = 0;
-
-			WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
-			WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
-			WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
-			WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
-			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
-
-			SetFlashOverFlow(0);//清除flash溢出标志
-		}
-	}
 }
 
 /******************************************************************************
@@ -552,12 +503,12 @@ static void TestFramIsOrNotOk(void)
   *****************************************************************************/
 void OffPowerSupply(void)
 {
-	//AVCC1_POWER(OFF);     //关传感器电源
+	AVCC1_POWER(OFF);     //关传感器电源
     BATTEST_POWER(OFF);   //关电池电压检测电源
 	BEEP(OFF);
 	LED1(OFF);LED2(OFF);
 	LcdBackLight(OFF);
-	//MODEL_PWRCTRL(OFF);
+	MODEL_PWRCTRL(OFF);
 	TOUCHKEY_POWER(OFF);
 	HAC_POWER(OFF);
 }
@@ -581,7 +532,13 @@ void SysInit(void)
     FisrtPowerOnDisplay();
 	
 	//上电后判断通道数量,数量为0显示NUL
-	JudgingChannelNumberDisplay(Conf.Jly.ChannelNum);
+	if(JlyParam.ChannelNumActual >0)
+	{
+		JudgingChannelNumberDisplay(JlyParam.ChannelNumOld);
+	}else{
+		JudgingChannelNumberDisplay(JlyParam.ChannelNumActual);
+	}
+	
     
 	
     Flag.MucReset = 1;
@@ -612,7 +569,7 @@ void PeripheralInit(void)
 
 	TIM2_Configuration();	//开启定时器
 	
-	WakeUp_GPIO_Config();
+	//WakeUp_GPIO_Config();
 	KEY_GPIO_Config();
 	EXTI15_10_Config();
 
@@ -632,4 +589,46 @@ void PeripheralInit(void)
 	//RX8025_RTC_Init();
 	RTC8025_Reset(true);
 	
+}
+/******************************************************************************
+  * @brief  Description 进入低功耗模式
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+void EnterStopModePower(void)
+{
+	if(ReadRX8025Control2() & RX8025_Control2CTFG)
+	{
+		RTC8025_Reset(true);
+	}
+	read_time();
+	if(Rtc.Second >= 0x30)
+	{
+	  
+		/* Check and Clear the Wakeup flag */
+		if (PWR_GetFlagStatus(PWR_FLAG_WU) != RESET)
+		{
+			PWR_ClearFlag(PWR_FLAG_WU);
+		}
+		{
+			
+//			printf("\r\n ... \r\n");
+//			printf("\r\n Enter StopMode \r\n");
+			Display_LOW();
+			OffPowerSupply();
+			
+			ADC_Cmd(ADC1, DISABLE);
+			//关闭滴答定时器
+			SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+			//使能电源管理单元时钟
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+			PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+		}
+		if(JlyParam.WakeUpSource != 2)
+		{
+			SysClock_ReConfig();
+		}
+		//rtc_deel();
+//		printf("\r\n Exit StopMode \r\n");
+	}
 }

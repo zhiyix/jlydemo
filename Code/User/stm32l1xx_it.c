@@ -181,6 +181,7 @@ void EXTI0_IRQHandler(void)
 	{
 		// Toggle LED1 
 		//LED1_TOGGLE;
+		
 		/* Clear the EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line0);
 	}
@@ -195,16 +196,17 @@ void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line13) != RESET) //机械按键key1
 	{
-		//SysClock_ReConfig();
+		SysClock_ReConfig();
 		printf("\r\n Sys Clock ReConfig Exit StopMode \r\n");
-		//SystemInit();
+		TOUCHKEY_POWER(ON);		  //开触摸按键电源
+		JlyParam.WakeUpSource = 2;//表示按键唤醒
         Flag.Key1AnXia = 1;
 		Flag.AlarmXiaoYin = 1;	//按键消音标志
 		Flag.LcdBackLightOn = 1; //Lcd背光点亮
 		LcdBackLight(ON);
 		BEEP(OFF);
 		// Toggle LED1 
-		//LED1_TOGGLE;
+		LED1_TOGGLE;
 		/* Clear the EXTI line 13 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line13);
 	}
@@ -212,6 +214,7 @@ void EXTI15_10_IRQHandler(void)
 	{
 		AlarmLed2_TOGGLE;
 		Flag.TouchKey2DuanAn = 1;
+		JlyParam.WakeUpCount = 0;
 		/* Clear the EXTI line 14 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line14);
 	}
@@ -235,6 +238,28 @@ void TIM2_IRQHandler(void)
     {
 //        time++;
         Flag.Sec = 1;
+		//控制进入低功耗
+		if(JlyParam.WakeUpSource == 2)
+		{
+			JlyParam.WakeUpCount ++;
+			if(JlyParam.WakeUpCount >= WakeUpTime)
+			{
+				JlyParam.WakeUpCount = 0;
+				Flag.WakeUpStopModeOnTime = 1;
+			}
+		}
+		//这里重要，上电首次进入低功耗，adc
+		if(Flag.FirstNotEnterStopMode == 1)
+		{
+			JlyParam.FirstEnterStopModeCount ++;
+			if(JlyParam.FirstEnterStopModeCount >= FirstEnterStopModeTime)
+			{
+				Flag.FirstNotEnterStopMode = 0;
+				Flag.FirstEnterStopMode = 1;
+				JlyParam.FirstEnterStopModeCount =0;
+			}
+		}
+		
         TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
     }
 }

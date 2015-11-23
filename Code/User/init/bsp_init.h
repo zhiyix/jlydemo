@@ -113,5 +113,5 @@ void OffPowerSupply(void);
 void WriteSetFramFlag(void);
 int16_t ReadSetFramFlag(void);
 
-void SetJlyParamJudgeChannelNumSensorType(void);
+void EnterStopModePower(void);
 #endif

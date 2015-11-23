@@ -72,7 +72,7 @@ static void LOWorNomal_Mode(void)
         if(JlyParam.SampleTime == JlyParam.SampleInterval-1)//
         {
 			/*判断传感器接口类型 模拟/数字*/
-			for(i=0;i<Conf.Jly.ChannelNum;i++)
+			for(i=0;i<JlyParam.ChannelNumOld;i++)
 			{
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
 				{
@@ -110,7 +110,7 @@ static void LOWorNomal_Mode(void)
         if((JlyParam.SampleTime>1) && JlyParam.SampleTime%2==0)//2s采集一次
         {
 			/*判断传感器接口类型 模拟/数字*/
-			for(i=0;i<Conf.Jly.ChannelNum;i++)
+			for(i=0;i<JlyParam.ChannelNumOld;i++)
 			{
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
 				{
@@ -165,20 +165,20 @@ static void WorkornotMode(void)
     }
     else
     {
-        
-        LOWorNomal_Mode();
-        
-//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
-//        {
-            Display_ChannelValue(StartedChannelForDisplay);  //LCD 
-//        }
-        Display_Signal(2);/*显示信号强度*/
-        
-		
-		//SaveDataOnTimeDeal();
-		
-        Flag.IsDisplayRightNow=1;
-        
+		//当实际通道数 >0 时开启采样 存储 显示
+        if(JlyParam.ChannelNumActual >0)
+		{
+			LOWorNomal_Mode();
+			
+			SaveDataOnTimeDeal();
+	//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
+	//        {
+				Display_ChannelValue(StartedChannelForDisplay);  //LCD 
+	//        }
+			Display_Signal(2);/*显示信号强度*/
+			
+			Flag.IsDisplayRightNow=1;
+        }
     } 
 }
 
@@ -357,8 +357,6 @@ void JlySecDeal(void)
         Flag.Sec = 0;
         
         Display_SN();   
-        
-		StorageHistoryData();
 		
         OneSec_Timedeal();
         

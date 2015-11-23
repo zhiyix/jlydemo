@@ -150,7 +150,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
 //    unsigned int  add_adc;
     if(!all_channel_code)
     {
-        for(m=0;m<Conf.Jly.ChannelNum;m++)adc[m] = 0;
+        for(m=0;m<JlyParam.ChannelNumOld;m++)adc[m] = 0;
         return;
     }
     else
@@ -162,7 +162,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
         for(i=0;i<GatherMaxCt;i++)//GatherMaxCt=15
         {
             channel_cp = all_channel_code;
-            for(m = 0;m < Conf.Jly.ChannelNum;m++)//
+            for(m = 0;m < JlyParam.ChannelNumOld;m++)//
             {
                 if(channel_cp & 0x01)
                 {
@@ -179,7 +179,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
             }
         }
         
-        for(m = 0;m < Conf.Jly.ChannelNum;m++)//GatherMaxCt
+        for(m = 0;m < JlyParam.ChannelNumOld;m++)//GatherMaxCt
         {
             adc[m] = adcCopy[m]/GatherMaxCt;
             adcCopy[m] = 0;

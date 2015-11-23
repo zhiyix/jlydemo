@@ -575,7 +575,7 @@ void DoGatherChannelDataFloat(uint8_t ChannelCode)
 {
     uint8_t i;
     uint8_t ChiFang2 = 0x01;
-    for(i=0;i<Conf.Jly.ChannelNum;i++)
+    for(i=0;i<JlyParam.ChannelNumOld;i++)
     {
         if(ChannelCode & ChiFang2)
         {

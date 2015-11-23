@@ -81,12 +81,12 @@ struct BasicConfDataStr
 	union    Si2Char BatVoltage;/*!< 电池电压,  */
 	//22byte
 	uint8_t  RecordFlashOverFlow; 	//flash记录溢出标志
-	uint8_t  :8;		  /*!< 保留 */
+	uint8_t  HisOneBytes;		  /*!< 保留 */
 	
 	uint16_t RecFramWritePointer;	//fram中数据记录指针
 	uint16_t FlashSectorPointer;	//flash中扇区指针
 	
-	uint32_t FlashDataMaxNum;  	    /*!< flash存储最大组数*/		
+	uint32_t FlashRecMaxSize;  	    /*!< flash存储 容量*/		
 	uint32_t FlashNoReadingDataNum;	//flash中未读数据条数
 	uint32_t FlashReadDataBeginPointer;//flash中读数据起始指针
 	uint32_t WriteFlashDataPointer;	   /*!< Flash写数据指针(当前条数) */
@@ -222,7 +222,10 @@ struct SensorChanelConfDataStr
 								 Bit0：上限报警
 								 Bit1：下限报警 
 								 Bit15：故障报警 */
-	uint16_t :16;	/*!< Reserv */
+	uint8_t ChannelSwitch; /*通道使能 
+								 0x00:通道打开
+								 0x01:通道关闭*/
+	uint8_t :8;	/*!< Reserv */
 	uint32_t SensorAddCode;	/*!< 传感器地址码 */
 	
 	union FISI2CH4 SensorAlarm_High;  /*!< 报警上限 [IEEE-754_1二进制浮点操作数] 0x0000 0000*/ 
@@ -268,7 +271,7 @@ struct CircularQueueStr
 {
 	uint8_t  SectorHeadBytes;		
 	uint8_t  FlashRecOverFlow;		//flash存储数据溢出
-	uint16_t HIS_ONE_BYTES;			//一包数据大小
+	uint8_t  HIS_ONE_BYTES;			//一包数据大小
 	uint16_t FRAM_MAX_NUM;			//fram中存储数据的最大包数
 	
     uint16_t RecFramWritePointer;   //fram中记录数据指针

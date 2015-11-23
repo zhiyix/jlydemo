@@ -135,10 +135,10 @@ bool RX8025_RTC_Init(void)
 void read_time(void)
 {
 //    unsigned char i;
-	uint8_t readbuf[16];
+	uint8_t readbuf[7];//16
 
     //RTC8025_Read(&readbuf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);
-	RTC8025_Read(readbuf,RX8025_SecondsAddr,16);	/*读取时钟时间*/
+	RTC8025_Read(readbuf,RX8025_SecondsAddr,7);	/*读取时钟时间*/
 	
 	Rtc.Second = readbuf[0];
     Rtc.Minute = readbuf[1];

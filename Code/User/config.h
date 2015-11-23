@@ -63,7 +63,10 @@
 //! \brief AD最小、最大值
 #define  ADC_ERR_L           10
 #define  ADC_ERR_H           4090
-
+//上电20s过后开启进入低功耗
+#define FirstEnterStopModeTime 20
+//唤醒时间
+#define WakeUpTime             10
 /****************************************************************************************/
 //! \brief 协议中对应的虚拟地址
 #define VirtBasicConfAddr			0x0000
@@ -100,14 +103,16 @@
 
 //flash记录数据溢出标志
 #define FLASH_FlashRecOverFlowAddr	 	 FRAM_BasicConfAddr+22 //低8位
+//一帧数据大小
+#define HisOneBytesAddr					 FRAM_BasicConfAddr+23
 //! \brief FRAM中存放fram记录指针地址
 #define FRAM_RecWriteAddr_Lchar          FRAM_BasicConfAddr+24      
 #define FRAM_RecWriteAddr_Hchar          
 //Flash扇区写指针
 #define FLASH_SectorWriteAddr_Lchar		 FRAM_BasicConfAddr+26 		
 #define FLASH_SectorWriteAddr_Hchar		 
-//flash存储最大数据组数
-#define FLASH__DataMaxNum				 FRAM_BasicConfAddr+28
+//flash存储最大容量
+#define FLASH_RecMaxSizeAddr			 FRAM_BasicConfAddr+28
 //flash未读数据地址
 #define FLASH_NoReadingDataNumAddr_Lchar 	FRAM_BasicConfAddr+32	
 #define FLASH_NoReadingDataNumAddr_MidLchar 
@@ -196,14 +201,17 @@ struct FLAGStr
 {
     __IO uint8_t Sec:1;             	//TIM2定时1s时间
 //    __IO uint8_t SysTickSec:1;      	//系统滴答时钟
-	
+	__IO uint8_t FirstNotEnterStopMode:1;//首次上电不进入低功耗
+	__IO uint8_t FirstEnterStopMode:1;  //首次上电时间到进入低功耗
 	__IO uint8_t Key1AnXia:1;       	//机械按键key1 按下
+	__IO uint8_t WakeUpStopModeOnTime:1;	//时间到唤醒 StopMode低功耗模式
 	
 	__IO uint8_t AlarmXiaoYin:1;        //报警消音标志
 	__IO uint8_t LcdBackLightOn:1;		//Lcd背光点亮标志
 	__IO uint8_t TouchKey1DuanAn:1;     //触摸按键key1 短按
 	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
-		
+	//__IO uint8_t ChannelOnceSwitch:1;	//通道曾经被客户开关过
+	
 		 uint8_t Keyflag:1;				//机械按键长短按标志
 		 uint8_t Key1DuanAn:1;			//机械按键Key1短按
 		 uint8_t Key1ChangAn:1;			//机械按键Key1长按
@@ -229,7 +237,6 @@ struct FLAGStr
 		 uint8_t RecTimeDingDianStop:1; //记录仪时间点定点停止
 		 
 		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
-		 uint8_t FirstNotEnterStopMode:1;//
 		 //uint8_t FirstSampleOkAlarm:1;	//第一次采样完成后，
 		 
 		 uint8_t AlarmHuiFu[32];		//报警消音恢复标志-------可以优化为4个字节，每个标志占一个bit
@@ -256,9 +263,16 @@ struct JLYPARAMETERStr
     uint8_t  LastErrorCode:1;		//错误码 
 	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
 	
+    __IO uint8_t  WakeUpSource;		//StopMode下唤醒源
+	__IO uint8_t  WakeUpCount;			//StopMode下唤醒时间
+	
+	uint8_t  FirstEnterStopModeCount;//上电第一次进入低功耗时间
 	uint8_t  LcdBackLightCount;		//Lcd亮多长时间计数
+	uint8_t  ChannelNumActual;		//实际通道数量，32个通道中使能与不使能之后的数量,
+	uint8_t  ChannelNumActualOld;   //实际通道数量备份,Conf.Jly.ChannelNum不变，有通道开关
 	uint8_t  ChannelNumOld;			//未重新配置之前的通道数
 	uint8_t  SensorTypeOld[32];		//未重新配置之前的通道类型
+	uint8_t  ChannelSwitchOld[32];  //未重新配置之前的通道使能位
 	
 	uint16_t NormalRecIntervalMin;	//正常记录间隔 单位：min 
 	

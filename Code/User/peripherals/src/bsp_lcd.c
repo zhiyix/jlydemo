@@ -1593,7 +1593,6 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
 void Display_ChannelValue(uint8_t started_channel0)
 {
     uint8_t channel_cp;
-    
     if(!(display_ct%channeldisplaytime)&&Flag.IsDisplayRightNow)
     {
         
@@ -1602,23 +1601,28 @@ void Display_ChannelValue(uint8_t started_channel0)
         while(channel_cp & 0x01)
         {
 			ChannelForDisplay++;//ChannelForDisplay
-			Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
-			AlarmDeal(ChannelForDisplay);
-            
-            if(Conf.Sensor[ChannelForDisplay-1].SensorType == SENSOR_HUMI)	/*物業*/
-            {
-                /*!< Wait Until the last LCD RAM update finish */
-                while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-                clearC;  
-				showRH;
-                /*!< Requesy LCD RAM update */
-                LCD_UpdateDisplayRequest();  
-            }else{
-				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-				clearRH;
-				showC;
-				LCD_UpdateDisplayRequest();  
+
+			if(Conf.Sensor[ChannelForDisplay-1].ChannelSwitch ==0)
+			{
+				Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
+				AlarmDeal(ChannelForDisplay);
+				
+				if(Conf.Sensor[ChannelForDisplay-1].SensorType == SENSOR_HUMI)	/*物業*/
+				{
+					/*!< Wait Until the last LCD RAM update finish */
+					while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+					clearC;  
+					showRH;
+					/*!< Requesy LCD RAM update */
+					LCD_UpdateDisplayRequest();  
+				}else{
+					while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+					clearRH;
+					showC;
+					LCD_UpdateDisplayRequest();  
+				}
 			}
+
             break;
         }
         

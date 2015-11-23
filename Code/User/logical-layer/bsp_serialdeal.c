@@ -58,6 +58,183 @@ static void ReadBatVoltage(uint16_t value)
 	Conf.Basic.BatVoltage.hwd = value;//更新内存
 	Fram_Write(Conf.Basic.BatVoltage.byte,FRAM_BatVoltageAddr,2);//电池电量写入Fram中
 }
+
+/******************************************************************************
+  * @brief  Description 设置内存中记录仪参数,判断通道数量/通道类型是否修改
+						如果修改了就清除历史数据
+测试：
+	1.只改通道数
+	2.通道数不变改通道类型
+	3.改变通道数和通道类型
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+static void SetJlyParamJudgeChannelNumSensorType(void)
+{
+	uint8_t i;
+	//参数复位
+	ChannelForDisplay =0;//显示
+	//重要参数
+	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow ; //读出flash溢出标志
+	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
+	Queue.WriteFlashDataPointer = Conf.Basic.WriteFlashDataPointer;
+	Queue.FlashReadDataBeginPointer = Conf.Basic.FlashReadDataBeginPointer;
+	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
+	Queue.FlashNoReadingDataNum = Conf.Basic.FlashNoReadingDataNum;
+	//通道数
+	JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//首次上电备份通道数量
+	JlyParam.ChannelNumActual = JlyParam.ChannelNumOld;
+	JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;
+	/*------------------------------------------------------*/
+	/*清历史数据分3种情况
+	 *(1)未出厂前 通道数改变清除历史数据
+	 *(2)未出厂前 通道数不变，通道类型改变清除历史数据
+	 */
+	if(JlyParam.ChannelNumOld != Conf.Jly.ChannelNum)
+	{
+		JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//备份通道数量
+		
+		Queue.FlashSectorPointer = 0;
+		Queue.FlashNoReadingDataNum = 0;
+		Queue.FlashReadDataBeginPointer =0;
+		Queue.WriteFlashDataPointer =0;
+		Queue.ReadFlashDataPointer = 0;
+
+		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
+		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
+		WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
+
+		SetFlashOverFlow(0);//清除flash溢出标志
+	}else{
+		for(i=0; i< JlyParam.ChannelNumActual; i++)
+		{
+			if(JlyParam.SensorTypeOld[i] != Conf.Sensor[i].SensorType)
+			{
+				//通道数循环完，并且备份新的通道类型，如果有改变的则清除历史数据
+				JlyParam.SensorTypeOld[i] = Conf.Sensor[i].SensorType;
+				Flag.SensorTypeIsChange = 1;
+			}
+		}
+		//循环完所有通道再执行
+		if(Flag.SensorTypeIsChange == 1)
+		{
+			Flag.SensorTypeIsChange = 0; //标志清除
+			
+			Queue.FlashSectorPointer = 0;
+			Queue.FlashNoReadingDataNum = 0;
+			Queue.FlashReadDataBeginPointer =0;
+			Queue.WriteFlashDataPointer =0;
+			Queue.ReadFlashDataPointer = 0;
+
+			WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
+			WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
+			WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
+			WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
+			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
+
+			SetFlashOverFlow(0);//清除flash溢出标志
+		}
+	}
+	
+	/*------------------------------------------------------*/
+	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumOld*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
+	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
+	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//这里配置会修改通道数，即一帧数据会被修改需要写入fram
+	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
+	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	/*------------------------------------------------------*/
+	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
+	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
+	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
+	
+	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
+	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
+	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
+	
+}
+/******************************************************************************
+  * @brief  Description 设置内存中记录仪参数,判断通道数量、通道类型是否修改
+						如果修改了就清除历史数据
+测试：
+	1.只改通道数
+	2.通道数不变改通道类型
+	3.改变通道数和通道类型
+	4.通道数不变，关闭通道
+	5.改变通道数和通道类型，关闭通道 
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+static void SetJlyParamJudgeChannelSwitch(void)
+{
+	uint8_t i;
+	//参数复位
+	ChannelForDisplay =0;//显示
+	//重要参数
+	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow ; //读出flash溢出标志
+	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
+	Queue.WriteFlashDataPointer = Conf.Basic.WriteFlashDataPointer;
+	Queue.FlashReadDataBeginPointer = Conf.Basic.FlashReadDataBeginPointer;
+	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
+	Queue.FlashNoReadingDataNum = Conf.Basic.FlashNoReadingDataNum;
+	//判断实际的通道数
+	for(i=0;i < Conf.Jly.ChannelNum;i++)//所有通道循环一遍
+	{
+		if(JlyParam.ChannelSwitchOld[i] != Conf.Sensor[i].ChannelSwitch)//通道使能位被修改
+		{
+			if(Conf.Sensor[i].ChannelSwitch == 0x01)
+			{
+				JlyParam.ChannelNumActual = JlyParam.ChannelNumActual - 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
+				if(JlyParam.ChannelNumActual < 0)
+				{
+					JlyParam.ChannelNumActual =0;//通道数保护
+				}
+			}else{
+				JlyParam.ChannelNumActual = JlyParam.ChannelNumActual + 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
+				if(JlyParam.ChannelNumActual > Conf.Jly.ChannelNum)
+				{
+					JlyParam.ChannelNumActual =Conf.Jly.ChannelNum;//通道数保护
+				}
+			}
+			JlyParam.ChannelSwitchOld[i] = Conf.Sensor[i].ChannelSwitch;//通道使能位修改过，备份
+		}
+	}
+	
+	/*------------------------------------------------------*/
+	/*清历史数据分3种情况
+	 *在客户手里Conf.Jly.ChannelNum不变，某个通道被关闭询问是否下载历史数据否则清除历史数据
+	 */
+	if(JlyParam.ChannelNumActualOld != JlyParam.ChannelNumActual)
+	{
+		JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;//Conf.Jly.ChannelNum不变，有通道被关闭
+		
+		Queue.FlashSectorPointer = 0;
+		Queue.FlashNoReadingDataNum = 0;
+		Queue.FlashReadDataBeginPointer =0;
+		Queue.WriteFlashDataPointer =0;
+		Queue.ReadFlashDataPointer = 0;
+
+		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
+		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
+		WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
+
+		SetFlashOverFlow(0);//清除flash溢出标志
+	}
+	
+	/*------------------------------------------------------*/
+	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumActual*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
+	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
+	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//这里配置会修改通道数，即一帧数据会被修改需要写入fram
+	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
+	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	
+}
+
 /******************************************************************************
   * @brief  Description 写配置数据到Fram中，同时更新内存中的数据
   * @param  pucBuffer   要写入数据指针
@@ -76,6 +253,7 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		/* 基本配置数据地址表 */
 		offset = usAddress - VirtBasicConfAddr;
 		/*写配置表数据到Fram，每个地址有两个字节数据，offset * 2*/
+		size = 8*2;//基本配置表只有前8个字节需要配置到fram中
 		Fram_Write(pucBuffer,ConfMap_Address[0][1] + offset * 2,size);
 		WriteSetFramFlag();//设置过fram标志
 		/*更新配置表数据 */
@@ -86,10 +264,9 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = usAddress - VirtJlyConfAddr;
 		Fram_Write(pucBuffer, ConfMap_Address[1][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_JlyConfAddr],ConfMap_Address[1][1] + offset * 2,size);
-		/*通道数量、通道类型变化时做相应处理*/
+		/*通道数量/通道类型 变化时做相应处理*/
 		SetJlyParamJudgeChannelNumSensorType();
-		JudgingChannelNumberDisplay(Conf.Jly.ChannelNum);//修改通道数量
-		//if(Conf.)
+		JudgingChannelNumberDisplay(JlyParam.ChannelNumOld);
 		
 	}else if (usAddress < VirtAlarmConfAddr)
 	{
@@ -115,6 +292,14 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = offsetnum * FRAM_SensorChanelOffset;						/* Fram中的偏移量 */
 		Fram_Write(pucBuffer, ConfMap_Address[4][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_SensorChanelConfAddr + offset * 2],ConfMap_Address[4][1] + offset * 2,size);
+		/*通道类型变化时和通道使能(关闭时)做相应处理*/
+		SetJlyParamJudgeChannelSwitch();
+		if(JlyParam.ChannelNumActual >0)
+		{
+			JudgingChannelNumberDisplay(JlyParam.ChannelNumOld);
+		}else{
+			JudgingChannelNumberDisplay(JlyParam.ChannelNumActual);
+		}
 		
 	} else if (usAddress < VirtMax)
 	{
@@ -196,109 +381,111 @@ usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
   * @param  usNRegs		读取数据的字节数
   * @retval 无
   *****************************************************************************/
-bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
-{
-	//usAddress *= 2;
-	usNRegs *= 2;
-	
-	if((usAddress % Queue.HIS_ONE_BYTES ==0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
-	{
-		Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
-		if(usAddress < Queue.FlashReadDataBeginPointer)//小于最小
-		{
-			usAddress = Queue.FlashReadDataBeginPointer;
-		}else{
-			if(usAddress > FLASH_RecMaxSize)//超过最大存储地址
-			{
-				return false;
-			}else{
-				if((Queue.FlashReadDataBeginPointer > (FLASH_RecMaxSize - FLASH_SectorPerSize))&&((usAddress + usNRegs) > FLASH_RecMaxSize))
-				{
-					usNRegs = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES*Queue.HIS_ONE_BYTES - usAddress;
-				}
-			}
-		}
-		
-		SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);
-		
-		//测试
-		printf("Flag.RecordFlashOverFlow %d\r\n",Queue.FlashRecOverFlow);
-		printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
-		printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
-		printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
-		printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
-		printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
-		rtc_deel();
-		
-		return true;
-	}else{
-		return false;
-	}
-}
-
-///******************************************************************************
-//  * @brief  Description 读取历史数据
-//usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
-//						(1)读数据测试ok
-//						(2)读最新数据时测试ok，
-//						(3)当读取数据大于Queue.FlashNoReadingDataNum,反复测试
-//  * @param  pucBuffer   存放读出数据的指针
-//  * @param  usAddress	读出数据的地址,在本函数中没有实际意义
-//  * @param  usNRegs   读取数据的字节数,为一帧数据的整数倍
-//  * @retval 无
-//  *****************************************************************************/
 //bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 //{
-//	uint32_t NoReadingDataNumTemp;
 //	//usAddress *= 2;
 //	usNRegs *= 2;
 //	
-//	if(usNRegs % Queue.HIS_ONE_BYTES ==0)
+//	if((usAddress % Queue.HIS_ONE_BYTES ==0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
 //	{
-//		Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
-//		Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
-//		
-//		NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
-//		if(NoReadingDataNumTemp > Queue.FlashNoReadingDataNum)//要读的数据包数大于flash中未读数据包数
+//		Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
+//		if(usAddress < Queue.FlashReadDataBeginPointer)//小于最小
 //		{
-//			usNRegs = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;
-//			NoReadingDataNumTemp = Queue.FlashNoReadingDataNum;
-//		}
-//		if(Queue.FlashNoReadingDataNum >=2) //读最新的两条数据
-//		{
-//			SPI_FLASH_BufferRead(pucBuffer,Queue.ReadFlashDataPointer,usNRegs);
-//			Queue.ReadFlashDataPointer += usNRegs;
-//			if(Queue.ReadFlashDataPointer >= FLASH_RecMaxSize)
+//			usAddress = Queue.FlashReadDataBeginPointer;
+//		}else{
+//			if(usAddress > FLASH_RecMaxSize)//超过最大存储地址
 //			{
-//				Queue.ReadFlashDataPointer = 0;
+//				return false;
+//			}else{
+//				if((Queue.FlashReadDataBeginPointer > (FLASH_RecMaxSize - FLASH_SectorPerSize))&&((usAddress + usNRegs) > FLASH_RecMaxSize))
+//				{
+//					usNRegs = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES*Queue.HIS_ONE_BYTES - usAddress;
+//				}
 //			}
-//			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);
-//			
-//			
-//			Queue.FlashNoReadingDataNum -= NoReadingDataNumTemp; //未读条数减
-//			if(Queue.FlashNoReadingDataNum <= 0)
-//			{
-//				Queue.FlashNoReadingDataNum = 0;
-//			}
-//			WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);
-//			
-//			//测试
-//			printf("Flag.RecordFlashOverFlow %d\r\n",Queue.FlashRecOverFlow);
-//			printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
-//			printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
-//			printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
-//			printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
-//			printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
 //		}
 //		
+//		SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);
+//		
+//		//测试
+//		printf("Flag.RecordFlashOverFlow %d\r\n",Queue.FlashRecOverFlow);
+//		printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
+//		printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
+//		printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
+//		printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
+//		printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
 //		rtc_deel();
 //		
 //		return true;
 //	}else{
-//		
 //		return false;
 //	}
 //}
+
+/******************************************************************************
+  * @brief  Description 读取实时数据
+usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
+						(1)读数据测试ok
+						(2)读最新数据时测试ok，
+						(3)当读取数据大于Queue.FlashNoReadingDataNum,反复测试
+  * @param  pucBuffer   存放读出数据的指针
+  * @param  usAddress	读出数据的地址,在本函数中没有实际意义
+  * @param  usNRegs   读取数据的字节数,为一帧数据的整数倍
+  * @retval 无
+  *****************************************************************************/
+bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+{
+	uint32_t NoReadingDataNumTemp;
+	//usAddress *= 2;
+	usNRegs *= 2;
+	
+	if(usNRegs % Queue.HIS_ONE_BYTES ==0)
+	{
+		Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
+		Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
+		
+		NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
+		if(NoReadingDataNumTemp > Queue.FlashNoReadingDataNum)//要读的数据包数大于flash中未读数据包数
+		{
+			usNRegs = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;
+			NoReadingDataNumTemp = Queue.FlashNoReadingDataNum;
+		}
+		if(Queue.FlashNoReadingDataNum >=2) //读最新的两条数据
+		{
+			SPI_FLASH_BufferRead(pucBuffer,Queue.ReadFlashDataPointer,usNRegs);
+			Queue.ReadFlashDataPointer += usNRegs;
+			if(Queue.ReadFlashDataPointer >= FLASH_RecMaxSize)
+			{
+				Queue.ReadFlashDataPointer = 0;
+			}
+			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);
+			
+			
+			Queue.FlashNoReadingDataNum -= NoReadingDataNumTemp; //未读条数减
+			if(Queue.FlashNoReadingDataNum <= 0)
+			{
+				Queue.FlashNoReadingDataNum = 0;
+			}
+			WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);
+			
+			//测试
+			/*
+			printf("Flag.RecordFlashOverFlow %d\r\n",Queue.FlashRecOverFlow);
+			printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
+			printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
+			printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
+			printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
+			printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
+			*/
+		}
+		
+		rtc_deel();
+		
+		return true;
+	}else{
+		
+		return false;
+	}
+}
 
 /******************************************************************************
   * @brief  Description 

@@ -41,27 +41,30 @@ static void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpsch
     
     for(j=0;j<channelnum;j++)
     {
-        if(1==FlagSeniorErr[j])
-        {
-            DataBuf[i++]=0X01;//DataBuf[i++]=0XFF;
-            DataBuf[i++]=0X80;//DataBuf[i++]=0XFF;
-        }
-        else
-        {
-            
-            if((ChannelDataFloat[j]>200)|(ChannelDataFloat[j]<-300))
-            {
-                DataBuf[i++]=0X01;
-                DataBuf[i++]=0X80;
-            }
-            else
-            {
-                UtTmp=ValueFtToU16(ChannelDataFloat[j]);
-                DataBuf[i++]=0XFF&(UtTmp);	//数据低位
-                DataBuf[i++]=0XFF&((UtTmp)>>8); //数据高位
-            }
-            
-        }
+		if(Conf.Sensor[j].ChannelSwitch ==0)//通道开 保存数据
+		{
+			if(1==FlagSeniorErr[j])
+			{
+				DataBuf[i++]=0X01;//DataBuf[i++]=0XFF;
+				DataBuf[i++]=0X80;//DataBuf[i++]=0XFF;
+			}
+			else
+			{
+				
+				if((ChannelDataFloat[j]>200)|(ChannelDataFloat[j]<-300))
+				{
+					DataBuf[i++]=0X01;
+					DataBuf[i++]=0X80;
+				}
+				else
+				{
+					UtTmp=ValueFtToU16(ChannelDataFloat[j]);
+					DataBuf[i++]=0XFF&(UtTmp);	//数据低位
+					DataBuf[i++]=0XFF&((UtTmp)>>8); //数据高位
+				}
+				
+			}
+		}
     }
     //---------------
 //    if(Gpschoose==1)
@@ -329,58 +332,165 @@ void ReadFlashHisData(uint32_t RecPointerBeginAddr,uint32_t RecPointerEndAddr)
     {
         SPI_FLASH_BufferRead(BufTemp,(FLASH_RecFirstAddr+down_hisdata_count),Queue.HIS_ONE_BYTES);
         down_hisdata_count += Queue.HIS_ONE_BYTES;
-		
-		if(Conf.Jly.ChannelNum == 2)
-		{
-			i=0;
-			Buf[i++]=BufTemp[4]; 
-			Buf[i++]=BufTemp[5];
-			Buf[i++]=BufTemp[6];
-			Buf[i++]=BufTemp[7];
-			Buf[i++]=BufTemp[8];
-			Buf[i++]=BufTemp[9];
-			
-			//Buf[i++]=BufTemp[0];
-			//Buf[i++]=BufTemp[1];
-			Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
-			Buf[i++]=Temp/100;
-			Buf[i++]=(Temp%100)/10;
-			Buf[i++]=Temp%10;
-			
-			//Buf[i++]=BufTemp[2];
-			//Buf[i++]=BufTemp[3];
-			Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
-			Buf[i++]=Temp/100;
-			Buf[i++]=(Temp%100)/10;
-			Buf[i++]=Temp%10;
-			
-			printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
-			printf("%d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11]);
-		}else if(Conf.Jly.ChannelNum == 8){
-			i=0;
-			Buf[i++]=BufTemp[16];
-			Buf[i++]=BufTemp[17];
-			Buf[i++]=BufTemp[18]; 
-			Buf[i++]=BufTemp[19];
-			Buf[i++]=BufTemp[20];
-			Buf[i++]=BufTemp[21];
-			
-			//Buf[i++]=BufTemp[0];
-			//Buf[i++]=BufTemp[1];
-			Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
-			Buf[i++]=Temp/100;
-			Buf[i++]=(Temp%100)/10;
-			Buf[i++]=Temp%10;
-			
-			//Buf[i++]=BufTemp[2];
-			//Buf[i++]=BufTemp[3];
-			Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
-			Buf[i++]=Temp/100;
-			Buf[i++]=(Temp%100)/10;
-			Buf[i++]=Temp%10;
-			
-			printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
-			printf("%d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+		if(JlyParam.ChannelNumOld == JlyParam.ChannelNumActual)
+		{	
+			if(JlyParam.ChannelNumOld == 1)
+			{
+				i=0;
+				Buf[i++]=BufTemp[2]; 
+				Buf[i++]=BufTemp[3];
+				Buf[i++]=BufTemp[4];
+				Buf[i++]=BufTemp[5];
+				Buf[i++]=BufTemp[6];
+				Buf[i++]=BufTemp[7];
+				
+				//Buf[i++]=BufTemp[0];
+				//Buf[i++]=BufTemp[1];
+				Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				//Buf[i++]=BufTemp[2];
+				//Buf[i++]=BufTemp[3];
+	//			Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+	//			Buf[i++]=Temp/100;
+	//			Buf[i++]=(Temp%100)/10;
+	//			Buf[i++]=Temp%10;
+				
+				printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+				printf("%d%d.%d \r\n",Buf[6],Buf[7],Buf[8]);
+			}else if(JlyParam.ChannelNumOld == 2)
+			{
+				i=0;
+				Buf[i++]=BufTemp[4]; 
+				Buf[i++]=BufTemp[5];
+				Buf[i++]=BufTemp[6];
+				Buf[i++]=BufTemp[7];
+				Buf[i++]=BufTemp[8];
+				Buf[i++]=BufTemp[9];
+				
+				//Buf[i++]=BufTemp[0];
+				//Buf[i++]=BufTemp[1];
+				Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				//Buf[i++]=BufTemp[2];
+				//Buf[i++]=BufTemp[3];
+				Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+				printf("%d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11]);
+			}else if(JlyParam.ChannelNumOld == 8){
+				i=0;
+				Buf[i++]=BufTemp[16];
+				Buf[i++]=BufTemp[17];
+				Buf[i++]=BufTemp[18]; 
+				Buf[i++]=BufTemp[19];
+				Buf[i++]=BufTemp[20];
+				Buf[i++]=BufTemp[21];
+				
+				//Buf[i++]=BufTemp[0];
+				//Buf[i++]=BufTemp[1];
+				Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				//Buf[i++]=BufTemp[2];
+				//Buf[i++]=BufTemp[3];
+				Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+				printf("%d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+			}
+		}else{
+			if(JlyParam.ChannelNumActual == 1)
+			{
+				i=0;
+				Buf[i++]=BufTemp[2]; 
+				Buf[i++]=BufTemp[3];
+				Buf[i++]=BufTemp[4];
+				Buf[i++]=BufTemp[5];
+				Buf[i++]=BufTemp[6];
+				Buf[i++]=BufTemp[7];
+				
+				//Buf[i++]=BufTemp[0];
+				//Buf[i++]=BufTemp[1];
+				Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				//Buf[i++]=BufTemp[2];
+				//Buf[i++]=BufTemp[3];
+	//			Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+	//			Buf[i++]=Temp/100;
+	//			Buf[i++]=(Temp%100)/10;
+	//			Buf[i++]=Temp%10;
+				
+				printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+				printf("%d%d.%d \r\n",Buf[6],Buf[7],Buf[8]);
+			}else if(JlyParam.ChannelNumActual == 2)
+			{
+				i=0;
+				Buf[i++]=BufTemp[4]; 
+				Buf[i++]=BufTemp[5];
+				Buf[i++]=BufTemp[6];
+				Buf[i++]=BufTemp[7];
+				Buf[i++]=BufTemp[8];
+				Buf[i++]=BufTemp[9];
+				
+				//Buf[i++]=BufTemp[0];
+				//Buf[i++]=BufTemp[1];
+				Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				//Buf[i++]=BufTemp[2];
+				//Buf[i++]=BufTemp[3];
+				Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+				printf("%d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11]);
+			}else if(JlyParam.ChannelNumActual == 8){
+				i=0;
+				Buf[i++]=BufTemp[16];
+				Buf[i++]=BufTemp[17];
+				Buf[i++]=BufTemp[18]; 
+				Buf[i++]=BufTemp[19];
+				Buf[i++]=BufTemp[20];
+				Buf[i++]=BufTemp[21];
+				
+				//Buf[i++]=BufTemp[0];
+				//Buf[i++]=BufTemp[1];
+				Temp=U16ToValue10(BufTemp[1],BufTemp[0]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				//Buf[i++]=BufTemp[2];
+				//Buf[i++]=BufTemp[3];
+				Temp=U16ToValue10(BufTemp[3],BufTemp[2]);
+				Buf[i++]=Temp/100;
+				Buf[i++]=(Temp%100)/10;
+				Buf[i++]=Temp%10;
+				
+				printf("%02x-%02x-%02x %02x:%02x:%02x ",Buf[1],Buf[0],Buf[3],Buf[2],Buf[5],Buf[4]);
+				printf("%d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d %d%d.%d\r\n",Buf[6],Buf[7],Buf[8],Buf[9],Buf[10],Buf[11],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+			}
 		}
         
     }
@@ -402,21 +512,22 @@ void DownFlash_HisData(void)
     if(RecorderPoint_temp==0)
     {
         Flag.TouchKey1DuanAn = 0;
-    }
-    if(Queue.FlashRecOverFlow ==0)
-    {
-        ReadFlashHisData(0,RecorderPoint_temp);
-        Flag.TouchKey1DuanAn = 0;
-    }
-    if(Queue.FlashRecOverFlow >=1)
-    {
-		if(Queue.WriteFlashDataPointer < (FLASH_RecMaxSize - FLASH_SectorPerSize - Queue.HIS_ONE_BYTES))//如果正在写数据到最后一个扇区，如数据起始地址为0
+    }else{
+		if(Queue.FlashRecOverFlow ==0)
 		{
-			ReadFlashHisData(Queue.FlashReadDataBeginPointer,FLASH_RecMaxSize); 
+			ReadFlashHisData(0,RecorderPoint_temp);
+			Flag.TouchKey1DuanAn = 0;
 		}
-        ReadFlashHisData(0,RecorderPoint_temp);
-        Flag.TouchKey1DuanAn = 0;            
-    }
+		if(Queue.FlashRecOverFlow >=1)
+		{
+			if(Queue.WriteFlashDataPointer < (FLASH_RecMaxSize - FLASH_SectorPerSize - Queue.HIS_ONE_BYTES))//如果正在写数据到最后一个扇区，如数据起始地址为0
+			{
+				ReadFlashHisData(Queue.FlashReadDataBeginPointer,FLASH_RecMaxSize); 
+			}
+			ReadFlashHisData(0,RecorderPoint_temp);
+			Flag.TouchKey1DuanAn = 0;            
+		}
+	}
 }
 
 /******************************************************************************
@@ -424,7 +535,7 @@ void DownFlash_HisData(void)
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
-static void SaveDataOnTimeDeal(void)
+void SaveDataOnTimeDeal(void)
 {
     
 	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
@@ -438,7 +549,7 @@ static void SaveDataOnTimeDeal(void)
 		{
 			
 			read_time();
-			ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
+			ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
 //			SaveHisDataToFram();
 			SaveHisDataToFlash();
 		}
@@ -461,7 +572,7 @@ static void SaveDataOnTimeDeal(void)
 				Rtc.TCPS=Rtc.TMPS;
 				
 				read_time();
-				ChannelDataDeal(Conf.Jly.ChannelNum,Clock_choose,Gps_choose);
+				ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
 //				SaveHisDataToFram();
 				SaveHisDataToFlash();
 			}
@@ -474,11 +585,11 @@ static void SaveDataOnTimeDeal(void)
   * @param    		
   * @retval 		
   *****************************************************************************/
-void StorageHistoryData(void)
-{
-	if(Conf.Jly.WorkStatueIsStop >= 1)
-	{
-		SaveDataOnTimeDeal();
-	}
-}
+//void StorageHistoryData(void)
+//{
+//	if(Conf.Jly.WorkStatueIsStop >= 1)
+//	{
+//		SaveDataOnTimeDeal();
+//	}
+//}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

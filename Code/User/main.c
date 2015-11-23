@@ -61,8 +61,8 @@ int main(void)
     SysInit();
 	
 	printf("\r\n this is a 32bits  demo \r\n");
-//	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
-//	printf("\r\n Conf.Sensor[0].SensorAlarm_High.wd:%d \r\n",Conf.Sensor[0].SensorAlarm_High.wd);
+	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
+	printf("\r\n Conf.Sensor[0].SensorType:%d \r\n",Conf.Sensor[0].SensorType);
 //	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
   /* Add your application code here
      */
@@ -89,38 +89,21 @@ int main(void)
 	  
 	  
 //µÍ¹¦ºÄ²âÊÔ
-	 if(ReadRX8025Control2() & RX8025_Control2CTFG)
-	 {
-		RTC8025_Reset(true);
-	 }
-	if(Flag.FirstNotEnterStopMode ==1)
-	{
-		Flag.FirstNotEnterStopMode =0;
-	}else{
-	  read_time();
-	  if(Rtc.Second >= 0x30)
-	  {
-		  
-			/* Check and Clear the Wakeup flag */
-			if (PWR_GetFlagStatus(PWR_FLAG_WU) != RESET)
-			{
-				PWR_ClearFlag(PWR_FLAG_WU);
-			}
-			{
-				
-				printf("\r\n ... \r\n");
-				printf("\r\n Enter StopMode \r\n");
-				OffPowerSupply();
-				//Display_LOW();
-				//¹Ø±ÕµÎ´ð¶¨Ê±Æ÷
-				SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-				PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
-			}
-			SysClock_ReConfig();
-			//rtc_deel();
-			printf("\r\n Exit StopMode \r\n");
-	  }
-	}
+//	if(Flag.FirstEnterStopMode ==1)
+//	{
+//		if(JlyParam.WakeUpSource == 2)
+//		{
+//			if(Flag.WakeUpStopModeOnTime == 1)
+//			{
+//				JlyParam.WakeUpSource =0;
+//				JlyParam.WakeUpCount = 0; //Çå0
+//				Flag.WakeUpStopModeOnTime = 0;
+//				EnterStopModePower();
+//			}
+//		}else{
+//			EnterStopModePower();
+//		}
+//	}
 	  
 //	  LED1(ON);LED1(OFF);//Delay_ms(500);
 //	  LED2(ON);LED2(OFF);//Delay_ms(500);

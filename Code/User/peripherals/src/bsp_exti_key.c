@@ -108,6 +108,11 @@ void KeyDeal(void)
 		printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
 		printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
 		printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
+		
+		printf("Conf.Jly.ChannelNum %d\r\n",Conf.Jly.ChannelNum);
+		printf("JlyParam.ChannelNumOld %d\r\n",JlyParam.ChannelNumOld);
+		printf("JlyParam.ChannelNumActual %d\r\n",JlyParam.ChannelNumActual);
+		printf("JlyParam.ChannelNumActualOld %d\r\n",JlyParam.ChannelNumActualOld);
 		DownFlash_HisData();
 		rtc_deel();
 	}
