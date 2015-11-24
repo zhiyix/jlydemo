@@ -332,7 +332,7 @@ void ReadFlashHisData(uint32_t RecPointerBeginAddr,uint32_t RecPointerEndAddr)
     {
         SPI_FLASH_BufferRead(BufTemp,(FLASH_RecFirstAddr+down_hisdata_count),Queue.HIS_ONE_BYTES);
         down_hisdata_count += Queue.HIS_ONE_BYTES;
-		if(JlyParam.ChannelNumOld == JlyParam.ChannelNumActual)
+		if(Flag.ChannelSwitchIsOn ==0)
 		{	
 			if(JlyParam.ChannelNumOld == 1)
 			{

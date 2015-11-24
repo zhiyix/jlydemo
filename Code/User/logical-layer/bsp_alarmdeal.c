@@ -142,35 +142,78 @@ void AlarmDeal(uint8_t channel)
 {
 	if(Conf.Alarm.AlarmSwitch ==1)	// 报警总开关 
 	{
-		if((ChannelDataFloat[channel-1] >= Conf.Sensor[channel-1].SensorAlarm_High.wd)||(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.wd))
+		if(ChannelDataFloat[channel-1] >= Conf.Sensor[channel-1].SensorAlarm_High.wd)//上限超标
         {
+			if(Flag.AlarmXiaoYin == 1)//按下消音键
+			{
+				Flag.AlarmHuiFu[channel-1] = 1;//报警关闭
+				
+				JlyParam.ContinueExcessiveUpperLimitCount = 0;//上限超标计数 清0
+                CloseAlarm();
+			}else if(Flag.AlarmHuiFu[channel-1] ==0)
+			{
+				JlyParam.ContinueExcessiveUpperLimitCount++;
+				if(JlyParam.ContinueExcessiveUpperLimitCount >= JlyParam.ContinueExcessiveTimes)//连续超上限
+				{
+					JlyParam.ContinueExcessiveUpperLimitCount = 0;//上限超标计数 清0
+					if(Flag.AlarmTimeDelayIsOut == 1)
+					{
+						Flag.AlarmTimeDelayIsOut =0;
+						if(Conf.Alarm.AlarmTime_Mode & 0x01)	// 上班时间 
+						{
+							read_time();
+							if((Rtc.Minute < Conf.Alarm.OnWork_Min && Rtc.Hour < Conf.Alarm.OnWork_Hour)||(Rtc.Minute > Conf.Alarm.OffWork_Min && Rtc.Hour > Conf.Alarm.OffWork_Hour))
+							{
+								AlarmAction(channel);
+							}else{
+								CloseAlarm();
+							}
+						}else if(Conf.Alarm.AlarmTime_Mode & 0x02)	// 下班时间 
+						{
+							AlarmAction(channel);
+						}
+
+					}
+				}
+			} 
+        }else if(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.wd){//下限超标
 			if(Flag.AlarmXiaoYin == 1)
 			{
 				Flag.AlarmHuiFu[channel-1] = 1;//报警关闭
 				
+				JlyParam.ContinueExcessiveLowerLimitCount =0;//下限超标计数 清0
                 CloseAlarm();
 			}else if(Flag.AlarmHuiFu[channel-1] ==0)
 			{
-				if(Conf.Alarm.AlarmTime_Mode & 0x01)	// 上班时间 
+				JlyParam.ContinueExcessiveLowerLimitCount++;
+				if(JlyParam.ContinueExcessiveLowerLimitCount >= JlyParam.ContinueExcessiveTimes)//连续超下限
 				{
-					read_time();
-					if((Rtc.Minute < Conf.Alarm.OnWork_Min && Rtc.Hour < Conf.Alarm.OnWork_Hour)||(Rtc.Minute > Conf.Alarm.OffWork_Min && Rtc.Hour > Conf.Alarm.OffWork_Hour))
+					JlyParam.ContinueExcessiveLowerLimitCount =0;//下限超标计数 清0
+					if(Flag.AlarmTimeDelayIsOut == 1)
 					{
-						AlarmAction(channel);
-					}else{
-						CloseAlarm();
+						Flag.AlarmTimeDelayIsOut =0;
+						if(Conf.Alarm.AlarmTime_Mode & 0x01)	// 上班时间 
+						{
+							read_time();
+							if((Rtc.Minute < Conf.Alarm.OnWork_Min && Rtc.Hour < Conf.Alarm.OnWork_Hour)||(Rtc.Minute > Conf.Alarm.OffWork_Min && Rtc.Hour > Conf.Alarm.OffWork_Hour))
+							{
+								AlarmAction(channel);
+							}else{
+								CloseAlarm();
+							}
+						}else if(Conf.Alarm.AlarmTime_Mode & 0x02)	// 下班时间 
+						{
+							AlarmAction(channel);
+						}
 					}
-				}else if(Conf.Alarm.AlarmTime_Mode & 0x02)	// 下班时间 
-				{
-					AlarmAction(channel);
 				}
-			} 
-        }
-        else
-        {
+			}
+		}else{
 			Flag.AlarmXiaoYin = 0;
             Flag.AlarmHuiFu[channel-1] = 0;//消音恢复
 			
+			JlyParam.ContinueExcessiveUpperLimitCount = 0;//上限超标计数 清0
+			JlyParam.ContinueExcessiveLowerLimitCount =0;//下限超标计数 清0
             CloseAlarm();
         }        
 	}

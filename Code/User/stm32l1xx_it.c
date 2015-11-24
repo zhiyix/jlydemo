@@ -237,7 +237,14 @@ void TIM2_IRQHandler(void)
     if(TIM_GetITStatus(TIM2,TIM_IT_Update) != RESET)
     {
 //        time++;
-        Flag.Sec = 1;
+        Flag.Sec = 1;//1s定时时间到
+		
+		JlyParam.AlarmTimeDelayCount ++;
+		if(JlyParam.AlarmTimeDelayCount >= JlyParam.SoundLightAlarmTimeDelay)
+		{
+			JlyParam.AlarmTimeDelayCount = 0;
+			Flag.AlarmTimeDelayIsOut = 1;//声光报警延时时间到
+		}
 		//控制进入低功耗
 		if(JlyParam.WakeUpSource == 2)
 		{

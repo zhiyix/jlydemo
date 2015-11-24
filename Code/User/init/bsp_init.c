@@ -343,7 +343,9 @@ static void General_GPIO_Config(void)
 static void SetJlyParamData(void)
 {
 	uint8_t i;
-	//重要参数
+	//按键使能 重要参数
+	Flag.KeyEnableOrDisable = Conf.Jly.KeyEnableOrDisable;
+	//数据存储环形队列 重要参数
 	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow ; //读出flash溢出标志
 	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
 	Queue.WriteFlashDataPointer = Conf.Basic.WriteFlashDataPointer;
@@ -352,8 +354,7 @@ static void SetJlyParamData(void)
 	Queue.FlashNoReadingDataNum = Conf.Basic.FlashNoReadingDataNum;
 	//通道数
 	JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//首次上电备份通道数量
-	JlyParam.ChannelNumActual = JlyParam.ChannelNumOld;
-	JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;
+	JlyParam.ChannelNumActual = JlyParam.ChannelNumOld;	
 	/*------------------------------------------------------*/
 	for(i=0; i<Conf.Jly.ChannelNum; i++)
 	{
@@ -366,13 +367,15 @@ static void SetJlyParamData(void)
 	{
 		if(Conf.Sensor[i].ChannelSwitch == 0x01)
 		{
-			JlyParam.ChannelNumActual = JlyParam.ChannelNumOld - 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
+			Flag.ChannelSwitchIsOn =1;//---------这个标志作为测试用---------
+			JlyParam.ChannelNumActual = JlyParam.ChannelNumActual - 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
 			if(JlyParam.ChannelNumActual <=0)
 			{
 				JlyParam.ChannelNumActual =0;//通道数保护
 			}
 		}
 	}
+	JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;//放在当前位置保持和没有复位前的一致
 	/*------------------------------------------------------*/
 	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumActual*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
 	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
@@ -391,6 +394,10 @@ static void SetJlyParamData(void)
 	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
 	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
 	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
+	
+	//报警参数设置
+	JlyParam.ContinueExcessiveTimes = 3; //连续超标次数 0-10可设置 默认3
+	JlyParam.SoundLightAlarmTimeDelay =30;  //声光报警延时 单位s 1s到18小时可设置 默认30s
 	
 }
 /******************************************************************************
@@ -539,7 +546,10 @@ void SysInit(void)
 		JudgingChannelNumberDisplay(JlyParam.ChannelNumActual);
 	}
 	
-    
+	
+    TIM2_Configuration();	//开启定时器
+	
+	//WakeUp_GPIO_Config();
 	
     Flag.MucReset = 1;
 	Flag.FirstNotEnterStopMode = 1;
@@ -566,10 +576,7 @@ void PeripheralInit(void)
 	//GPIO_ReConfig();//影响ADC正常工作,烧写程序时必须reset复位
 
 	SysTick_Init();
-
-	TIM2_Configuration();	//开启定时器
 	
-	//WakeUp_GPIO_Config();
 	KEY_GPIO_Config();
 	EXTI15_10_Config();
 

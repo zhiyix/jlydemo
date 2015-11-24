@@ -126,7 +126,11 @@ struct JlyConfDataStr
 	uint8_t FixedStop_Year;
 	uint8_t FixedStop_Cen; /*!< 14个byte */
 	
-	uint16_t :16;	/*!< Reserv */
+	uint8_t KeyEnableOrDisable;	/*按键是否选通
+								  0x00:按键关闭(不能操作)
+								  0x01:按键打开(可以操作)*/
+	uint8_t :8;	/*!< Reserv */
+	
 	/*!< 正常记录间隔 dd-hh-mm[BCD]:ms */
 	uint16_t NormalRecInterval;
 	uint8_t  NormalRec_Sec;
@@ -181,7 +185,7 @@ struct AlarmConfDataStr
 								 Bit0：声音开关
 								 Bit1：显示开关
 								 Bit2：短信开关 */
-	uint8_t  :8;			/*!< Reserv */	
+	uint8_t  ContinueExcessiveTimes;//连续超标次数 0-10可设置
 	uint8_t  AlarmTime_Mode;	/*!< 报警时间模式
 									 Bit0：上班时间
 									 Bit1：下班时间 */

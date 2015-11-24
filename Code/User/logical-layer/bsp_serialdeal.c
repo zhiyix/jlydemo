@@ -60,8 +60,11 @@ static void ReadBatVoltage(uint16_t value)
 }
 
 /******************************************************************************
-  * @brief  Description 设置内存中记录仪参数,判断通道数量/通道类型是否修改
-						如果修改了就清除历史数据
+  * @brief  Description 修改记录仪配置数据地址表 2 ,设置内存中记录仪参数,判断通
+道数量是否修改,如果修改了就清除历史数据
+
+通过记录仪配置数据表2修改通道数,记录间隔/采集间隔
+修改通道数的权限只有出厂前
 测试：
 	1.只改通道数
 	2.通道数不变改通道类型
@@ -69,30 +72,24 @@ static void ReadBatVoltage(uint16_t value)
   * @param  None
   * @retval None
   *****************************************************************************/
-static void SetJlyParamJudgeChannelNumSensorType(void)
+static void JlyConfDataUpData(void)
 {
-	uint8_t i;
 	//参数复位
 	ChannelForDisplay =0;//显示
-	//重要参数
-	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow ; //读出flash溢出标志
-	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
-	Queue.WriteFlashDataPointer = Conf.Basic.WriteFlashDataPointer;
-	Queue.FlashReadDataBeginPointer = Conf.Basic.FlashReadDataBeginPointer;
-	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
-	Queue.FlashNoReadingDataNum = Conf.Basic.FlashNoReadingDataNum;
-	//通道数
-	JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//首次上电备份通道数量
-	JlyParam.ChannelNumActual = JlyParam.ChannelNumOld;
+	
+	//按键使能 重要参数,在这里客户通过app进行设置
+	Flag.KeyEnableOrDisable = Conf.Jly.KeyEnableOrDisable;
+	
+	//通道数,上位机软件配置修改通道数量
+	JlyParam.ChannelNumActual = Conf.Jly.ChannelNum;//这里会修改通道数量
 	JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;
 	/*------------------------------------------------------*/
-	/*清历史数据分3种情况
+	/*清历史数据
 	 *(1)未出厂前 通道数改变清除历史数据
-	 *(2)未出厂前 通道数不变，通道类型改变清除历史数据
 	 */
 	if(JlyParam.ChannelNumOld != Conf.Jly.ChannelNum)
 	{
-		JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//备份通道数量
+		JlyParam.ChannelNumOld = Conf.Jly.ChannelNum;	//通道数量修改了重新备份通道数量
 		
 		Queue.FlashSectorPointer = 0;
 		Queue.FlashNoReadingDataNum = 0;
@@ -107,7 +104,103 @@ static void SetJlyParamJudgeChannelNumSensorType(void)
 		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
 
 		SetFlashOverFlow(0);//清除flash溢出标志
-	}else{
+	}
+	/*------------------------------------------------------*/
+	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumOld*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
+	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
+	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//这里配置会修改通道数，即一帧数据会被修改需要写入fram
+	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
+	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	/*------------------------------------------------------*/
+	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
+	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
+	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
+	
+	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
+	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
+	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s	
+}
+
+/******************************************************************************
+  * @brief  Description  报警配置数据表 数据更新
+  * @param  无
+  * @retval 无
+  *****************************************************************************/
+static void AlarmConfDataUpdate(void)
+{
+	JlyParam.ContinueExcessiveTimes = Conf.Alarm.ContinueExcessiveTimes; //连续超标次数 0-10可设置
+	JlyParam.SoundLightAlarmTimeDelay =Conf.Alarm.SoundLightAlarmDelay;  //声光报警延时 单位s 1s到18小时可设置
+}
+
+/******************************************************************************
+  * @brief  Description 设置内存中记录仪参数,判断通道类型/通道使能是否修改
+						如果修改了就清除历史数据
+通过传感器配置数据表5 修改通道类型/通道使能
+修改通道类型的权限只有出厂前,客户有通道使能权限
+测试：
+	1.通道数不变改通道类型
+	2.通道数不变，打开关闭通道
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+static void SetJlyParamJudgeSensorTypeChannelSwitch(void)
+{
+	uint8_t i;
+	//参数复位
+	ChannelForDisplay =0;//显示
+	
+	//判断实际的通道数
+	for(i=0;i < Conf.Jly.ChannelNum;i++)//所有通道循环一遍
+	{
+		if(JlyParam.ChannelSwitchOld[i] != Conf.Sensor[i].ChannelSwitch)//通道使能位被修改
+		{
+			if(Conf.Sensor[i].ChannelSwitch == 0x01)
+			{
+				Flag.ChannelSwitchIsOn = 1;//---------这个标志作为测试用---------
+				JlyParam.ChannelNumActual = JlyParam.ChannelNumActual - 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
+				if(JlyParam.ChannelNumActual < 0)
+				{
+					JlyParam.ChannelNumActual =0;//通道数保护
+				}
+			}else{
+				JlyParam.ChannelNumActual = JlyParam.ChannelNumActual + 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
+				if(JlyParam.ChannelNumActual > Conf.Jly.ChannelNum)
+				{
+					JlyParam.ChannelNumActual =Conf.Jly.ChannelNum;//通道数保护
+				}
+			}
+			JlyParam.ChannelSwitchOld[i] = Conf.Sensor[i].ChannelSwitch;//通道使能位修改过，备份
+		}
+	}
+	
+	/*------------------------------------------------------*/
+	/*清历史数据
+	 *在客户手里Conf.Jly.ChannelNum不变，某个通道被关闭询问是否下载历史数据否则清除历史数据
+	 */
+	if(JlyParam.ChannelNumActualOld != JlyParam.ChannelNumActual)
+	{
+		JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;//Conf.Jly.ChannelNum不变，有通道被关闭
+		
+		Queue.FlashSectorPointer = 0;
+		Queue.FlashNoReadingDataNum = 0;
+		Queue.FlashReadDataBeginPointer =0;
+		Queue.WriteFlashDataPointer =0;
+		Queue.ReadFlashDataPointer = 0;
+
+		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
+		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
+		WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
+		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
+
+		SetFlashOverFlow(0);//清除flash溢出标志
+	}
+	/*清历史数据
+	 *未出厂前 通道数不变，通道类型改变清除历史数据
+	 */
+	if(JlyParam.ChannelNumOld == Conf.Jly.ChannelNum)
+	{
 		for(i=0; i< JlyParam.ChannelNumActual; i++)
 		{
 			if(JlyParam.SensorTypeOld[i] != Conf.Sensor[i].SensorType)
@@ -137,94 +230,6 @@ static void SetJlyParamJudgeChannelNumSensorType(void)
 			SetFlashOverFlow(0);//清除flash溢出标志
 		}
 	}
-	
-	/*------------------------------------------------------*/
-	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumOld*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
-	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
-	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//这里配置会修改通道数，即一帧数据会被修改需要写入fram
-	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
-	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
-	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
-	/*------------------------------------------------------*/
-	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
-	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
-	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
-	
-	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
-	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
-	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
-	
-}
-/******************************************************************************
-  * @brief  Description 设置内存中记录仪参数,判断通道数量、通道类型是否修改
-						如果修改了就清除历史数据
-测试：
-	1.只改通道数
-	2.通道数不变改通道类型
-	3.改变通道数和通道类型
-	4.通道数不变，关闭通道
-	5.改变通道数和通道类型，关闭通道 
-  * @param  None
-  * @retval None
-  *****************************************************************************/
-static void SetJlyParamJudgeChannelSwitch(void)
-{
-	uint8_t i;
-	//参数复位
-	ChannelForDisplay =0;//显示
-	//重要参数
-	Queue.FlashRecOverFlow = Conf.Basic.RecordFlashOverFlow ; //读出flash溢出标志
-	Queue.FlashSectorPointer = Conf.Basic.FlashSectorPointer;
-	Queue.WriteFlashDataPointer = Conf.Basic.WriteFlashDataPointer;
-	Queue.FlashReadDataBeginPointer = Conf.Basic.FlashReadDataBeginPointer;
-	Queue.ReadFlashDataPointer = Conf.Basic.ReadFlashDataPointer;
-	Queue.FlashNoReadingDataNum = Conf.Basic.FlashNoReadingDataNum;
-	//判断实际的通道数
-	for(i=0;i < Conf.Jly.ChannelNum;i++)//所有通道循环一遍
-	{
-		if(JlyParam.ChannelSwitchOld[i] != Conf.Sensor[i].ChannelSwitch)//通道使能位被修改
-		{
-			if(Conf.Sensor[i].ChannelSwitch == 0x01)
-			{
-				JlyParam.ChannelNumActual = JlyParam.ChannelNumActual - 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
-				if(JlyParam.ChannelNumActual < 0)
-				{
-					JlyParam.ChannelNumActual =0;//通道数保护
-				}
-			}else{
-				JlyParam.ChannelNumActual = JlyParam.ChannelNumActual + 1;//有通道被关闭则实际通道数量减去关闭的通道数量 重新赋值
-				if(JlyParam.ChannelNumActual > Conf.Jly.ChannelNum)
-				{
-					JlyParam.ChannelNumActual =Conf.Jly.ChannelNum;//通道数保护
-				}
-			}
-			JlyParam.ChannelSwitchOld[i] = Conf.Sensor[i].ChannelSwitch;//通道使能位修改过，备份
-		}
-	}
-	
-	/*------------------------------------------------------*/
-	/*清历史数据分3种情况
-	 *在客户手里Conf.Jly.ChannelNum不变，某个通道被关闭询问是否下载历史数据否则清除历史数据
-	 */
-	if(JlyParam.ChannelNumActualOld != JlyParam.ChannelNumActual)
-	{
-		JlyParam.ChannelNumActualOld = JlyParam.ChannelNumActual;//Conf.Jly.ChannelNum不变，有通道被关闭
-		
-		Queue.FlashSectorPointer = 0;
-		Queue.FlashNoReadingDataNum = 0;
-		Queue.FlashReadDataBeginPointer =0;
-		Queue.WriteFlashDataPointer =0;
-		Queue.ReadFlashDataPointer = 0;
-
-		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
-		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
-		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,0);
-		WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
-		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
-
-		SetFlashOverFlow(0);//清除flash溢出标志
-	}
-	
 	/*------------------------------------------------------*/
 	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumActual*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
 	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
@@ -264,8 +269,8 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = usAddress - VirtJlyConfAddr;
 		Fram_Write(pucBuffer, ConfMap_Address[1][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_JlyConfAddr],ConfMap_Address[1][1] + offset * 2,size);
-		/*通道数量/通道类型 变化时做相应处理*/
-		SetJlyParamJudgeChannelNumSensorType();
+		/*通道数量 变化时做相应处理*/
+		JlyConfDataUpData();
 		JudgingChannelNumberDisplay(JlyParam.ChannelNumOld);
 		
 	}else if (usAddress < VirtAlarmConfAddr)
@@ -283,7 +288,7 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = usAddress - VirtAlarmConfAddr;
 		Fram_Write(pucBuffer, ConfMap_Address[3][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_AlarmConfAddr],ConfMap_Address[3][1] + offset * 2,size);
-		
+		AlarmConfDataUpdate();
 	} else if (usAddress < VirtTempHumiAdjustConfAddr)
 	{
 		/* 传感器通道配置数据地址表  */
@@ -292,8 +297,8 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		offset = offsetnum * FRAM_SensorChanelOffset;						/* Fram中的偏移量 */
 		Fram_Write(pucBuffer, ConfMap_Address[4][1] + offset * 2, size);
 		Fram_Read(&Conf.Buf[FRAM_SensorChanelConfAddr + offset * 2],ConfMap_Address[4][1] + offset * 2,size);
-		/*通道类型变化时和通道使能(关闭时)做相应处理*/
-		SetJlyParamJudgeChannelSwitch();
+		/*通道类型变化时和通道使能(打开关闭时)做相应处理*/
+		SetJlyParamJudgeSensorTypeChannelSwitch();
 		if(JlyParam.ChannelNumActual >0)
 		{
 			JudgingChannelNumberDisplay(JlyParam.ChannelNumOld);
@@ -329,7 +334,7 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	{
 		/* 基本配置数据地址表 */
 		offset = usAddress - VirtBasicConfAddr;
-		ReadBatVoltage(PManage.BatVoltage);//跟新Fram中电池电量
+		ReadBatVoltage(PManage.BatVoltage);//更新Fram中电池电量
 		Fram_Read(pucBuffer,ConfMap_Address[0][1] + offset * 2,size);
 //		Fram_Read(Buf,ConfMap_Address[0][1] + offset * 2,size);
 	} else if (usAddress < VirJlyTimeConfAddr)
