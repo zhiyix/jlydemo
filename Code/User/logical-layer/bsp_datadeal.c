@@ -57,12 +57,12 @@
 static void LOWorNomal_Mode(void)
 {
 	uint8_t i=0;
-    if((Conf.Jly.PowerMode == 1)&&(Conf.Jly.WorkStatueIsStop >= 1)) /*低功耗模式*/
+    if((Conf.Jly.PowerMode >= 1)&&(Conf.Jly.WorkStatueIsStop >= 1)) /*低功耗模式*/
     {
         if(Flag.StartSample==1)
         {
             Flag.StartSample=0;
-            Flag.EndSample=1;
+            //Flag.EndSample=1;
 			Flag.IsDisplayRightNow = 1; //第一次采样完显示
 			
             Dealing_Gather(Started_Channel);
@@ -77,30 +77,33 @@ static void LOWorNomal_Mode(void)
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
 				{
 					Flag.StartSample=1;
-					AVCC1_POWER(ON);	/*打开传感器电源*/
 				}
 				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
 				{
 					
 				}
 			}
+			if(Flag.StartSample == 1 )
+			{
+				AVCC1_POWER(ON);	/*打开传感器电源*/
+			}
         }
-        if(Flag.EndSample==1)
-        {
-            Flag.EndSample=0;
-            
-            if(Flag.MucReset==1)//???? MCU???,???????????
-            {
-                Flag.MucReset=0;
-            }
-        }
+//        if(Flag.EndSample==1)
+//        {
+//            Flag.EndSample=0;
+//            
+//            if(Flag.MucReset==1)//???? MCU???,???????????
+//            {
+//                Flag.MucReset=0;
+//            }
+//        }
     }//END 
     else if(Conf.Jly.WorkStatueIsStop >= 1)//正常模式
     {
         if(Flag.StartSample==1)
         {
             Flag.StartSample=0;
-            Flag.EndSample=1;
+            //Flag.EndSample=1;
                 
 			
 			Dealing_Gather(Started_Channel);
@@ -115,23 +118,26 @@ static void LOWorNomal_Mode(void)
 				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
 				{
 					Flag.StartSample=1;
-					AVCC1_POWER(ON);	/*打开传感器电源*/
 				}
 				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
 				{
 					
 				}
 			}
+			if(Flag.StartSample == 1 )
+			{
+				AVCC1_POWER(ON);	/*打开传感器电源*/
+			}
         }
-        if(Flag.EndSample==1)
-        {
-            Flag.EndSample=0;
-            
-            if(Flag.MucReset==1)
-            {
-                Flag.MucReset=0;
-            }
-        }
+//        if(Flag.EndSample==1)
+//        {
+//            Flag.EndSample=0;
+//            
+//            if(Flag.MucReset==1)
+//            {
+//                Flag.MucReset=0;
+//            }
+//        }
     }
 	
 	if((--JlyParam.SampleTime)<=0)
@@ -170,12 +176,11 @@ static void WorkornotMode(void)
 		{
 			LOWorNomal_Mode();
 			
-			SaveDataOnTimeDeal();
+			//SaveDataOnTimeDeal();
 	//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
 	//        {
 				Display_ChannelValue(StartedChannelForDisplay);  //LCD 
 	//        }
-			Display_Signal(2);/*显示信号强度*/
 			
 			Flag.IsDisplayRightNow=1;
         }
@@ -196,7 +201,9 @@ static void OneSec_Timedeal(void)
     if(display_ct>=36)
     {
         display_ct = 0;
+		Display_SN();   
         Display_Mem();	  //显示存储容量 
+		Display_Signal(2);/*显示信号强度*/
     }
 	/*****************************************************************/
 	/*机械按键 key1短按长按检测*/
@@ -355,8 +362,6 @@ void JlySecDeal(void)
     if(Flag.Sec == 1)   //1秒
     {
         Flag.Sec = 0;
-        
-        Display_SN();   
 		
         OneSec_Timedeal();
         
@@ -367,10 +372,10 @@ void JlySecDeal(void)
         VoltageTest();
         
 		RecorderBootModeHandle();
-		RecorderStopModeHandle();
 		
         WorkornotMode();
         
+		StorageHistoryData();
 		//----------------------测试
 //		read_time();
     }

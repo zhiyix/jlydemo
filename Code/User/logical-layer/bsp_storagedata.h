@@ -28,5 +28,5 @@ uint32_t ReadU32Pointer(const uint32_t PointerAddr);
 void WriteU32Pointer(const uint32_t PointerAddr,uint32_t Pointer);
 
 void SaveDataOnTimeDeal(void);
-//void StorageHistoryData(void);
+void StorageHistoryData(void);
 #endif /* __STORAGEDATA_H */

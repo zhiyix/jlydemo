@@ -144,18 +144,18 @@ void AlarmDeal(uint8_t channel)
 	{
 		if(ChannelDataFloat[channel-1] >= Conf.Sensor[channel-1].SensorAlarm_High.wd)//上限超标
         {
-			if(Flag.AlarmXiaoYin == 1)//按下消音键
+			if(Flag.AlarmXiaoYin == 1)//按下消音键,关闭声音 符号显示
 			{
 				Flag.AlarmHuiFu[channel-1] = 1;//报警关闭
 				
-				JlyParam.ContinueExcessiveUpperLimitCount = 0;//上限超标计数 清0
+				JlyParam.ContinueExcessiveCount[channel-1] = 0;//超标计数 清0
                 CloseAlarm();
 			}else if(Flag.AlarmHuiFu[channel-1] ==0)
 			{
-				JlyParam.ContinueExcessiveUpperLimitCount++;
-				if(JlyParam.ContinueExcessiveUpperLimitCount >= JlyParam.ContinueExcessiveTimes)//连续超上限
+				JlyParam.ContinueExcessiveCount[channel-1]++;
+				if(JlyParam.ContinueExcessiveCount[channel-1] >= JlyParam.ContinueExcessiveTimes)//连续超
 				{
-					JlyParam.ContinueExcessiveUpperLimitCount = 0;//上限超标计数 清0
+					JlyParam.ContinueExcessiveCount[channel-1] = 0;//超标计数 清0
 					if(Flag.AlarmTimeDelayIsOut == 1)
 					{
 						Flag.AlarmTimeDelayIsOut =0;
@@ -165,30 +165,35 @@ void AlarmDeal(uint8_t channel)
 							if((Rtc.Minute < Conf.Alarm.OnWork_Min && Rtc.Hour < Conf.Alarm.OnWork_Hour)||(Rtc.Minute > Conf.Alarm.OffWork_Min && Rtc.Hour > Conf.Alarm.OffWork_Hour))
 							{
 								AlarmAction(channel);
+								Conf.Sensor[channel-1].AlarmStatus = 1;//上限报警状态
+								WriteU16Pointer(((channel-1)*FRAM_SensorChanelOffset32+FRAM_AlarmStatusBaseAddr),Conf.Sensor[channel-1].AlarmStatus);
 							}else{
 								CloseAlarm();
 							}
 						}else if(Conf.Alarm.AlarmTime_Mode & 0x02)	// 下班时间 
 						{
 							AlarmAction(channel);
+							Conf.Sensor[channel-1].AlarmStatus = 1;//上限报警状态
+							WriteU16Pointer(((channel-1)*FRAM_SensorChanelOffset32+FRAM_AlarmStatusBaseAddr),Conf.Sensor[channel-1].AlarmStatus);
 						}
 
 					}
 				}
 			} 
-        }else if(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.wd){//下限超标
+        }else if(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.wd)//下限超标
+		{
 			if(Flag.AlarmXiaoYin == 1)
 			{
 				Flag.AlarmHuiFu[channel-1] = 1;//报警关闭
 				
-				JlyParam.ContinueExcessiveLowerLimitCount =0;//下限超标计数 清0
+				JlyParam.ContinueExcessiveCount[channel-1] =0;//超标计数 清0
                 CloseAlarm();
 			}else if(Flag.AlarmHuiFu[channel-1] ==0)
 			{
-				JlyParam.ContinueExcessiveLowerLimitCount++;
-				if(JlyParam.ContinueExcessiveLowerLimitCount >= JlyParam.ContinueExcessiveTimes)//连续超下限
+				JlyParam.ContinueExcessiveCount[channel-1]++;
+				if(JlyParam.ContinueExcessiveCount[channel-1] >= JlyParam.ContinueExcessiveTimes)//连续超
 				{
-					JlyParam.ContinueExcessiveLowerLimitCount =0;//下限超标计数 清0
+					JlyParam.ContinueExcessiveCount[channel-1] =0;//超标计数 清0
 					if(Flag.AlarmTimeDelayIsOut == 1)
 					{
 						Flag.AlarmTimeDelayIsOut =0;
@@ -198,12 +203,16 @@ void AlarmDeal(uint8_t channel)
 							if((Rtc.Minute < Conf.Alarm.OnWork_Min && Rtc.Hour < Conf.Alarm.OnWork_Hour)||(Rtc.Minute > Conf.Alarm.OffWork_Min && Rtc.Hour > Conf.Alarm.OffWork_Hour))
 							{
 								AlarmAction(channel);
+								Conf.Sensor[channel-1].AlarmStatus = 2;//下限报警状态
+								WriteU16Pointer(((channel-1)*FRAM_SensorChanelOffset32+FRAM_AlarmStatusBaseAddr),Conf.Sensor[channel-1].AlarmStatus);
 							}else{
 								CloseAlarm();
 							}
 						}else if(Conf.Alarm.AlarmTime_Mode & 0x02)	// 下班时间 
 						{
 							AlarmAction(channel);
+							Conf.Sensor[channel-1].AlarmStatus = 2;//下限报警状态
+							WriteU16Pointer(((channel-1)*FRAM_SensorChanelOffset32+FRAM_AlarmStatusBaseAddr),Conf.Sensor[channel-1].AlarmStatus);
 						}
 					}
 				}
@@ -212,9 +221,10 @@ void AlarmDeal(uint8_t channel)
 			Flag.AlarmXiaoYin = 0;
             Flag.AlarmHuiFu[channel-1] = 0;//消音恢复
 			
-			JlyParam.ContinueExcessiveUpperLimitCount = 0;//上限超标计数 清0
-			JlyParam.ContinueExcessiveLowerLimitCount =0;//下限超标计数 清0
-            CloseAlarm();
+			JlyParam.ContinueExcessiveCount[channel-1] = 0;//恢复正常 超标计数 清0
+            
+			BEEP(OFF);//曾经报过警，又恢复正常声音关掉但是报警符号任然显示
+			//CloseAlarm();
         }        
 	}
     else

@@ -382,7 +382,7 @@ static void SetJlyParamData(void)
 	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//一个字节 这里配置会修改通道数，即一帧数据会被修改需要写入fram
 	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
 	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
-	Queue.FLASH_MAX_NUM = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES; //flash中存储数据的最大包数 8388608/
+	Queue.FlashRecActualStorage = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES*Queue.HIS_ONE_BYTES; //flash中实际存储字节数
 	
 	Conf.Basic.FlashRecMaxSize = FLASH_RecMaxSize;//flash最大存储容量 
 	WriteU32Pointer(FLASH_RecMaxSizeAddr,Conf.Basic.FlashRecMaxSize);//flash最大存储容量 4字节保存
@@ -515,8 +515,8 @@ void OffPowerSupply(void)
 	BEEP(OFF);
 	LED1(OFF);LED2(OFF);
 	LcdBackLight(OFF);
-	MODEL_PWRCTRL(OFF);
-	TOUCHKEY_POWER(OFF);
+	//MODEL_PWRCTRL(OFF);
+	//TOUCHKEY_POWER(OFF);
 	HAC_POWER(OFF);
 }
 /******************************************************************************

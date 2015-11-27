@@ -176,7 +176,7 @@ void RecorderStopModeHandle(void)
         if(Conf.Jly.RecStopMode == 0){};	/* 先进先出的记录停止方式 */
         if(Conf.Jly.RecStopMode == 1)		/* 存储器记满的记录停止方式 */
         {
-            if((Queue.WriteFlashDataPointer >= Queue.FLASH_MAX_NUM)) //&&IsReadingI2c==0,下载数据
+            if((Queue.WriteFlashDataPointer >= Queue.FlashRecActualStorage)) //&&IsReadingI2c==0,下载数据
             {
                 Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
 				

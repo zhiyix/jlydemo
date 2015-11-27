@@ -172,23 +172,39 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>355</LineNumber>
+          <LineNumber>223</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134252034</Address>
+          <Address>134251936</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>E:\job-32\BTJLY_Github\Code\User\init\bsp_init.c</Filename>
+          <Filename>E:\job-32\BTJLY_Github\Code\User\logical-layer\bsp_storagedata.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>357</LineNumber>
+          <LineNumber>177</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134221910</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>E:\job-32\BTJLY_Github\Code\User\logical-layer\bsp_alarmdeal.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>222</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -197,7 +213,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>E:\job-32\BTJLY_Github\Code\User\init\bsp_init.c</Filename>
+          <Filename>E:\job-32\BTJLY_Github\Code\User\logical-layer\bsp_storagedata.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -251,12 +267,22 @@
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>JlyParam.WakeUpCount</ItemText>
+          <ItemText>Flag.AlarmTimeDelayIsOut</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>JlyParam.SensorTypeOld</ItemText>
+          <ItemText>Rtc.SCount</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Flag.Sec</ItemText>
+        </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Queue.WriteFlashDataPointer</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -331,7 +357,7 @@
       <Focus>0</Focus>
       <ColumnNumber>18</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>65</TopLine>
+      <TopLine>66</TopLine>
       <CurrentLine>85</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Libraries\CMSIC\system_stm32l1xx.h</PathWithFileName>
@@ -363,7 +389,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1783</TopLine>
+      <TopLine>1784</TopLine>
       <CurrentLine>1806</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Libraries\CMSIC\core_cm3.h</PathWithFileName>
@@ -419,7 +445,7 @@
       <Focus>0</Focus>
       <ColumnNumber>3</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1276</TopLine>
+      <TopLine>1280</TopLine>
       <CurrentLine>1281</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Libraries\src\stm32l1xx_usart.c</PathWithFileName>
@@ -513,10 +539,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>16</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>551</TopLine>
-      <CurrentLine>565</CurrentLine>
+      <TopLine>543</TopLine>
+      <CurrentLine>548</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Libraries\src\stm32l1xx_lcd.c</PathWithFileName>
       <FilenameWithoutPath>stm32l1xx_lcd.c</FilenameWithoutPath>
@@ -531,7 +557,7 @@
       <Focus>0</Focus>
       <ColumnNumber>12</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>704</TopLine>
+      <TopLine>708</TopLine>
       <CurrentLine>709</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Libraries\src\stm32l1xx_pwr.c</PathWithFileName>
@@ -547,7 +573,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1138</TopLine>
+      <TopLine>1141</TopLine>
       <CurrentLine>1142</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Libraries\src\stm32l1xx_rcc.c</PathWithFileName>
@@ -611,7 +637,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>919</TopLine>
+      <TopLine>924</TopLine>
       <CurrentLine>926</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Libraries\src\stm32l1xx_spi.c</PathWithFileName>
@@ -681,10 +707,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>158</TopLine>
-      <CurrentLine>176</CurrentLine>
+      <TopLine>428</TopLine>
+      <CurrentLine>429</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\BTBusLibraries\Src\freemodbus.c</PathWithFileName>
       <FilenameWithoutPath>freemodbus.c</FilenameWithoutPath>
@@ -705,9 +731,9 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>13</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>49</TopLine>
+      <TopLine>52</TopLine>
       <CurrentLine>60</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\main.c</PathWithFileName>
@@ -753,10 +779,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>40</ColumnNumber>
+      <ColumnNumber>22</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>225</TopLine>
-      <CurrentLine>246</CurrentLine>
+      <TopLine>241</TopLine>
+      <CurrentLine>242</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\stm32l1xx_it.c</PathWithFileName>
       <FilenameWithoutPath>stm32l1xx_it.c</FilenameWithoutPath>
@@ -785,10 +811,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>37</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>383</TopLine>
-      <CurrentLine>400</CurrentLine>
+      <TopLine>370</TopLine>
+      <CurrentLine>388</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\init\bsp_init.c</PathWithFileName>
       <FilenameWithoutPath>bsp_init.c</FilenameWithoutPath>
@@ -803,7 +829,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>14</TopLine>
+      <TopLine>19</TopLine>
       <CurrentLine>24</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\SysTick\bsp_SysTick.c</PathWithFileName>
@@ -819,7 +845,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>110</TopLine>
+      <TopLine>115</TopLine>
       <CurrentLine>130</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\peripherals\src\bsp_adc.c</PathWithFileName>
@@ -831,12 +857,12 @@
       <GroupNumber>5</GroupNumber>
       <FileNumber>32</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>16</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>92</TopLine>
-      <CurrentLine>110</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\peripherals\src\bsp_exti_key.c</PathWithFileName>
       <FilenameWithoutPath>bsp_exti_key.c</FilenameWithoutPath>
@@ -849,10 +875,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1033</TopLine>
-      <CurrentLine>1046</CurrentLine>
+      <TopLine>1265</TopLine>
+      <CurrentLine>1288</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\peripherals\src\bsp_lcd.c</PathWithFileName>
       <FilenameWithoutPath>bsp_lcd.c</FilenameWithoutPath>
@@ -883,7 +909,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>23</TopLine>
+      <TopLine>28</TopLine>
       <CurrentLine>31</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\global.c</PathWithFileName>
@@ -899,7 +925,7 @@
       <Focus>0</Focus>
       <ColumnNumber>39</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>112</TopLine>
+      <TopLine>117</TopLine>
       <CurrentLine>127</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\peripherals\src\bsp_spi_flash.c</PathWithFileName>
@@ -915,7 +941,7 @@
       <Focus>0</Focus>
       <ColumnNumber>20</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>506</TopLine>
+      <TopLine>511</TopLine>
       <CurrentLine>513</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\peripherals\src\bsp_i2c.c</PathWithFileName>
@@ -961,10 +987,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>30</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>354</TopLine>
-      <CurrentLine>369</CurrentLine>
+      <TopLine>357</TopLine>
+      <CurrentLine>361</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\logical-layer\bsp_datadeal.c</PathWithFileName>
       <FilenameWithoutPath>bsp_datadeal.c</FilenameWithoutPath>
@@ -977,10 +1003,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>60</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>199</TopLine>
-      <CurrentLine>203</CurrentLine>
+      <TopLine>246</TopLine>
+      <CurrentLine>264</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\peripherals\src\bsp_rtc.c</PathWithFileName>
       <FilenameWithoutPath>bsp_rtc.c</FilenameWithoutPath>
@@ -993,10 +1019,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>17</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>139</TopLine>
-      <CurrentLine>157</CurrentLine>
+      <TopLine>140</TopLine>
+      <CurrentLine>141</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\logical-layer\bsp_alarmdeal.c</PathWithFileName>
       <FilenameWithoutPath>bsp_alarmdeal.c</FilenameWithoutPath>
@@ -1011,8 +1037,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>71</TopLine>
-      <CurrentLine>72</CurrentLine>
+      <TopLine>151</TopLine>
+      <CurrentLine>152</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\logical-layer\bsp_powerdeal.c</PathWithFileName>
       <FilenameWithoutPath>bsp_powerdeal.c</FilenameWithoutPath>
@@ -1027,7 +1053,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>575</TopLine>
+      <TopLine>576</TopLine>
       <CurrentLine>595</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\logical-layer\bsp_sensordeal.c</PathWithFileName>
@@ -1041,10 +1067,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>8</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>270</TopLine>
-      <CurrentLine>275</CurrentLine>
+      <TopLine>383</TopLine>
+      <CurrentLine>407</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\logical-layer\bsp_serialdeal.c</PathWithFileName>
       <FilenameWithoutPath>bsp_serialdeal.c</FilenameWithoutPath>
@@ -1057,10 +1083,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>9</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>90</TopLine>
-      <CurrentLine>109</CurrentLine>
+      <TopLine>157</TopLine>
+      <CurrentLine>179</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\logical-layer\bsp_bootstop.c</PathWithFileName>
       <FilenameWithoutPath>bsp_bootstop.c</FilenameWithoutPath>
@@ -1073,10 +1099,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>12</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>467</TopLine>
-      <CurrentLine>487</CurrentLine>
+      <TopLine>310</TopLine>
+      <CurrentLine>315</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\logical-layer\bsp_storagedata.c</PathWithFileName>
       <FilenameWithoutPath>bsp_storagedata.c</FilenameWithoutPath>

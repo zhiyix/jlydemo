@@ -282,7 +282,7 @@ struct CircularQueueStr
 	uint16_t FLASH_SECTOR_PER_NUM;  //flash中一个扇区存储数据条数
     uint16_t FlashSectorPointer;	//flash中扇区指针
 	
-	uint32_t FLASH_MAX_NUM;			//flash中存储数据的最大包数
+	uint32_t FlashRecActualStorage;	//flash中实际存储容量
 	uint32_t FlashNoReadingDataNum;	//flash中未读数据条数
     uint32_t WriteFlashDataPointer;  //flash中记录数据指针
     uint32_t FlashReadDataBeginPointer;  //flash中读数据起始指针

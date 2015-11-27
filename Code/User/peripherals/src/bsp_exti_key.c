@@ -126,6 +126,9 @@ void KeyDeal(void)
 		Queue.ReadFlashDataPointer = 0;
 		Queue.FlashNoReadingDataNum = 0;
 
+		//测试变量清零
+		JlyParam.DataNumInFlash = 0;
+		
 		SetFlashOverFlow(0);//清除flash溢出标志
 		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,0);
 		WriteU32Pointer(FLASH_WriteDataAddr_Lchar,0);
@@ -133,4 +136,16 @@ void KeyDeal(void)
 		WriteU32Pointer(FLASH_ReadDataAddr_Lchar,0);
 		WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,0);
 	}
+}
+//测试输出代码
+void test_Printf(void)
+{
+	printf("Queue.FlashRecOverFlow %d\r\n",Queue.FlashRecOverFlow);
+	printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
+	printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
+	printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
+	printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
+	printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
+	
+	printf("%02x-%02x-%02x %02x:%02x:%02x ",Rtc.Year,Rtc.Month,Rtc.Day,Rtc.Hour,Rtc.Minute,Rtc.Second);
 }

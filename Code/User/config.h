@@ -95,11 +95,13 @@
 
 #define FRAM_ConfSize			     3232	/* 配置信息表大小 */
 #define FRAM_SensorChanelOffset      0x0010	/* 传感器通道，32byte/2 offset*2,每一通道之间的物理(Fram)偏移量 */
+#define FRAM_SensorChanelOffset32    0x0020	// 传感器通道，32byte,每一通道之间的物理(Fram)偏移量
 #define FRAM_TempHumiAdjustOffset    0x0020	/* 传感器校准，64byte/2 offset*2,每一通道之间的物理(Fram)偏移量 */
 
 //! \brief 配置信息表中成员  在Fram中的地址 
 #define FRAM_BatVoltageAddr			 FRAM_BasicConfAddr+20	//电池电压地址 低8位
 #define FRAM_WorkStatueIsStopAddr	 FRAM_JlyConfAddr+34	//工作状态地址
+#define FRAM_AlarmStatusBaseAddr	 FRAM_SensorChanelConfAddr+4	//32个通道报警状态基地址
 
 //flash记录数据溢出标志
 #define FLASH_FlashRecOverFlowAddr	 	 FRAM_BasicConfAddr+22 //低8位
@@ -269,8 +271,6 @@ struct JLYPARAMETERStr
 	__IO uint8_t  WakeUpCount;		//StopMode下唤醒时间
 	
 	uint8_t  ContinueExcessiveTimes;//连续超标次数 0-10可设置
-	uint8_t  ContinueExcessiveUpperLimitCount;//连续超上限计数
-	uint8_t  ContinueExcessiveLowerLimitCount;//连续超下限计数
 	
 	uint8_t  FirstEnterStopModeCount;//上电第一次进入低功耗时间
 	uint8_t  LcdBackLightCount;		//Lcd亮多长时间计数
@@ -279,6 +279,7 @@ struct JLYPARAMETERStr
 	uint8_t  ChannelNumOld;			//未重新配置之前的通道数
 	uint8_t  SensorTypeOld[32];		//未重新配置之前的通道类型
 	uint8_t  ChannelSwitchOld[32];  //未重新配置之前的通道使能位
+	uint8_t  ContinueExcessiveCount[32];//连续超标计数
 	
 	uint16_t SoundLightAlarmTimeDelay;	//声光报警延时 单位s 1s到18小时可设置
 	uint16_t AlarmTimeDelayCount;	//声光报警延时计数
@@ -290,7 +291,7 @@ struct JLYPARAMETERStr
     uint32_t NormalRecInterval;  	//正常记录间隔 单位：s
     //uint32_t SaveHisDataTime;       //存储间隔
 	int32_t delay_start_time;		// 延时启动时间 
-	
+	uint32_t DataNumInFlash;		//测试flash中数据数量 使用变量---------------
 };
 //按键
 struct KEYStr
