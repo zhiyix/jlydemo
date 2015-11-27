@@ -546,6 +546,11 @@
               <FilePath>..\FreeModbus\modbus\functions\mbfuncinput.c</FilePath>
             </File>
             <File>
+              <FileName>mbfunchistory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeModbus\modbus\functions\mbfunchistory.c</FilePath>
+            </File>
+            <File>
               <FileName>mbfuncother.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FreeModbus\modbus\functions\mbfuncother.c</FilePath>
@@ -1172,6 +1177,11 @@
               <FileName>mbfuncinput.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FreeModbus\modbus\functions\mbfuncinput.c</FilePath>
+            </File>
+            <File>
+              <FileName>mbfunchistory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeModbus\modbus\functions\mbfunchistory.c</FilePath>
             </File>
             <File>
               <FileName>mbfuncother.c</FileName>

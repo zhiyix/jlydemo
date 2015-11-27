@@ -156,6 +156,13 @@ __weak bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRe
 	usNRegs *= 2;
 	return true;
 }
+//<! 
+__weak bool HISTORY_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+{
+	usAddress *= 2;
+	usNRegs *= 2;
+	return true;
+}
 
 /* Private functions ---------------------------------------------------------*/
 /**
@@ -225,6 +232,45 @@ eMBRegInputCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
         iRegIndex = ( int16_t )( usAddress - usRegInputStart );
 		//
 		STORAGE_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
+			usAddress, usNRegs);
+        //逐个赋值
+        while( usNRegs > 0 )
+        {
+            //赋值高字节
+            *pucRegBuffer++ = ( uint8_t )( usRegInputBuf[iRegIndex] >> 8 );
+            //赋值低字节
+            *pucRegBuffer++ = ( uint8_t )( usRegInputBuf[iRegIndex] & 0xFF );
+            //偏移量增加
+            iRegIndex++;
+            //被操作寄存器数量递减
+            usNRegs--;
+        }
+        xMBOutput(__DEG, "Input\r\n");
+    }
+    else
+    {
+        //返回错误状态，无寄存器
+        eStatus = MB_ENOREG;
+    }
+
+    return eStatus;
+}
+
+eMBErrorCode
+eMBRegHistoryCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
+{
+    eMBErrorCode    eStatus = MB_ENOERR;
+    int16_t         iRegIndex;
+
+    //查询是否在寄存器范围内
+    //为了避免警告，修改为有符号整数
+    if( ( (int16_t)usAddress >= REG_INPUT_START ) && \
+          ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) )
+    {
+        //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
+        iRegIndex = ( int16_t )( usAddress - usRegInputStart );
+		//
+		HISTORY_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
 			usAddress, usNRegs);
         //逐个赋值
         while( usNRegs > 0 )

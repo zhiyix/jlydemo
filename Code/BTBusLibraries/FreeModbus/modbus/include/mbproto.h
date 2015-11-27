@@ -53,6 +53,7 @@ PR_BEGIN_EXTERN_C
 #define MB_FUNC_READ_HOLDING_REGISTER         (  3 )
 //读输入寄存器
 #define MB_FUNC_READ_INPUT_REGISTER           (  4 )
+#define MB_FUNC_READ_HISTORY_REGISTER         (  5 )
 //写单个保持寄存器
 #define MB_FUNC_WRITE_REGISTER                (  6 )
 //写多个保持寄存器

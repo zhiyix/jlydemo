@@ -138,6 +138,14 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	BSP_LED_Toggle(LED3);
 	return true;
 }
+//<! 
+bool HISTORY_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+{
+	usAddress *= 2;
+	usNRegs *= 2;
+	BSP_LED_Toggle(LED3);
+	return true;
+}
 
 /**
   * @brief  System Clock Configuration

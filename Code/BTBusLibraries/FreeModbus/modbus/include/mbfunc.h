@@ -42,6 +42,10 @@ eMBException    eMBFuncReportSlaveID( UCHAR * pucFrame, USHORT * usLen );
 eMBException    eMBFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen );
 #endif
 
+#if MB_FUNC_READ_HISTORY_ENABLED > 0
+eMBException    eMBFuncReadHistoryRegister( UCHAR * pucFrame, USHORT * usLen );
+#endif
+
 #if MB_FUNC_READ_HOLDING_ENABLED > 0
 eMBException    eMBFuncReadHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
 #endif
