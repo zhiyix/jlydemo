@@ -37,7 +37,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "bt_main.h"
 #include "string.h"
 #include "freemodbus.h"
 

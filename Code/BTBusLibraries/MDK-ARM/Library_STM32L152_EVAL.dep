@@ -280,12 +280,201 @@ I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim.h)(0x561EFBCC)
 I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim_ex.h)(0x561EFBCC)
 I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_uart.h)(0x561EFBCC)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\string.h)(0x51C7C554)
-F (..\Src\main.c)(0x5657C732)()
-F (..\Src\mcu_itm.c)(0x561EFBCD)()
-F (..\Src\mcu_tim.c)(0x561EFBCD)()
-F (..\Src\stm32l1xx_hal_msp.c)(0x561EFBCD)()
-F (..\Src\stm32l1xx_it.c)(0x561EFBCD)()
-F (..\Src\freemodbus.c)(0x5657C70F)()
+F (..\Src\main.c)(0x565C2097)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\main.o --omf_browse .\stm32l152_eval\main.crf --depend .\stm32l152_eval\main.d)
+I (..\Inc\bt_main.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal.h)(0x561EFBCC)
+I (..\Inc\stm32l1xx_hal_conf.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_def.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l152xb.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\core_cm3.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdint.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmInstr.h)(0x532BF7C2)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmFunc.h)(0x532BF7C2)
+I (..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include\system_stm32l1xx.h)(0x561EFBC9)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\Legacy/stm32_hal_legacy.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdio.h)(0x51C7C554)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_cortex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ramfunc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_uart.h)(0x561EFBCC)
+I (..\Inc\mcu_itm.h)(0x561EFBCC)
+I (..\Inc\mcu_tim.h)(0x561EFBCC)
+I (..\Inc\mcu_uart.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\string.h)(0x51C7C554)
+I (..\Inc\freemodbus.h)(0x563C1B4C)
+I (..\FreeModbus\modbus\./app_cfg.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\./porttype.h)(0x561EFBC8)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdbool.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\inttypes.h)(0x51C7C554)
+I (..\FreeModbus\modbus\./modbus.h)(0x561EFBC8)
+I (..\FreeModbus\modbus\././include/mb.h)(0x5657C6DA)
+I (..\FreeModbus\modbus\././include/mbport.h)(0x561EFBC8)
+I (..\FreeModbus\modbus\././include/./app_cfg.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\././include/./..\app_cfg.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\././include/mbproto.h)(0x5657C5F8)
+I (..\FreeModbus\modbus\././include/mbconfig.h)(0x5657C5CB)
+I (..\FreeModbus\modbus\././include/mbframe.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\././include/mbfunc.h)(0x5657C5CF)
+I (..\FreeModbus\modbus\././include/mbutils.h)(0x561EFBC8)
+I (..\FreeModbus\modbus\././rtu/mbrtu.h)(0x561EFBC8)
+F (..\Src\mcu_itm.c)(0x561EFBCD)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\mcu_itm.o --omf_browse .\stm32l152_eval\mcu_itm.crf --depend .\stm32l152_eval\mcu_itm.d)
+I (..\Inc\mcu_itm.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal.h)(0x561EFBCC)
+I (..\Inc\stm32l1xx_hal_conf.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_def.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l152xb.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\core_cm3.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdint.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmInstr.h)(0x532BF7C2)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmFunc.h)(0x532BF7C2)
+I (..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include\system_stm32l1xx.h)(0x561EFBC9)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\Legacy/stm32_hal_legacy.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdio.h)(0x51C7C554)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_cortex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ramfunc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_uart.h)(0x561EFBCC)
+F (..\Src\mcu_tim.c)(0x565C208C)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\mcu_tim.o --omf_browse .\stm32l152_eval\mcu_tim.crf --depend .\stm32l152_eval\mcu_tim.d)
+I (..\Inc\bt_main.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal.h)(0x561EFBCC)
+I (..\Inc\stm32l1xx_hal_conf.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_def.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l152xb.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\core_cm3.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdint.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmInstr.h)(0x532BF7C2)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmFunc.h)(0x532BF7C2)
+I (..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include\system_stm32l1xx.h)(0x561EFBC9)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\Legacy/stm32_hal_legacy.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdio.h)(0x51C7C554)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_cortex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ramfunc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_uart.h)(0x561EFBCC)
+I (..\Inc\mcu_itm.h)(0x561EFBCC)
+I (..\Inc\mcu_tim.h)(0x561EFBCC)
+I (..\Inc\mcu_uart.h)(0x561EFBCC)
+F (..\Src\stm32l1xx_hal_msp.c)(0x561EFBCD)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\stm32l1xx_hal_msp.o --omf_browse .\stm32l152_eval\stm32l1xx_hal_msp.crf --depend .\stm32l152_eval\stm32l1xx_hal_msp.d)
+I (..\Inc\bt_main.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal.h)(0x561EFBCC)
+I (..\Inc\stm32l1xx_hal_conf.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_def.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l152xb.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\core_cm3.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdint.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmInstr.h)(0x532BF7C2)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmFunc.h)(0x532BF7C2)
+I (..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include\system_stm32l1xx.h)(0x561EFBC9)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\Legacy/stm32_hal_legacy.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdio.h)(0x51C7C554)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_cortex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ramfunc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_uart.h)(0x561EFBCC)
+I (..\Inc\mcu_itm.h)(0x561EFBCC)
+I (..\Inc\mcu_tim.h)(0x561EFBCC)
+I (..\Inc\mcu_uart.h)(0x561EFBCC)
+F (..\Src\stm32l1xx_it.c)(0x565C2083)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\stm32l1xx_it.o --omf_browse .\stm32l152_eval\stm32l1xx_it.crf --depend .\stm32l152_eval\stm32l1xx_it.d)
+I (..\Inc\bt_main.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal.h)(0x561EFBCC)
+I (..\Inc\stm32l1xx_hal_conf.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_def.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l152xb.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\core_cm3.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdint.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmInstr.h)(0x532BF7C2)
+I (D:\Win_Profession\MDK474\ARM\CMSIS\Include\core_cmFunc.h)(0x532BF7C2)
+I (..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include\system_stm32l1xx.h)(0x561EFBC9)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\Legacy/stm32_hal_legacy.h)(0x561EFBCC)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdio.h)(0x51C7C554)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_rcc_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_gpio_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_dma_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_cortex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_flash_ramfunc.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_pwr_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_tim_ex.h)(0x561EFBCC)
+I (..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc\stm32l1xx_hal_uart.h)(0x561EFBCC)
+I (..\Inc\mcu_itm.h)(0x561EFBCC)
+I (..\Inc\mcu_tim.h)(0x561EFBCC)
+I (..\Inc\mcu_uart.h)(0x561EFBCC)
+I (..\Inc\stm32l1xx_it.h)(0x561EFBCC)
+F (..\Src\freemodbus.c)(0x5657C70F)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\freemodbus.o --omf_browse .\stm32l152_eval\freemodbus.crf --depend .\stm32l152_eval\freemodbus.d)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdio.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\string.h)(0x51C7C554)
+I (..\Inc\./freemodbus.h)(0x563C1B4C)
+I (..\FreeModbus\modbus\./app_cfg.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\./porttype.h)(0x561EFBC8)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdint.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdbool.h)(0x51C7C554)
+I (D:\Win_Profession\MDK474\ARM\ARMCC\include\inttypes.h)(0x51C7C554)
+I (..\FreeModbus\modbus\./modbus.h)(0x561EFBC8)
+I (..\FreeModbus\modbus\././include/mb.h)(0x5657C6DA)
+I (..\FreeModbus\modbus\././include/mbport.h)(0x561EFBC8)
+I (..\FreeModbus\modbus\././include/./app_cfg.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\././include/./..\app_cfg.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\././include/mbproto.h)(0x5657C5F8)
+I (..\FreeModbus\modbus\././include/mbconfig.h)(0x5657C5CB)
+I (..\FreeModbus\modbus\././include/mbframe.h)(0x561EFBC7)
+I (..\FreeModbus\modbus\././include/mbfunc.h)(0x5657C5CF)
+I (..\FreeModbus\modbus\././include/mbutils.h)(0x561EFBC8)
+I (..\FreeModbus\modbus\././rtu/mbrtu.h)(0x561EFBC8)
 F (..\mbport\port.c)(0x561EFBCD)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\port.o --omf_browse .\stm32l152_eval\port.crf --depend .\stm32l152_eval\port.d)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdarg.h)(0x51C7C554)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdlib.h)(0x51C7C554)
@@ -604,7 +793,7 @@ I (..\FreeModbus\modbus\rtu\..\./include/mbfunc.h)(0x5657C5CF)
 I (..\FreeModbus\modbus\rtu\..\./include/mbutils.h)(0x561EFBC8)
 I (..\FreeModbus\modbus\rtu\..\./rtu/mbrtu.h)(0x561EFBC8)
 I (..\FreeModbus\modbus\rtu\./mbcrc.h)(0x561EFBC8)
-F (..\FreeModbus\modbus\mb.c)(0x561EFBC8)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\mb.o --omf_browse .\stm32l152_eval\mb.crf --depend .\stm32l152_eval\mb.d)
+F (..\FreeModbus\modbus\mb.c)(0x565C2593)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\mb.o --omf_browse .\stm32l152_eval\mb.crf --depend .\stm32l152_eval\mb.d)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdlib.h)(0x51C7C554)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\string.h)(0x51C7C554)
 I (..\FreeModbus\modbus\./app_cfg.h)(0x561EFBC7)

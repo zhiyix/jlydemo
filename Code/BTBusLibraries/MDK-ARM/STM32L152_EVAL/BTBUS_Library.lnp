@@ -1,0 +1,31 @@
+--cpu Cortex-M3
+".\stm32l152_eval\stm32l1xx_hal.o"
+".\stm32l152_eval\stm32l1xx_hal_cortex.o"
+".\stm32l152_eval\stm32l1xx_hal_dma.o"
+".\stm32l152_eval\stm32l1xx_hal_pwr.o"
+".\stm32l152_eval\stm32l1xx_hal_pwr_ex.o"
+".\stm32l152_eval\stm32l1xx_hal_gpio.o"
+".\stm32l152_eval\stm32l1xx_hal_rcc.o"
+".\stm32l152_eval\stm32l1xx_hal_rcc_ex.o"
+".\stm32l152_eval\stm32l1xx_hal_tim.o"
+".\stm32l152_eval\stm32l1xx_hal_uart.o"
+".\stm32l152_eval\port.o"
+".\stm32l152_eval\portevent.o"
+".\stm32l152_eval\portserial.o"
+".\stm32l152_eval\porttimer.o"
+".\stm32l152_eval\mbfunccoils.o"
+".\stm32l152_eval\mbfuncdiag.o"
+".\stm32l152_eval\mbfuncdisc.o"
+".\stm32l152_eval\mbfuncholding.o"
+".\stm32l152_eval\mbfuncinput.o"
+".\stm32l152_eval\mbfunchistory.o"
+".\stm32l152_eval\mbfuncother.o"
+".\stm32l152_eval\mbutils.o"
+".\stm32l152_eval\mbcrc.o"
+".\stm32l152_eval\mbrtu.o"
+".\stm32l152_eval\mb.o"
+--library_type=microlib --strict --scatter ".\STM32L152_EVAL\BTBUS_Library.sct"
+
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\STM32L152_EVAL\BTBUS_Library.map" -o .\STM32L152_EVAL\BTBUS_Library.axf
