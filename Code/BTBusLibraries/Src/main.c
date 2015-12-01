@@ -130,6 +130,14 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	BSP_LED_Toggle(LED2);
 	return true;
 }
+//<!
+bool REALDATA_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+{
+	usAddress *= 2;
+	usNRegs *= 2;
+	BSP_LED_Toggle(LED3);
+	return true;
+}
 //<! 
 bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {

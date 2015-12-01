@@ -118,6 +118,8 @@ PR_BEGIN_EXTERN_C
 
 #define MB_FUNC_READ_HISTORY_ENABLED            (  1 )
 
+#define MB_FUNC_READ_REALDATA_ENABLED           (  1 )
+
 /*! \brief If the <em>Read Holding Registers</em> function should be enabled. */
 #define MB_FUNC_READ_HOLDING_ENABLED            (  1 )
 

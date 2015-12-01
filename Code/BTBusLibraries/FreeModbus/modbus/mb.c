@@ -116,6 +116,11 @@ static xMBFunctionHandler xFuncHandlers[MB_FUNC_HANDLERS_MAX] = {
     {MB_FUNC_READ_HISTORY_REGISTER, eMBFuncReadHistoryRegister},
 #endif
 
+//¶ÁÊäÈë¼Ä´æÆ÷
+#if MB_FUNC_READ_REALDATA_ENABLED > 0
+    {MB_FUNC_READ_REALDATA_REGISTER, eMBFuncReadRealDataRegister},
+#endif
+
 //¶Á±£³Ö¼Ä´æÆ÷
 #if MB_FUNC_READ_HOLDING_ENABLED > 0
     {MB_FUNC_READ_HOLDING_REGISTER, eMBFuncReadHoldingRegister},

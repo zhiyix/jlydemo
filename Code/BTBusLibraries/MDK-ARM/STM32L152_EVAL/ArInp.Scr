@@ -19,6 +19,7 @@
 .\stm32l152_eval\mbfuncholding.o
 .\stm32l152_eval\mbfuncinput.o
 .\stm32l152_eval\mbfunchistory.o
+.\stm32l152_eval\mbfuncrealdata.o
 .\stm32l152_eval\mbfuncother.o
 .\stm32l152_eval\mbutils.o
 .\stm32l152_eval\mbcrc.o

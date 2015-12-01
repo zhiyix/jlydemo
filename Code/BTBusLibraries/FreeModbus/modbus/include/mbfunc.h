@@ -46,6 +46,10 @@ eMBException    eMBFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen );
 eMBException    eMBFuncReadHistoryRegister( UCHAR * pucFrame, USHORT * usLen );
 #endif
 
+#if MB_FUNC_READ_REALDATA_ENABLED > 0
+eMBException    eMBFuncReadRealDataRegister( UCHAR * pucFrame, USHORT * usLen );
+#endif
+
 #if MB_FUNC_READ_HOLDING_ENABLED > 0
 eMBException    eMBFuncReadHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
 #endif
