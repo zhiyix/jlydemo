@@ -48,9 +48,9 @@
 #define  HIS_ONE_MAX_BYTES   (uint16_t)(32*2+8*Gps_choose+5+Clock_choose)
 //! \brief 外接电池宏定义   
 #define  VOLTAGE 
-#define  vtest_cnt           7
+#define  vtest_cnt           5
 #define  voltagetesttimenum   30//300 5分钟检测一次        
-#define  voltagetesttimenum1  60//600 10分钟检测一次
+#define  voltagetesttimenum1  10//60//600 10分钟检测一次
 
 #define  ExternalPowerchecktime 60 //外接电源检测时间
 //Lcd背光点亮时间 10 s
@@ -264,7 +264,7 @@ struct JLYPARAMETERStr
 {
     uint8_t  WorkStatueIsStop:1; 	//记录仪工作状态，0停止工作
     uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
-    uint8_t  LastErrorCode:1;		//错误码 
+    uint8_t  FramErrorCode:1;		//错误码 
 	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
 	
     __IO uint8_t  WakeUpSource;		//StopMode下唤醒源

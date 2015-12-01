@@ -407,17 +407,17 @@ static void SetJlyParamData(void)
   *****************************************************************************/
 static void FirstScanSysData(void)
 {
-	if(JlyParam.LastErrorCode != 1)//Fram is ok
+	if(JlyParam.FramErrorCode != 1)//Fram is ok
 	{
 		if(ReadSetFramFlag() == 0x5050)
 		{
 			Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
+			SetJlyParamData();
 		}else{
 			
 			JlyParam.ChannelNumActual = 0;//默认设置0个通道
 			JlyParam.ChannelNumOld = 0;
 		}
-		SetJlyParamData();
 	}else{//fram出错
 		Conf.Jly.WorkStatueIsStop = 0;//停止工作
 		JlyParam.ChannelNumActual = 0;
@@ -486,7 +486,7 @@ static void TestFramIsOrNotOk(void)
 		{
 			//printf("0x%02X ", Fram_Buf_Read[i]);
 			//printf("错误:I2C EEPROM写入与读出的数据不一致\r\n");
-			JlyParam.LastErrorCode = 1;
+			JlyParam.FramErrorCode = 1;
 			return;
 		}
 		//printf("0x%02X ", Fram_Buf_Read[i]);
@@ -528,13 +528,14 @@ void SysInit(void)
 {
     //关外设电源
 	OffPowerSupply();
-    //系统上电检测外接电
-	FirstCheckExternPower();
+    
 	//检测Fram
 	TestFramIsOrNotOk();
 	
 	FirstScanSysData();
 	
+	//系统上电检测外接电
+	FirstCheckExternPower();
 	//上电显示
     FisrtPowerOnDisplay();
 	

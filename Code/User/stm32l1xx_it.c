@@ -238,7 +238,6 @@ void TIM2_IRQHandler(void)
     {
 //        time++;
         Flag.Sec = 1;//1s定时时间到
-		
 		JlyParam.AlarmTimeDelayCount ++;
 		if(JlyParam.AlarmTimeDelayCount >= JlyParam.SoundLightAlarmTimeDelay)
 		{

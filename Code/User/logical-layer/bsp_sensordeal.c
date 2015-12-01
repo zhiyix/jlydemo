@@ -516,16 +516,18 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
         case SENSOR_TEMP:
 				/*计算原始温度数据*/
                 ChannelDataFloat[i] = TempChang_to_Shishu(adc[i]);//
+		
+				FlagSeniorErr[i]=0;//v2.0
+                if((adc[i]<ADC_ERR_L)|(adc[i]>ADC_ERR_H))
+                {
+                    FlagSeniorErr[i]=1;
+                }
 				/*校准开启，校准数据*/
 				if(Conf.Sensor[i].AdjustSwitch == 0x01)
 				{
 					Temp_Adjust(Conf.Adjust[i].adbuf,1,&ChannelDataFloat[i]);
 				}
-                FlagSeniorErr[i]=0;//v2.0
-                if((adc[i]<ADC_ERR_L)|(adc[i]>ADC_ERR_H))
-                {
-                    FlagSeniorErr[i]=1;
-                }
+                
             break;
         //湿度处理
         case SENSOR_HUMI:
@@ -594,7 +596,7 @@ void DoGatherChannelDataFloat(uint8_t ChannelCode)
   *****************************************************************************/
 void JudgingChannelNumberDisplay(uint8_t ChannelNum)
 {
-	if(JlyParam.LastErrorCode != 1)
+	if(JlyParam.FramErrorCode != 1)
 	{
 		if(ChannelNum <= 0)
 		{

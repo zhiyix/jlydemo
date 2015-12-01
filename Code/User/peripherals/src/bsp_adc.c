@@ -88,7 +88,7 @@ static void ADC1_Mode_Config(void)
 //	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;			                //独立ADC模式
 	ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
 	ADC_InitStructure.ADC_ScanConvMode = ENABLE ; 	 				            //扫描模式，扫描模式用于多通道采集
-	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;			                //开启连续转换模式，即不停地进行ADC转换
+	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;			                //关闭连续转换模式，即不停地进行ADC转换
 	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;	//不使用外部触发转换
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right; 	                    //采集数据右对齐
 	ADC_InitStructure.ADC_NbrOfConversion = 6+1;	 							//要转换的通道数目
@@ -129,7 +129,7 @@ static void ADC1_Mode_Config(void)
   ******************************************************************************/
 void ADC1_Init(void)
 {
-		/* 使能内部 HSI 注意时钟*/
+	/* 使能内部 HSI 注意时钟*/
 	RCC_HSICmd(ENABLE);	//ADC使用
 	/* Check that HSI oscillator is ready */
 	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
@@ -155,20 +155,20 @@ void  Dealing_Gather(unsigned char all_channel_code)
     }
     else
     {
-        GatherMaxCt = 14;
-        if(GatherMaxCt==0||GatherMaxCt>15) //
+        GatherMaxCt = 10;
+        if(GatherMaxCt==0||GatherMaxCt>10) //
             return;
         else
-        for(i=0;i<GatherMaxCt;i++)//GatherMaxCt=15
+        for(i=0;i<GatherMaxCt;i++)//采样 GatherMaxCt这么多次
         {
             channel_cp = all_channel_code;
+			/* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
+			ADC_SoftwareStartConv(ADC1);
+			Delay_ms(5);    //延时2ms
             for(m = 0;m < JlyParam.ChannelNumOld;m++)//
             {
                 if(channel_cp & 0x01)
                 {
-                    /* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
-                    ADC_SoftwareStartConv(ADC1);
-                    Delay_ms(5);    //延时5ms
                     adcCopy[m] = adcCopy[m] + ADC_ConvertedValue[m];
                 }                		
                 else
@@ -185,8 +185,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
             adcCopy[m] = 0;
         }
     }
-//    ChannelDataFloat[0] = 23.5;//(((float)ADC_ConvertedValue[1]/4095)-0.1515)/0.00636;
-//	ChannelDataFloat[1] = (((float)adc[1]/4095)-0.1515)/0.00636;
+
 }
 
 /*********************************************END OF FILE**********************/

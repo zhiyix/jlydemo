@@ -1340,19 +1340,23 @@ void Display_LOW(void)
   ******************************************************************************/
 void FisrtPowerOnDisplay(void)
 {
-	Display_SN();//显示SN号
-	/*显示时间*/
-	read_time();
-    while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-	
-	displayTIME(Rtc.Hour,Rtc.Minute);
-    showTIME;	/*显示钟表符号*/
-	
-	Lcd_Dis2Value('-');
-	Lcd_Dis3Value('-');
-	Lcd_Dis4Value('-');
-	
-	LCD_UpdateDisplayRequest();
+	if(JlyParam.FramErrorCode != 1)
+	{
+		Display_SN();//显示SN号
+		Display_Mem();	  //显示存储容量 
+		/*显示时间*/
+		read_time();
+		while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+		
+		displayTIME(Rtc.Hour,Rtc.Minute);
+		showTIME;	/*显示钟表符号*/
+		
+		Lcd_Dis2Value('-');
+		Lcd_Dis3Value('-');
+		Lcd_Dis4Value('-');
+		
+		LCD_UpdateDisplayRequest();
+	}
 }
 /*******************************************************************************
   * @brief  显示仪器SN号
@@ -1432,7 +1436,7 @@ void displayErr(uint8_t Er)
 		/* 清 "设置上限"，“设置下限" */	
         clearshangxian;clearxiaxian;		
         /* 清符号 */
-        clearFUHAO;clearAlarmStatus;clearJINBAO;
+        clearFUHAO;clearAlarmStatus;//clearJINBAO;
         //clearRH;
 		//showC;
 		clearP1;clearP2;

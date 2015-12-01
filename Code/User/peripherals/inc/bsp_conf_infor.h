@@ -235,7 +235,9 @@ struct SensorChanelConfDataStr
 	union FISI2CH4 SensorAlarm_High;  /*!< 报警上限 [IEEE-754_1二进制浮点操作数] 0x0000 0000*/ 
     union FISI2CH4 SensorAlarm_Low;   /*!< 报警下限 [IEEE-754_1二进制浮点操作数]0x0000 0000*/
 	
-	uint8_t Reserv[12];	/*!< Reserv */
+	int16_t ChannelRangeLimit;	//通道量程上限
+	int16_t ChannelRangeLowerLimit;	//通道量程下限
+	uint8_t Reserv[8];	/*!< Reserv */
 };
 //! \brief温湿度传感器校准配置数据地址表 6 (Display="Hex",ADDRESS_OFFSET=0x2000 + Sensor_Channel * 0x80,其中Sensor_Channel取值为0~31):
 

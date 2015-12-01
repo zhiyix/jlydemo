@@ -64,7 +64,7 @@
   *****************************************************************************/
 void RecorderBootModeHandle(void)
 {
-    if(JlyParam.LastErrorCode != 0)
+    if(JlyParam.FramErrorCode != 0)
     {
         if(Conf.Jly.WorkStatueIsStop == 1)	/* ¹¤×÷×´Ì¬ */
         {

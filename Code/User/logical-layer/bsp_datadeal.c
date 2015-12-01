@@ -59,15 +59,18 @@ static void LOWorNomal_Mode(void)
 	uint8_t i=0;
     if((Conf.Jly.PowerMode >= 1)&&(Conf.Jly.WorkStatueIsStop >= 1)) /*低功耗模式*/
     {
-        if(Flag.StartSample==1)
+		
+		if(Flag.StartSample==1)//这里位置不能乱动，会导致adc采集不准
         {
             Flag.StartSample=0;
             //Flag.EndSample=1;
 			Flag.IsDisplayRightNow = 1; //第一次采样完显示
 			
             Dealing_Gather(Started_Channel);
+			
             AVCC1_POWER(OFF);
             DoGatherChannelDataFloat(Started_Channel);
+			
         }
         if(JlyParam.SampleTime == JlyParam.SampleInterval-1)//
         {
@@ -88,6 +91,7 @@ static void LOWorNomal_Mode(void)
 				AVCC1_POWER(ON);	/*打开传感器电源*/
 			}
         }
+		
 //        if(Flag.EndSample==1)
 //        {
 //            Flag.EndSample=0;
@@ -100,7 +104,8 @@ static void LOWorNomal_Mode(void)
     }//END 
     else if(Conf.Jly.WorkStatueIsStop >= 1)//正常模式
     {
-        if(Flag.StartSample==1)
+		
+		if(Flag.StartSample==1)
         {
             Flag.StartSample=0;
             //Flag.EndSample=1;
@@ -129,6 +134,7 @@ static void LOWorNomal_Mode(void)
 				AVCC1_POWER(ON);	/*打开传感器电源*/
 			}
         }
+		
 //        if(Flag.EndSample==1)
 //        {
 //            Flag.EndSample=0;
@@ -156,9 +162,9 @@ static void WorkornotMode(void)
     {
 		OffPowerSupply();//关设备电源
 		
-        if(JlyParam.LastErrorCode!=0)
+        if(JlyParam.FramErrorCode!=0)
         {
-            displayErr(JlyParam.LastErrorCode);
+            displayErr(JlyParam.FramErrorCode);
 		}else{
 			lcd_OFF(JlyParam.ShowOffCode);
 		}
@@ -174,6 +180,7 @@ static void WorkornotMode(void)
 		//当实际通道数 >0 时开启采样 存储 显示
         if(JlyParam.ChannelNumActual >0)
 		{
+			
 			LOWorNomal_Mode();
 			
 			//SaveDataOnTimeDeal();
@@ -181,6 +188,7 @@ static void WorkornotMode(void)
 	//        {
 				Display_ChannelValue(StartedChannelForDisplay);  //LCD 
 	//        }
+			
 			
 			Flag.IsDisplayRightNow=1;
         }
@@ -198,12 +206,14 @@ static void OneSec_Timedeal(void)
     
     //LCD显示处理
     display_ct++;          
-    if(display_ct>=36)
+    if(display_ct>=36)//----------耗时80ms,调整显示的位置
     {
+		
         display_ct = 0;
-		Display_SN();   
+		   
         Display_Mem();	  //显示存储容量 
 		Display_Signal(2);/*显示信号强度*/
+		//LED1(ON);//LED1(OFF);
     }
 	/*****************************************************************/
 	/*机械按键 key1短按长按检测*/
@@ -363,6 +373,7 @@ void JlySecDeal(void)
     {
         Flag.Sec = 0;
 		
+		//LED1(ON);
         OneSec_Timedeal();
         
         rtc_deel();
@@ -374,8 +385,10 @@ void JlySecDeal(void)
 		RecorderBootModeHandle();
 		
         WorkornotMode();
-        
+		
 		StorageHistoryData();
+		
+		//LED1(OFF);
 		//----------------------测试
 //		read_time();
     }
@@ -383,9 +396,9 @@ void JlySecDeal(void)
     {
 		OffPowerSupply();//关设备电源
 		
-        if(JlyParam.LastErrorCode!=0)
+        if(JlyParam.FramErrorCode!=0)
         {
-            displayErr(JlyParam.LastErrorCode);
+            displayErr(JlyParam.FramErrorCode);
         }else{
 			lcd_OFF(JlyParam.ShowOffCode);
 		}

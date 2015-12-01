@@ -58,7 +58,7 @@ void BellNn(uint8_t n)
         BELL;
         if(n>0)
         {
-            Delay_ms(50);
+            Delay_ms(10);
         }
     }
 }
@@ -74,7 +74,7 @@ void BellNn_longer(uint8_t n)
         BELL_longer;
         if(n>0)
         {
-            Delay_ms(250);
+            Delay_ms(50);
         }
     }
 }
@@ -142,7 +142,7 @@ void AlarmDeal(uint8_t channel)
 {
 	if(Conf.Alarm.AlarmSwitch ==1)	// 报警总开关 
 	{
-		if(ChannelDataFloat[channel-1] >= Conf.Sensor[channel-1].SensorAlarm_High.wd)//上限超标
+		if(ChannelDataFloat[channel-1] >= Conf.Sensor[channel-1].SensorAlarm_High.ft)//上限超标
         {
 			if(Flag.AlarmXiaoYin == 1)//按下消音键,关闭声音 符号显示
 			{
@@ -180,7 +180,7 @@ void AlarmDeal(uint8_t channel)
 					}
 				}
 			} 
-        }else if(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.wd)//下限超标
+        }else if(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.ft)//下限超标
 		{
 			if(Flag.AlarmXiaoYin == 1)
 			{

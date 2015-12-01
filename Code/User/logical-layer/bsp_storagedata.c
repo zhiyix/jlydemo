@@ -320,7 +320,7 @@ void ReadFlashHisData(uint32_t RecPointerBeginAddr,uint32_t RecPointerEndAddr)
 	uint16_t Temp;
     uint32_t down_hisdata_count;
     
-    for(down_hisdata_count=RecPointerBeginAddr;down_hisdata_count < (RecPointerEndAddr- Queue.HIS_ONE_BYTES);)//- Queue.HIS_ONE_BYTES
+    for(down_hisdata_count=RecPointerBeginAddr;down_hisdata_count < RecPointerEndAddr;)//- Queue.HIS_ONE_BYTES
     {
         SPI_FLASH_BufferRead(BufTemp,(FLASH_RecFirstAddr+down_hisdata_count),Queue.HIS_ONE_BYTES);
         down_hisdata_count += Queue.HIS_ONE_BYTES;

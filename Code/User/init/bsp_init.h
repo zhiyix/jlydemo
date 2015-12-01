@@ -97,8 +97,8 @@
 #define AlarmLed2_OFF		digitalLo(GPIOF,GPIO_Pin_11)
 
 /* 蜂鸣器 */
-#define BELL            BEEP(ON);Delay_ms(50);BEEP(OFF)
-#define BELL_longer     BEEP(ON);Delay_ms(500);BEEP(OFF)
+#define BELL            BEEP(ON);Delay_ms(20);BEEP(OFF)
+#define BELL_longer     BEEP(ON);Delay_ms(100);BEEP(OFF)
 
 /* 读取延时启动时间 */
 #define ReadDelayStartTime   Change3BytesTimeToLong(Conf.Jly.MixBoot_Hour ,Conf.Jly.MixBoot_Min,0)

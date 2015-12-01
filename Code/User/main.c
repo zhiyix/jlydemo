@@ -63,7 +63,7 @@ int main(void)
 	printf("\r\n this is a 32bits  demo \r\n");
 	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
 	printf("\r\n Conf.Sensor[0].SensorType:%d \r\n",Conf.Sensor[0].SensorType);
-//	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
+	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
   /* Add your application code here
      */
 	freemodbus_init();
@@ -80,13 +80,11 @@ int main(void)
   while (1)
   {
 	  //JlySerialDeal();
-	  
 	  JlySecDeal();
 
 	  KeyDeal();
      
 	  freemodbus_main();
-	  
 	  
 //µÍ¹¦ºÄ²âÊÔ
 //	if(Flag.FirstEnterStopMode ==1)
@@ -105,8 +103,8 @@ int main(void)
 //		}
 //	}
 	  
-//	  LED1(ON);LED1(OFF);//Delay_ms(500);
-//	  LED2(ON);LED2(OFF);//Delay_ms(500);
+//	  LED1(ON);LED1(OFF);//
+//	  LED2(ON);LED2(OFF);//
 //		printf("\r\n ... \r\n");
 //		printf("\r\n Enter StopMode \r\n");
 //		PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
