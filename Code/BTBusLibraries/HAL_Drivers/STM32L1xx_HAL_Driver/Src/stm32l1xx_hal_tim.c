@@ -354,6 +354,8 @@ HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *htim)
   /* Enable the TIM Update interrupt */
   __HAL_TIM_ENABLE_IT(htim, TIM_IT_UPDATE);
 
+  __HAL_TIM_SetCounter(htim, 0x0);
+	
    /* Enable the Peripheral */
   __HAL_TIM_ENABLE(htim);
 	
@@ -370,6 +372,10 @@ HAL_StatusTypeDef HAL_TIM_Base_Stop_IT(TIM_HandleTypeDef *htim)
 {
   /* Check the parameters */
   assert_param(IS_TIM_INSTANCE(htim->Instance));
+
+  /* Zhiyix Clear Config as Interrupt */
+  __HAL_TIM_CLEAR_FLAG(htim, TIM_FLAG_UPDATE);
+	
   /* Disable the TIM Update interrupt */
   __HAL_TIM_DISABLE_IT(htim, TIM_IT_UPDATE);
 
