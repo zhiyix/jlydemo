@@ -89,7 +89,7 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
          + ClockDivision = 0
          + Counter direction = Up
     */
-    TimHandle.Init.Period            = (usTim1Timerout50us * 20) - 1;
+    TimHandle.Init.Period            = (usTim1Timerout50us) - 1;
     TimHandle.Init.Prescaler         = uwPrescalerValue;
     TimHandle.Init.ClockDivision     = 0;
     TimHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;

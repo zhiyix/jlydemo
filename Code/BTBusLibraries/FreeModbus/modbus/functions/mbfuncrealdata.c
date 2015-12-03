@@ -92,7 +92,7 @@ eMBFuncReadRealDataRegister( UCHAR * pucFrame, USHORT * usLen )
             *usLen = MB_PDU_FUNC_OFF;
 
             /* First byte contains the function code. */
-            *pucFrameCur++ = MB_FUNC_READ_HISTORY_REGISTER;
+            *pucFrameCur++ = MB_FUNC_READ_REALDATA_REGISTER;
             *usLen += 1;
 
             /* Second byte in the response contain the number of bytes. */

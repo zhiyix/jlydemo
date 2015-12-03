@@ -548,7 +548,7 @@ I (..\FreeModbus\modbus\././include/mbframe.h)(0x561EFBC7)
 I (..\FreeModbus\modbus\././include/mbfunc.h)(0x565D09CF)
 I (..\FreeModbus\modbus\././include/mbutils.h)(0x561EFBC8)
 I (..\FreeModbus\modbus\././rtu/mbrtu.h)(0x561EFBC8)
-F (..\mbport\porttimer.c)(0x561EFBCD)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\porttimer.o --omf_browse .\stm32l152_eval\porttimer.crf --depend .\stm32l152_eval\porttimer.d)
+F (..\mbport\porttimer.c)(0x565FA87F)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\porttimer.o --omf_browse .\stm32l152_eval\porttimer.crf --depend .\stm32l152_eval\porttimer.d)
 I (..\FreeModbus\modbus\./app_cfg.h)(0x561EFBC7)
 I (..\FreeModbus\modbus\./porttype.h)(0x561EFBC8)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdint.h)(0x51C7C554)
@@ -713,7 +713,7 @@ I (..\FreeModbus\modbus\functions\..\./include/mbframe.h)(0x561EFBC7)
 I (..\FreeModbus\modbus\functions\..\./include/mbfunc.h)(0x565D09CF)
 I (..\FreeModbus\modbus\functions\..\./include/mbutils.h)(0x561EFBC8)
 I (..\FreeModbus\modbus\functions\..\./rtu/mbrtu.h)(0x561EFBC8)
-F (..\FreeModbus\modbus\functions\mbfuncrealdata.c)(0x565D07AE)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\mbfuncrealdata.o --omf_browse .\stm32l152_eval\mbfuncrealdata.crf --depend .\stm32l152_eval\mbfuncrealdata.d)
+F (..\FreeModbus\modbus\functions\mbfuncrealdata.c)(0x565D87E8)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\Inc -I..\HAL_Drivers\STM32L1xx_HAL_Driver\Inc -I..\FreeModbus\modbus -I..\HAL_Drivers\CMSIS\Device\ST\STM32L1xx\Include-I D:\Win_Profession\MDK474\ARM\RV31\INC-I D:\Win_Profession\MDK474\ARM\CMSIS\Include-I D:\Win_Profession\MDK474\ARM\Inc\ST\STM32L1xx-DSTM32L152xB -DUSE_HAL_DRIVER -DMB_SLAVE-o .\stm32l152_eval\mbfuncrealdata.o --omf_browse .\stm32l152_eval\mbfuncrealdata.crf --depend .\stm32l152_eval\mbfuncrealdata.d)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\stdlib.h)(0x51C7C554)
 I (D:\Win_Profession\MDK474\ARM\ARMCC\include\string.h)(0x51C7C554)
 I (..\FreeModbus\modbus\functions\..\modbus.h)(0x561EFBC8)
