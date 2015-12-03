@@ -60,7 +60,9 @@
 		40FF:
 		50FF:ÑÓÊ±Æô¶¯·½Ê½£¬»¹Î´¿ªÊ¼¼ÇÂ¼
 		90FF:³öÏÖ¹ÊÕÏÍ£»ú
-	ÊÖ¶¯Æô¶¯ÉÏÎ»»úÅäÖÃºÍ°´¼ü¿ªÆô¹¤×÷
+	ÊÖ¶¯Æô¶¯ÉÏÎ»»úÅäÖÃºÍ°´¼ü¿ªÆô¹¤×÷¡
+	
+	°´¼üÍ£Ö¹¼ÇÂ¼ºó£¬Èç¹ûÒÇÆ÷ÖØÆôÔò°´ÖØÆôÇ°µÄÆô¶¯·½Ê½Æô¶¯
   *****************************************************************************/
 void RecorderBootModeHandle(void)
 {
@@ -73,15 +75,17 @@ void RecorderBootModeHandle(void)
             Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
 			
             JlyParam.ShowOffCode = 0x09;	/*³öÏÖ¹ÊÕÏ*/
+			Flag.StopRecording = 0;	//Í£Ö¹¼ÇÂ¼±êÖ¾Çå0
         }
         return;
     }
     if(Conf.Jly.RecBootMode == 0x00)	/* ÑÓÊ±Æô¶¯(Ä¬ÈÏÑÓÊ±Ê±¼ä0£¬¼´Á¢¼´Æô¶¯)*/
     {
-		if((JlyParam.delay_start_time--) <= 0)	//&& (!Conf.Jly.WorkStatueIsStop)
+		if((JlyParam.delay_start_time--) <= 0 && (!Conf.Jly.WorkStatueIsStop))	//&& (!Conf.Jly.WorkStatueIsStop)
         {
             JlyParam.delay_start_time = -1;
             Conf.Jly.WorkStatueIsStop = 1;	/*¿ªÆô¹¤×÷*/
+			Conf.Jly.RecBootMode = 0xFF;	//µ±Ç°¼ÇÂ¼·½Ê½Æô¶¯ºó£¬²»»áÔÙÖ´ÐÐµ±Ç°³ÌÐò£¬Ìá¸ß´úÂëÐ§ÂÊ
         }
         if((JlyParam.delay_start_time)>0)
         {
@@ -92,20 +96,17 @@ void RecorderBootModeHandle(void)
     }
 	else if(Conf.Jly.RecBootMode == 0x01)	/* Ê±¼äµã¶¨Ê±Æô¶¯ */
 	{
-		if(Flag.RecTimeDingShiBoot == 0)	/* Í£Ö¹¹¤×÷ */
+		
+		/*¶ÁÈ¡Ê±ÖÓÊ±¼ä*/
+		read_time();
+		if((Rtc.Year == Conf.Jly.MixBoot_Year)&&(Rtc.Month == Conf.Jly.MixBoot_Month)&&(Rtc.Day == Conf.Jly.MixBoot_Day)\
+			&&(Rtc.Hour == Conf.Jly.MixBoot_Hour)&&(Rtc.Minute == Conf.Jly.MixBoot_Min))
 		{
-			/*¶ÁÈ¡Ê±ÖÓÊ±¼ä*/
-			read_time();
-			if((Rtc.Year == Conf.Jly.MixBoot_Year)&&(Rtc.Month == Conf.Jly.MixBoot_Month)&&(Rtc.Day == Conf.Jly.MixBoot_Day)\
-				&&(Rtc.Hour == Conf.Jly.MixBoot_Hour)&&(Rtc.Minute == Conf.Jly.MixBoot_Min))
-			{
-				Conf.Jly.WorkStatueIsStop = 1;	/*µ½Ê±¼äµã¿ªÆô¹¤×÷*/	
-				Flag.RecTimeDingShiBoot = 1;	/*Ê±¼äµã¶¨Ê±ÒÑÆô¶¯*/
-			}else{
-				Conf.Jly.WorkStatueIsStop = 0;	/* Í£Ö¹¹¤×÷ */
-				JlyParam.ShowOffCode = 0x03;	/*±íÊ¾¶¨Ê±Æô¶¯·½Ê½£¬»¹Î´¿ªÊ¼¼ÇÂ¼*/
-				Flag.RecTimeDingShiBoot = 0;
-			}
+			Conf.Jly.WorkStatueIsStop = 1;	/*µ½Ê±¼äµã¿ªÆô¹¤×÷*/	
+			Conf.Jly.RecBootMode = 0xFF;	//µ±Ç°¼ÇÂ¼·½Ê½Æô¶¯ºó£¬²»»áÔÙÖ´ÐÐµ±Ç°³ÌÐò£¬Ìá¸ß´úÂëÐ§ÂÊ
+		}else{
+			Conf.Jly.WorkStatueIsStop = 0;	/* Í£Ö¹¹¤×÷ */
+			JlyParam.ShowOffCode = 0x03;	/*±íÊ¾¶¨Ê±Æô¶¯·½Ê½£¬»¹Î´¿ªÊ¼¼ÇÂ¼*/
 		}
 	}
 	else if(Conf.Jly.RecBootMode == 0x02)	/* Ê±¼äµã¶¨µãÆôÍ£ */
@@ -125,6 +126,7 @@ void RecorderBootModeHandle(void)
 				Flag.RecTimeDingDianBoot = 0;
 			}
 		}
+		
 		if(Conf.Jly.WorkStatueIsStop) /* Ê±¼äµã¶¨µãÍ£Ö¹ */
 		{
 			/*¶ÁÈ¡Ê±ÖÓÊ±¼ä*/
@@ -134,9 +136,11 @@ void RecorderBootModeHandle(void)
 			{
 				Conf.Jly.WorkStatueIsStop = 0;	/* µ½Ê±¼äµãÍ£Ö¹¹¤×÷ */
 				JlyParam.ShowOffCode = 0x02;	/*±íÊ¾¶¨µãÍ£Ö¹·½Ê½ £¬ÒÑµ½Ê±Í£»ú*/
-			}
-			else
-			{
+				
+				Flag.RecTimeDingDianBoot = 0;
+				Conf.Jly.RecBootMode = 0xFF;	//µ±Ç°¼ÇÂ¼·½Ê½Æô¶¯Í£Ö¹ºó£¬²»»áÔÙÖ´ÐÐµ±Ç°³ÌÐò£¬Ìá¸ß´úÂëÐ§ÂÊ
+			}else{
+				
 				Conf.Jly.WorkStatueIsStop = 1;	
 			}
 		}
@@ -150,9 +154,11 @@ void RecorderBootModeHandle(void)
             //Ð´Èëfram
 			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
 			JlyParam.ShowOffCode = 0xFF;
+			Flag.StopRecording = 0;	//Í£Ö¹¼ÇÂ¼±êÖ¾Çå0  ÕâÑùµÄ»°ÔÚ±ðµÄÆô¶¯·½Ê½Î´ÉúÐ§Ç°ÈÎ¿ÉÐÞ¸Äµ½±ðµÄ¼ÇÂ¼·½Ê½
 		}else{//ÓÉÍ£Ö¹µ½¹¤×÷
 			Conf.Jly.WorkStatueIsStop = 1;
 			Conf.Jly.RecBootMode = 0xFF;
+			Flag.StopRecording = 0;	//Í£Ö¹¼ÇÂ¼±êÖ¾Çå0  ÕâÑùµÄ»°ÔÚ±ðµÄÆô¶¯·½Ê½Î´ÉúÐ§Ç°ÈÎ¿ÉÐÞ¸Äµ½±ðµÄ¼ÇÂ¼·½Ê½
 			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
 		}
     }

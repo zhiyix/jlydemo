@@ -76,6 +76,7 @@ static void JlyConfDataUpData(void)
 {
 	//参数复位
 	ChannelForDisplay =0;//显示
+	Flag.StopRecording = 0;	//停止记录标志清0  这样的话在别的启动方式未生效前任可修改到别的记录方式,立即刷新显示
 	
 	//按键使能 重要参数,在这里客户通过app进行设置
 	Flag.KeyEnableOrDisable = Conf.Jly.KeyEnableOrDisable;
@@ -378,50 +379,29 @@ bool PARAM_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 }
 
 /******************************************************************************
-  * @brief  Description 读取历史数据
-usAddress不是 Queue.HIS_ONE_BYTES整数倍时处理
-usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
-						(1)读数据测试ok
+  * @brief  Description 读取实时数据
   * @param  pucBuffer   存放读出数据的指针
-  * @param  usAddress	读数据起始地址,为一帧数据的整数倍
-  * @param  usNRegs		读取数据的字节数
+  * @param  usAddress	读出数据的地址 0
+  * @param  usNRegs		读的数量
   * @retval 无
   *****************************************************************************/
-bool HISTORY_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+bool REALDATA_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
-	//usAddress *= 2;
+	usAddress *= 2;
 	usNRegs *= 2;
-	
-	if((usAddress % Queue.HIS_ONE_BYTES ==0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
+	if((usAddress == 0) &&(usNRegs % Queue.HIS_ONE_BYTES) ==0)
 	{
-		Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
-		if(usAddress < Queue.FlashReadDataBeginPointer)//小于最小
-		{
-			usAddress = Queue.FlashReadDataBeginPointer;
-		}else{
-			if(usAddress >= Queue.FlashRecActualStorage)//超过最大存储地址
-			{
-				return false;
-			}else{
-				if((Queue.FlashReadDataBeginPointer > (Queue.FlashRecActualStorage - FLASH_SectorPerSize))&&((usAddress + usNRegs) > Queue.FlashRecActualStorage))
-				{
-					usNRegs = Queue.FlashRecActualStorage - usAddress;
-				}
-			}
-		}
-		
-		SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);
-		
-		//测试
+		Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar); 
+		SPI_FLASH_BufferRead(pucBuffer,(Queue.WriteFlashDataPointer-Queue.HIS_ONE_BYTES),usNRegs);
 		
 		return true;
 	}else{
+		
 		return false;
 	}
 }
-
 /******************************************************************************
-  * @brief  Description 读取实时数据
+  * @brief  Description 读取未读数据
 usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
 						(1)读数据测试ok
 						(2)读最新数据时测试ok，
@@ -431,7 +411,7 @@ usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
 2.溢出 r>w 测试最大边界
 3.溢出 r<w 测试r追上w
   * @param  pucBuffer   存放读出数据的指针
-  * @param  usAddress	读出数据的地址,在本函数中没有实际意义
+  * @param  usAddress	读出数据的地址 0,在本函数中没有实际意义
   * @param  usNRegs   读取数据的字节数,为一帧数据的整数倍
   * @retval 无
   *****************************************************************************/
@@ -442,8 +422,7 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	//usAddress *= 2;
 	usNRegs *= 2;
 	
-	//LED1(ON);
-	if(usNRegs % Queue.HIS_ONE_BYTES ==0)
+	if((usAddress == 0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
 	{
 		Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
 		Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
@@ -508,7 +487,6 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		
 		//rtc_deel();
 		
-		//LED1(OFF);
 		return true;
 	}else{
 		
@@ -517,14 +495,52 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 }
 
 /******************************************************************************
-  * @brief  Description 
-  * @param  无
+  * @brief  Description 下载历史数据
+usAddress不是 Queue.HIS_ONE_BYTES整数倍时处理
+usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
+						(1)读数据测试ok
+  * @param  pucBuffer   存放读出数据的指针
+  * @param  usAddress	读数据起始地址,为一帧数据的整数倍
+  * @param  usNRegs		读取数据的字节数
   * @retval 无
   *****************************************************************************/
-void JlySerialDeal(void)
+bool HISTORY_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
+	//usAddress *= 2;
+	usNRegs *= 2;
 	
+	if((usAddress % Queue.HIS_ONE_BYTES ==0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
+	{
+		Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
+		if(usAddress < Queue.FlashReadDataBeginPointer)//小于最小
+		{
+			usAddress = Queue.FlashReadDataBeginPointer;
+			SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);
+		}else{
+			if(usAddress >= Queue.FlashRecActualStorage)//超过最大存储地址
+			{
+				
+				return false;
+			}else{
+				if((Queue.FlashReadDataBeginPointer > (Queue.FlashRecActualStorage - FLASH_SectorPerSize))&&((usAddress + usNRegs) >= Queue.FlashRecActualStorage))
+				{
+					usNRegs = Queue.FlashRecActualStorage - usAddress;
+					
+				}
+				SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);
+			}
+		}
+		
+		
+		
+		//测试
+		
+		return true;
+	}else{
+		return false;
+	}
 }
+
 #endif /* __BSPSERIAL_C */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

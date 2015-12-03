@@ -227,10 +227,6 @@ void AlarmDeal(uint8_t channel)
 			//CloseAlarm();
         }        
 	}
-    else
-    {
-        CloseAlarm();
-    }   
 }
 
 #endif /* __BSPALARM_C */

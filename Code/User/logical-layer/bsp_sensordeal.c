@@ -600,7 +600,12 @@ void JudgingChannelNumberDisplay(uint8_t ChannelNum)
 	{
 		if(ChannelNum <= 0)
 		{
-			Display_NUL();//配置的通道数为0,显示NUL
+			/*!< Wait Until the last LCD RAM update finish */
+			while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+			
+            Display_NUL();//配置的通道数为0,显示NUL
+			/*!< Requesy LCD RAM update */
+			LCD_UpdateDisplayRequest();  
 		}else{
 			Started_Channel = GetStartChanel(ChannelNum); //通道数转换为 启动的通道
 			StartedChannelForDisplay = Started_Channel;

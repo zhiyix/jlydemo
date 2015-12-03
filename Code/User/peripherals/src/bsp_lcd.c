@@ -158,15 +158,15 @@ void LCD_GLASS_Init(void)
 	/*!< Configure the LCD interface -------------------------------------------*/
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_LCD, ENABLE);/*!< Enable LCD APB1 Clock */
 
-	LCD_InitStructure.LCD_Prescaler = LCD_Prescaler_8;
-	LCD_InitStructure.LCD_Divider = LCD_Divider_31;
+	LCD_InitStructure.LCD_Prescaler = LCD_Prescaler_2;	//
+	LCD_InitStructure.LCD_Divider = LCD_Divider_16;		//
 	LCD_InitStructure.LCD_Duty = LCD_Duty_1_4;
 	LCD_InitStructure.LCD_Bias = LCD_Bias_1_3;/*选择了COM0~COM3，偏压选LCD_Bias_1_3*/
 	LCD_InitStructure.LCD_VoltageSource = LCD_VoltageSource_Internal;
 	LCD_Init(&LCD_InitStructure);
 
 	/*!< Configure the Pulse On Duration */
-	LCD_PulseOnDurationConfig(LCD_PulseOnDuration_1); //配置LCD脉冲持续时间 LCD_PulseOnDuration_0
+	LCD_PulseOnDurationConfig(LCD_PulseOnDuration_7); //配置LCD脉冲持续时间 LCD_PulseOnDuration_0
   
 	/*!< Configure the LCD Contrast (3.25V) */
 	LCD_ContrastConfig(LCD_Contrast_Level_7); //配置LCD对比度 LCD_Contrast_Level_7
@@ -1249,7 +1249,7 @@ void displayTIME(uint8_t hour,uint8_t min)
 void Display_Signal(uint8_t signal_value)
 {
 	/*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){} 
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
 	
 	if((signal_value >0)&&(signal_value<=6))
 	{showS1;}
@@ -1272,7 +1272,7 @@ void Display_Signal(uint8_t signal_value)
 void Display_Mem(void) 
 {
 	/*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){}
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
     if(Queue.FlashRecOverFlow == 0)/*未溢出过*/
     {
         if(Queue.WriteFlashDataPointer<=(Queue.FlashRecActualStorage/5)) /**/
@@ -1300,7 +1300,7 @@ void Display_Mem(void)
   ******************************************************************************/
 void Display_NUL(void)
 {
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	//while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
 	
 	/*先清数据*/
 	Lcd_Dis2Value(0xFF);
@@ -1312,7 +1312,7 @@ void Display_NUL(void)
 	Lcd_Dis4Value('L');
 	
 	/*!< Requesy LCD RAM update */
-	LCD_UpdateDisplayRequest();  
+	//LCD_UpdateDisplayRequest();  
 }
 /*******************************************************************************
   * @brief  显示低功耗标志 LO.
@@ -1380,7 +1380,7 @@ void Display_SN(void)
     //LCDMEM[2]=digit[year%16];
 //    LCDMEM[2]|=digit[month/16];
     /*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET){} 
+	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
     
 	Lcd_Dis5Value(0xFF);	
 	Lcd_Dis6Value(0xFF);	
@@ -1424,7 +1424,7 @@ void Display_SN(void)
 void displayErr(uint8_t Er)
 {
 	/*!< Wait Until the last LCD RAM update finish */
-	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+	//while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
 //    if(FlagDownIng==0)
 //    {
         /* 2[8] 3[8] 4[8]清零 */
@@ -1446,7 +1446,7 @@ void displayErr(uint8_t Er)
         Lcd_Dis4Value('r');
 //    }
 	/*!< Requesy LCD RAM update */
-	LCD_UpdateDisplayRequest();  
+	//LCD_UpdateDisplayRequest();  
 }
 /*******************************************************************************
   * @brief  Description 关闭LCD
@@ -1469,7 +1469,7 @@ void lcd_OFF(uint8_t offcode)
 	clear_GPRS;
 	clear_GPS;
 	//clearBATT;
-	clearFlashMEM;
+	//clearFlashMEM;
 	cleartongdao;
 	clearJINBAO;
 	clearAlarmStatus;
@@ -1503,7 +1503,7 @@ void lcd_OFF(uint8_t offcode)
   * @param  humi		温湿度数据
   * @retval None
   ******************************************************************************/
-static void Lcd_ChannelValue(uint8_t temp,float humi)
+void Lcd_ChannelValue(uint8_t temp,float humi)
 {
     uint16_t value;
     uint8_t value_fuhao,chanel;
@@ -1573,7 +1573,13 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
 			else
 				Lcd_Dis2Value(0XFF);
 			if(value/10)
+			{
+				//temptest = SysTickTestCount;
 				Lcd_Dis3Value((value/10)%10);
+				//printf("[6:%d],",SysTickTestCount-temptest);	//5
+				//temptest = SysTickTestCount;
+			}
+				
 			else
 				Lcd_Dis3Value(0);
 			
@@ -1584,6 +1590,15 @@ static void Lcd_ChannelValue(uint8_t temp,float humi)
 			
 			showP2;
 		}
+	}
+	
+	if(Conf.Sensor[ChannelForDisplay-1].SensorType == SENSOR_HUMI)	/*湿度*/
+	{
+		clearC;  
+		showRH;
+	}else{
+		clearRH;
+		showC;
 	}
 	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
@@ -1608,23 +1623,16 @@ void Display_ChannelValue(uint8_t started_channel0)
 
 			if(Conf.Sensor[ChannelForDisplay-1].ChannelSwitch ==0)
 			{
+				//temptest = SysTickTestCount;
 				Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
+				//printf("[2:%d],",SysTickTestCount-temptest);	//5
+				//temptest = SysTickTestCount;
+				
 				AlarmDeal(ChannelForDisplay);
 				
-				if(Conf.Sensor[ChannelForDisplay-1].SensorType == SENSOR_HUMI)	/*湿度*/
-				{
-					/*!< Wait Until the last LCD RAM update finish */
-					while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-					clearC;  
-					showRH;
-					/*!< Requesy LCD RAM update */
-					LCD_UpdateDisplayRequest();  
-				}else{
-					while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-					clearRH;
-					showC;
-					LCD_UpdateDisplayRequest();  
-				}
+				//printf("[3:%d],",SysTickTestCount-temptest);	//5
+				//temptest = SysTickTestCount;
+				
 			}
 
             break;

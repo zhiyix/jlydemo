@@ -142,6 +142,12 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
 	TimingDelay_Decrement();
+	SysTickTestCount++;
+	
+	if(SysTickTestCount >= 1000000)
+	{
+		SysTickTestCount = 0;
+	}
 //	MsCount++;
 //	if(MsCount >=60000)
 //	{

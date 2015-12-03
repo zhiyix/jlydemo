@@ -69,7 +69,7 @@ static void Voltage_ADC1config(void)
     { 
         /* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
         ADC_SoftwareStartConv(ADC1);
-        Delay_ms(5);    //延时2ms
+        Delay_ms(2);    //延时2ms
 		PManage.BatADC_ConvertedValue = ADC_ConvertedValue[2];
         adc_temp[i] = PManage.BatADC_ConvertedValue;
     }

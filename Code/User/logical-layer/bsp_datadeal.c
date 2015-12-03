@@ -158,41 +158,46 @@ static void LOWorNomal_Mode(void)
   *****************************************************************************/
 static void WorkornotMode(void)
 {
-    if(Conf.Jly.WorkStatueIsStop < 1)//停止工作
+    if(Conf.Jly.WorkStatueIsStop >= 1)
     {
-		OffPowerSupply();//关设备电源
-		
-        if(JlyParam.FramErrorCode!=0)
-        {
-            displayErr(JlyParam.FramErrorCode);
-		}else{
-			lcd_OFF(JlyParam.ShowOffCode);
-		}
-        if(Flag.MucReset==1)
-        {
-            Flag.MucReset=0;
-            
-        }
-        return;
-    }
-    else
-    {
+
 		//当实际通道数 >0 时开启采样 存储 显示
         if(JlyParam.ChannelNumActual >0)
 		{
-			
+			//temptest = SysTickTestCount;
 			LOWorNomal_Mode();
-			
+			//printf("[1:%d],",SysTickTestCount-temptest);	//5
+			//temptest = SysTickTestCount;
 			//SaveDataOnTimeDeal();
 	//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
 	//        {
 				Display_ChannelValue(StartedChannelForDisplay);  //LCD 
 	//        }
-			
+			//printf("[4:%d],",SysTickTestCount-temptest);	//5
+			//temptest = SysTickTestCount;
 			
 			Flag.IsDisplayRightNow=1;
+			Flag.StopRecording = 0;	//停止记录标志清0
         }
-    } 
+    }else{
+		
+		if(Flag.StopRecording == 0)
+		{
+			Flag.StopRecording = 1;	//停止记录
+			
+			OffPowerSupply();//关设备电源
+			if(JlyParam.FramErrorCode!=0)
+			{
+				/*!< Wait Until the last LCD RAM update finish */
+				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+				displayErr(JlyParam.FramErrorCode);
+				/*!< Requesy LCD RAM update */
+				LCD_UpdateDisplayRequest();  
+			}else{
+				lcd_OFF(JlyParam.ShowOffCode);
+			}
+		}
+	}
 }
 
 
@@ -206,14 +211,14 @@ static void OneSec_Timedeal(void)
     
     //LCD显示处理
     display_ct++;          
-    if(display_ct>=36)//----------耗时80ms,调整显示的位置
+    if(display_ct >= 36)//----------耗时80ms,调整显示的位置
     {
-		
+		//printf("display_ct%d,",display_ct);
         display_ct = 0;
 		   
         Display_Mem();	  //显示存储容量 
-		Display_Signal(2);/*显示信号强度*/
-		//LED1(ON);//LED1(OFF);
+		//Display_Signal(2);/*显示信号强度*/
+		
     }
 	/*****************************************************************/
 	/*机械按键 key1短按长按检测*/
@@ -313,8 +318,6 @@ static void OneSec_Timedeal(void)
 				rtc_deel();
 			}
 		}
-	}else{
-		Key1ChangAnCount = 0;
 	}
 	
 	
@@ -346,16 +349,14 @@ static void OneSec_Timedeal(void)
 				Flag.BatChargeFull=1;/*接外接电，电池充满标志*/
 				
 				Flag.BatCharging = 0;/*接外接电未接电池，电池未充电*/
-			}			
-		}
-		else
-		{
+			}	
+			
+		}else{
 			Flag.BatChargeFull=0;
 			Flag.BatCharging = 1;/*接外接电，电池正在充电中*/
 		}
-	}
-	else
-	{
+		
+	}else{
 		Flag.BatChargeFull=0;
 		Flag.BatCharging = 0;/*外接电未接*/
 	}
@@ -372,35 +373,43 @@ void JlySecDeal(void)
     if(Flag.Sec == 1)   //1秒
     {
         Flag.Sec = 0;
-		
-		//LED1(ON);
+
         OneSec_Timedeal();
-        
+
+
         rtc_deel();
-        
+
 		OutpowerShan();
-		
+
         VoltageTest();
-        
+    
 		RecorderBootModeHandle();
-		
+
         WorkornotMode();
-		
+
 		StorageHistoryData();
 		
-		//LED1(OFF);
 		//----------------------测试
-//		read_time();
     }
+	
 	if(Conf.Jly.WorkStatueIsStop < 1) /*停止工作*/
-    {
-		OffPowerSupply();//关设备电源
-		
-        if(JlyParam.FramErrorCode!=0)
-        {
-            displayErr(JlyParam.FramErrorCode);
-        }else{
-			lcd_OFF(JlyParam.ShowOffCode);
+    {	
+		if(Flag.StopRecording == 0)
+		{
+			Flag.StopRecording = 1;	//停止记录,只执行一次
+			
+			RecorderBootModeHandle();
+			OffPowerSupply();//关设备电源
+			if(JlyParam.FramErrorCode!=0)
+			{
+				/*!< Wait Until the last LCD RAM update finish */
+				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+				displayErr(JlyParam.FramErrorCode);
+				/*!< Requesy LCD RAM update */
+				LCD_UpdateDisplayRequest();  
+			}else{
+				lcd_OFF(JlyParam.ShowOffCode);
+			}
 		}
     }
 }

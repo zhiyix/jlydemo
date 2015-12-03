@@ -234,14 +234,13 @@ struct FLAGStr
          uint8_t EndSample:1;           //结束采样
          uint8_t MucReset:1;            //上电复位？？
          uint8_t RtcShan:1;             //时钟 : 闪烁
-	
-		 uint8_t RecTimeDingShiBoot:1;	//记录仪时间点定时启动
+		 
 		 uint8_t RecTimeDingDianBoot:1; //记录仪时间点定点启动
-		 uint8_t RecTimeDingDianStop:1; //记录仪时间点定点停止
 		 
 		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
 		 //uint8_t FirstSampleOkAlarm:1;	//第一次采样完成后，
 		 uint8_t ChannelSwitchIsOn:1;	//通道使能打开
+		 uint8_t StopRecording:1;		//停止记录标志
 		 
 		 uint8_t AlarmHuiFu[32];		//报警消音恢复标志-------可以优化为4个字节，每个标志占一个bit
 		 		 
@@ -308,7 +307,10 @@ extern uint8_t  	DataBuf[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES];
 extern uint16_t     adc[32];
 extern uint16_t     adcCopy[32];
 extern uint16_t	    MsCount;
-extern uint32_t SYS_CLK;
+extern uint32_t     SYS_CLK;
+
+extern uint32_t		SysTickTestCount;
+extern uint32_t     temptest;
 
 extern struct 		CircularQueueStr   Queue;
 extern struct 		FLAGStr			   Flag;

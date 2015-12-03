@@ -79,12 +79,17 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-	  //JlySerialDeal();
+	  temptest = SysTickTestCount;
 	  JlySecDeal();
+	  
 
 	  KeyDeal();
-     
+
+temptest = SysTickTestCount;		
 	  freemodbus_main();
+	  if((SysTickTestCount-temptest)>1)
+		printf("%d\r\n",SysTickTestCount-temptest);	//7 ok
+temptest = SysTickTestCount;		
 	  
 //低功耗测试
 //	if(Flag.FirstEnterStopMode ==1)
@@ -102,32 +107,6 @@ int main(void)
 //			EnterStopModePower();
 //		}
 //	}
-	  
-//	  LED1(ON);LED1(OFF);//
-//	  LED2(ON);LED2(OFF);//
-//		printf("\r\n ... \r\n");
-//		printf("\r\n Enter StopMode \r\n");
-//		PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
-//		//printf("\r\n Exit StopMode \r\n");
-//		SysClock_ReConfig();
-//		printf("\r\n Exit StopMode \r\n");
-	  //PWR_EnterSTANDBYMode();
-	  //测试
-//	if(ReadRX8025Control2() & RX8025_Control2CTFG)
-//	{
-//		uint8_t setbuf[1];
-//		setbuf[0] = 0x20 ;
-//		RTC8025_Write(setbuf,RX8025_Control2Addr,1);  //清除RX8025 PON位，设置BIT3 为1表示设置过RX8025
-//		OffPowerSupply();//关设备电源
-//		PWR_WakeUpPinCmd(PWR_WakeUpPin_1,ENABLE);
-//		PWR_EnterSTANDBYMode();
-//	}
-//	Reset_Time();
-//	OffPowerSupply();//关设备电源
-//	PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
-//	PWR_EnterSTANDBYMode();
-//	PWR_WakeUpPinCmd(PWR_WakeUpPin_1,ENABLE);
-//	PWR_EnterSTANDBYMode();
 	
   }
 }

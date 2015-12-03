@@ -164,7 +164,7 @@ void  Dealing_Gather(unsigned char all_channel_code)
             channel_cp = all_channel_code;
 			/* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
 			ADC_SoftwareStartConv(ADC1);
-			Delay_ms(5);    //延时2ms
+			Delay_ms(2);    //延时2ms
             for(m = 0;m < JlyParam.ChannelNumOld;m++)//
             {
                 if(channel_cp & 0x01)

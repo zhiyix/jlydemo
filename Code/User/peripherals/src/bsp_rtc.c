@@ -218,20 +218,19 @@ void rtc_deel(void)
 //            clearMEM;
 //            Pt.IStep=0;
 //        }
-        
+        //printf("rtc_pt%d,",rtc_pt);
         rtc_pt=0;
         read_time();                     //60s 读一次时间
         while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
 		displayTIME(Rtc.Hour,Rtc.Minute);//显示时间
-        showTIME;
         LCD_UpdateDisplayRequest();
+		
     }
     if((rtc_pt==20)||(rtc_pt==50))
     {
         while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
 		displayDAY(Rtc.Month,Rtc.Day);  //30s 显示一次日期
         showP;
-        showTIME;        
         LCD_UpdateDisplayRequest();
     }
     if((rtc_pt==22)||(rtc_pt==52))
@@ -239,14 +238,12 @@ void rtc_deel(void)
         while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
 		displayYEAR(Rtc.Year);
         clearP;
-        showTIME;
         LCD_UpdateDisplayRequest();
     }
     if((rtc_pt==24)||(rtc_pt==54))
     {
         while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
 		displayTIME(Rtc.Hour,Rtc.Minute);
-        showTIME;
         LCD_UpdateDisplayRequest();
     }
     if((rtc_pt<20)||((rtc_pt>23)&&(rtc_pt<50))||(rtc_pt>53))//时间COL闪,在显示日期,年时,COL不闪
@@ -265,9 +262,6 @@ void rtc_deel(void)
             clearCOL;
             LCD_UpdateDisplayRequest();
         }
-        while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
-        showTIME;
-        LCD_UpdateDisplayRequest();
     }
 }
 

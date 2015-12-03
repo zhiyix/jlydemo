@@ -205,6 +205,9 @@ void displayDAY(uint8_t month,uint8_t day);
 void displayTIME(uint8_t hour,uint8_t min);
 void Display_ChannelValue(uint8_t started_channel0);
 void FisrtPowerOnDisplay(void);
+
+void Lcd_ChannelValue(uint8_t temp,float humi);
+
 //#ifdef __cplusplus
 //}
 //#endif
