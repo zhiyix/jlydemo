@@ -48,9 +48,9 @@
 /*============================ PROTOTYPES ====================================*/
 
 /*============================ EXTERN FUNCTIONS ==============================*/
-void VoltageTest(void);
+void BatteryVoltageDetection(void);
 void FirstCheckExternPower(void);
-void OutpowerShan(void);
+void ExternalPowerDetection(void);
 //#ifdef __cplusplus
 //}
 //#endif

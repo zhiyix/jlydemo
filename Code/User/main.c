@@ -79,19 +79,23 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-	  temptest = SysTickTestCount;
+//temptest = SysTickTestCount;
 	  JlySecDeal();
 	  
 
 	  KeyDeal();
 
-temptest = SysTickTestCount;		
+//temptest = SysTickTestCount;		
 	  freemodbus_main();
-	  if((SysTickTestCount-temptest)>1)
-		printf("%d\r\n",SysTickTestCount-temptest);	//7 ok
-temptest = SysTickTestCount;		
+	  
+//	  if((SysTickTestCount-temptest)>1)
+//		printf("%d\r\n",SysTickTestCount-temptest);	//7 ok
+//temptest = SysTickTestCount;		
+	  
+	  
 	  
 //µÍ¹¦ºÄ²âÊÔ
+	  
 //	if(Flag.FirstEnterStopMode ==1)
 //	{
 //		if(JlyParam.WakeUpSource == 2)

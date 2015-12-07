@@ -16,11 +16,11 @@
 
 __IO uint32_t TimingDelay = 0;
 
-/**
-  * @brief  启动系统滴答定时器 SysTick
+/******************************************************************************
+  * @brief  系统滴答定时器 SysTick初始化
   * @param  无
   * @retval 无
-  */
+  *****************************************************************************/
 void SysTick_Init(void)
 {
 	/* SystemFrequency / 1000 1ms 中断一次
@@ -35,11 +35,11 @@ void SysTick_Init(void)
 	SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
 }
 
-/**
+/******************************************************************************
   * @brief ms延时程序,1ms为一个单位
   * @param
   * @arg nTime: Delay_us( 1 ) 则实现延时1 * 1ms = 1ms
-  */
+  *****************************************************************************/
 void Delay_ms(__IO uint32_t nTime)
 {
 	TimingDelay = nTime;
@@ -48,12 +48,12 @@ void Delay_ms(__IO uint32_t nTime)
 	while(TimingDelay != 0);
 }
 
-/**
+/******************************************************************************
   * @brief  获取节拍程序
   *	@parram 无
   *	@retval 无
   * @attention 在SysTick 中断函数 sysTick_Handler() 调用
-  */
+  *****************************************************************************/
 void TimingDelay_Decrement(void)
 {
 	if(TimingDelay != 0x00)

@@ -140,7 +140,7 @@ static void LCD_GPIOConfig(void)
 }
 
 /*******************************************************************************
-  * @brief  Configures the lcd.
+  * @brief  Configures the lcd
   * @param  None
   * @retval None
   ******************************************************************************/
@@ -1574,10 +1574,8 @@ void Lcd_ChannelValue(uint8_t temp,float humi)
 				Lcd_Dis2Value(0XFF);
 			if(value/10)
 			{
-				//temptest = SysTickTestCount;
+
 				Lcd_Dis3Value((value/10)%10);
-				//printf("[6:%d],",SysTickTestCount-temptest);	//5
-				//temptest = SysTickTestCount;
 			}
 				
 			else
@@ -1623,15 +1621,9 @@ void Display_ChannelValue(uint8_t started_channel0)
 
 			if(Conf.Sensor[ChannelForDisplay-1].ChannelSwitch ==0)
 			{
-				//temptest = SysTickTestCount;
 				Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
-				//printf("[2:%d],",SysTickTestCount-temptest);	//5
-				//temptest = SysTickTestCount;
 				
 				AlarmDeal(ChannelForDisplay);
-				
-				//printf("[3:%d],",SysTickTestCount-temptest);	//5
-				//temptest = SysTickTestCount;
 				
 			}
 

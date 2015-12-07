@@ -128,7 +128,7 @@ static void ADC1_Mode_Config(void)
   * @retval 无
   ******************************************************************************/
 void ADC1_Init(void)
-{
+{	
 	/* 使能内部 HSI 注意时钟*/
 	RCC_HSICmd(ENABLE);	//ADC使用
 	/* Check that HSI oscillator is ready */

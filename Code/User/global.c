@@ -31,7 +31,7 @@ uint8_t 	   Key1ChangAnCount;	//机械按键长按检测计数
 uint8_t        ChannelForDisplay;   //显示计数
 uint8_t        StartedChannelForDisplay;    //显示启动的通道
 uint8_t        Started_Channel;
-uint8_t  	   DataBuf[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES]={0}; //32通道
+uint8_t  	   DataBuf[HIS_ONE_MAX_BYTES]={0}; //32通道
 
 //uint16_t	   MsCount; //系统滴答计数
 

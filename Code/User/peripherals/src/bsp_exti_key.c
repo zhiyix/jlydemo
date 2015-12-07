@@ -14,11 +14,11 @@
   */
 #include "main.h"
 
-/**
+/******************************************************************************
   * @brief  初始化控制KEY的IO
   * @param  无
   * @retval 无
-  */
+  *****************************************************************************/
 void KEY_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -41,11 +41,11 @@ void KEY_GPIO_Config(void)
 	GPIO_Init(TouchKey_PORT,&GPIO_InitStructure);
 	/********************************************************/
 }
-/**
+/******************************************************************************
   * @brief  Configure PF13 in interrupt mode
   * @param  None
   * @retval None
-  */
+  *****************************************************************************/
 void EXTI15_10_Config(void)
 {
 	EXTI_InitTypeDef   EXTI_InitStructure;

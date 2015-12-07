@@ -8,11 +8,11 @@
 
 static void NVIC_Configuration(void);
 
-/**
+/******************************************************************************
  * @brief 配置USART1接收中断
  * @param 无
  * @tetval 无
- */
+ *****************************************************************************/
 static void NVIC_Configuration(void)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -27,6 +27,11 @@ static void NVIC_Configuration(void)
     NVIC_Init(&NVIC_InitStructure);
 }
 
+/******************************************************************************
+ * @brief 配置USART1,作为打印测试
+ * @param 无
+ * @tetval 无
+ *****************************************************************************/
 void USART1_Config(uint32_t BaudRats)
 {
     GPIO_InitTypeDef GPIO_InitStructure;

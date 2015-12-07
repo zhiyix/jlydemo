@@ -210,14 +210,6 @@ void rtc_deel(void)
     }*/
     if(rtc_pt>59)
     {
-//        if(*(char*)(TCP_ENABLE_ADDR)!=1)
-//        {
-//            clear_GPRS;
-//            GSM_POWERCTL_OFF;;
-//            Flag.STOP_SendGPRS=1;
-//            clearMEM;
-//            Pt.IStep=0;
-//        }
         //printf("rtc_pt%d,",rtc_pt);
         rtc_pt=0;
         read_time();                     //60s 读一次时间

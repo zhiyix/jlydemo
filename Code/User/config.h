@@ -303,7 +303,7 @@ struct KEYStr
 extern uint8_t      rtc_pt;
 extern uint8_t      display_ct;
 extern uint8_t 	    Key1ChangAnCount;
-extern uint8_t  	DataBuf[HIS_ONE_MAX_BYTES+Headend_BYTES+ID_BYTES];
+extern uint8_t  	DataBuf[HIS_ONE_MAX_BYTES];
 extern uint16_t     adc[32];
 extern uint16_t     adcCopy[32];
 extern uint16_t	    MsCount;

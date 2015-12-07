@@ -21,7 +21,7 @@ const char shidu_unit[3]={0x25,0x52,0x48};//"%RH"
 
 
 /******************************************************************************
-  * @brief  Description 通道数据处理
+  * @brief  Description 温湿度数据和时间组成一帧,温湿度数据由float转uint16
   * @param  channelnum  通道数		
   * @param  clockchoose		
   * @param  Gpschoose	选择GPS
@@ -29,14 +29,9 @@ const char shidu_unit[3]={0x25,0x52,0x48};//"%RH"
   *****************************************************************************/
 static void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpschoose)
 {
-    //-------------
-	uint8_t zhuangtai_temp;
     uint16_t i=0,j=0;
     uint16_t UtTmp;
     
-    DataBuf[i++]=0xaa; //数据头
-	DataBuf[i++]= 0;   //SN号
-	DataBuf[i++]= 1;
     //---------------
     
     for(j=0;j<channelnum;j++)
@@ -72,11 +67,6 @@ static void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpsch
 //		
 //    }
     //---------------
-    //
-//    if((Rtc.Day>0X60)||(Rtc.Minute>0X60)||(Rtc.Hour>0X24)||(Rtc.Day>0X31))
-//    {
-//        read_time();
-//    }
 	
 	read_time();
     //---------------
@@ -100,16 +90,9 @@ static void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpsch
         DataBuf[i++]=Rtc.Day;
         DataBuf[i++]=Rtc.Second;
         DataBuf[i++]=Rtc.Minute;
-		//-----------------测试输出
-//		if(Rtc.Year == 0 && Rtc.Hour==0)
-//		{
-//			test_Printf();
-//		}
     }
     //---------------
-    
-    zhuangtai_temp=0;
-    DataBuf[i++]=zhuangtai_temp;
+
 }
 
 /******************************************************************************
@@ -190,12 +173,11 @@ flash中每个扇区的字节都利用起来
   *****************************************************************************/
 static void SaveHisDataToFlash(void)
 {
+	//优化这三个变量的读取，节省时间，复位测试存储数据ok
+	//Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
+	//Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar); //读未读条数
+	//Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar); //读取Flash写数据指针
 	
-	Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
-	Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar); //读未读条数
-	
-	Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar); //读取Flash写数据指针
-	//FlashOffset = Queue.WriteFlashDataPointer * Queue.HIS_ONE_BYTES; //偏移量
 	
 	//flash扇区写满，擦除下一扇区
 	//第一次擦除 Queue.RecFlashWritePointer =0
@@ -238,7 +220,7 @@ static void SaveHisDataToFlash(void)
 		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,Queue.FlashReadDataBeginPointer);//保存读数据起始指针
 	}
 	//历史数据写入flash，每次写入Queue.HIS_ONE_BYTES 大小
-	SPI_FLASH_BufferWrite(&DataBuf[3], Queue.WriteFlashDataPointer, Queue.HIS_ONE_BYTES);
+	SPI_FLASH_BufferWrite(DataBuf, Queue.WriteFlashDataPointer, Queue.HIS_ONE_BYTES);
 	Queue.WriteFlashDataPointer += Queue.HIS_ONE_BYTES;	//Flash写数据指针加 一帧Byte
 	if(Queue.WriteFlashDataPointer >= Queue.FlashRecActualStorage)
 	{
@@ -548,7 +530,6 @@ void SaveDataOnTimeDeal(void)
 		{
 			
 			ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
-//			SaveHisDataToFram();
 			SaveHisDataToFlash();
 		}
 	}
@@ -570,7 +551,6 @@ void SaveDataOnTimeDeal(void)
 				Rtc.TCPS=Rtc.TMPS;
 				
 				ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
-//				SaveHisDataToFram();
 				SaveHisDataToFlash();
 			}
 		}

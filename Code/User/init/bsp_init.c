@@ -58,6 +58,7 @@ static void SysClock_Config(void)
 	RCC_RTCCLKCmd(ENABLE); 
 	/* Wait for RTC APB registers synchronisation */
 	RTC_WaitForSynchro();
+	
 }
 
 /*******************************************************************************
@@ -90,7 +91,7 @@ void SysClock_ReConfig(void)
 	while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
 	
 	/*STOP模式下，调试使能*/
-//	DBGMCU_Config(DBGMCU_STOP,ENABLE);
+	DBGMCU_Config(DBGMCU_STOP,ENABLE);
 //	DBGMCU_Config(DBGMCU_STOP,DISABLE);
 	
 	//获取系统时钟类型（0x00: MSI used as system clock ；0x04: HSI used as system clock ；0x08: HSE used as system clock ；0x0C: PLL used as system clock ）
@@ -515,8 +516,8 @@ void OffPowerSupply(void)
 	BEEP(OFF);
 	LED1(OFF);LED2(OFF);
 	LcdBackLight(OFF);
-	//MODEL_PWRCTRL(OFF);
-	//TOUCHKEY_POWER(OFF);
+	MODEL_PWRCTRL(OFF);
+	TOUCHKEY_POWER(OFF);
 	HAC_POWER(OFF);
 }
 /******************************************************************************
@@ -559,11 +560,7 @@ void SysInit(void)
 	TOUCHKEY_POWER(ON);	  //开触摸按键电源
 	
 	BellNn(1); //这里开启系统滴答时钟对进低功耗有影响
-	
-	/*****************************************/
-	//测试
-	//Reset_Time();
-	/*****************************************/
+		
 }
 /******************************************************************************
   * @brief  Description 外设初始化
@@ -597,6 +594,7 @@ void PeripheralInit(void)
 	//RX8025_RTC_Init();
 	RTC8025_Reset(true);
 	
+	
 }
 /******************************************************************************
   * @brief  Description 进入低功耗模式
@@ -625,7 +623,10 @@ void EnterStopModePower(void)
 			Display_LOW();
 			OffPowerSupply();
 			
-			ADC_Cmd(ADC1, DISABLE);
+			/* Deselect the FLASH: Chip Select high */
+			SPI_FLASH_CS_HIGH();
+			ADC_Cmd(ADC1, DISABLE);	//关adc
+			
 			//关闭滴答定时器
 			SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
 			//使能电源管理单元时钟
@@ -636,6 +637,7 @@ void EnterStopModePower(void)
 		{
 			SysClock_ReConfig();
 		}
+		Display_SN();//显示SN号
 		//rtc_deel();
 //		printf("\r\n Exit StopMode \r\n");
 	}

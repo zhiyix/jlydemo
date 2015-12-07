@@ -54,7 +54,7 @@
   * @param  无
   * @retval 无
   *****************************************************************************/
-static void Voltage_ADC1config(void)
+static void BatteryVoltage_ADC1config(void)
 {
     unsigned char i=0,j=0;
     unsigned int temp=0;
@@ -64,8 +64,9 @@ static void Voltage_ADC1config(void)
     //unsigned char        voltage_xiaoshu=0;     //电压小数位
     
     BATTEST_POWER(ON);  //开启电池电压检测电源
-    
-    for(i=0;i<vtest_cnt;i++)//
+    Delay_ms(4);    //延时4ms,等待电压稳定,adc采集很准确,电池电压测试很准确
+	
+    for(i=0;i<vtest_cnt;i++)
     { 
         /* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
         ADC_SoftwareStartConv(ADC1);
@@ -107,11 +108,11 @@ static void Voltage_ADC1config(void)
 		
         if(temp>=405)
 			{showBATT;}
-        else if((temp>=380)&&(temp<405))
+        else if((temp>=350)&&(temp<405))//380
             {showBATT2;}
-        else if((temp>=350)&&(temp<380))
+        else if((temp>=300)&&(temp<350))//350 380
             {showBATT1;}
-        else if(temp<350)
+        else if(temp<300)//350
             {showBATT0;}
 			
         LCD_UpdateDisplayRequest();
@@ -149,7 +150,7 @@ static void Voltage_ADC1config(void)
   * @param  无
   * @retval 无
   *****************************************************************************/
-void VoltageTest(void)
+void BatteryVoltageDetection(void)
 {
     #ifdef VOLTAGE
 	if(Flag.ExPwOn == 0)
@@ -157,7 +158,7 @@ void VoltageTest(void)
 		PManage.BatVoltage_TestTime--;
 		if(PManage.BatVoltage_TestTime==0)
 		{
-			Voltage_ADC1config();
+			BatteryVoltage_ADC1config();
 			if(Flag.Low_Voltage==0)
 				PManage.BatVoltage_TestTime=voltagetesttimenum1;/*电池未低电压 10分钟检测一次*/
 			else 	//=1 低电压标志
@@ -210,8 +211,47 @@ void FirstCheckExternPower(void)
   * @param  无
   * @retval 无
   *****************************************************************************/
-void OutpowerShan(void)
+void ExternalPowerDetection(void)
 {
+	/*****************************************************************/
+    /*持续检测外接电接入 60s*/
+	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)         
+    {
+        PManage.HaveExternalPower++;
+        if(PManage.HaveExternalPower >= ExternalPowerchecktime)
+        {
+            Flag.Powerdowncountflag=1;
+            PManage.HaveExternalPower=0;
+        }
+    }    
+	/*****************************************************************
+	 *有外接电的情况
+	 *(1)接锂电池，检测其充满电
+	 *(2)未接锂电池
+	 *****************************************************************/
+	if(Flag.ExPwOn == 1)	
+	{
+		if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_CHGtest_PIN) == 1)         
+		{
+			PManage.BatChargeFullCount++;
+			
+			if(PManage.BatChargeFullCount >= ExternalPowerchecktime)/*检测60s*/
+			{
+				PManage.BatChargeFullCount=0;
+				Flag.BatChargeFull=1;/*接外接电，电池充满标志*/
+				
+				Flag.BatCharging = 0;/*接外接电未接电池，电池未充电*/
+			}	
+			
+		}else{
+			Flag.BatChargeFull=0;
+			Flag.BatCharging = 1;/*接外接电，电池正在充电中*/
+		}
+		
+	}else{
+		Flag.BatChargeFull=0;
+		Flag.BatCharging = 0;/*外接电未接*/
+	}
     // --------------------------------------------------
     if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)/*有外接电*/
     {
@@ -219,7 +259,6 @@ void OutpowerShan(void)
         {
             if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)
             {
-                //BellNn(1);
                 Flag.ExPwOn=1;
                 Flag.Powerdowncountflag=0;
                 

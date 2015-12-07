@@ -59,8 +59,8 @@ static void LOWorNomal_Mode(void)
 	uint8_t i=0;
     if((Conf.Jly.PowerMode >= 1)&&(Conf.Jly.WorkStatueIsStop >= 1)) /*低功耗模式*/
     {
-		
-		if(Flag.StartSample==1)//这里位置不能乱动，会导致adc采集不准
+		//开启adc电压后(AVCC1_POWER(ON)),由于电压不稳没有立即去采集，而是利用程序执行延时后在这个地方开启采集
+		if(Flag.StartSample==1)
         {
             Flag.StartSample=0;
             //Flag.EndSample=1;
@@ -152,7 +152,7 @@ static void LOWorNomal_Mode(void)
     }
 }
 /******************************************************************************
-  * @brief  Description 记录仪工作状态处理
+  * @brief  Description 记录仪数据采集、数据显示、通道报警处理
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
@@ -164,21 +164,17 @@ static void WorkornotMode(void)
 		//当实际通道数 >0 时开启采样 存储 显示
         if(JlyParam.ChannelNumActual >0)
 		{
-			//temptest = SysTickTestCount;
 			LOWorNomal_Mode();
-			//printf("[1:%d],",SysTickTestCount-temptest);	//5
-			//temptest = SysTickTestCount;
-			//SaveDataOnTimeDeal();
+			
 	//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
 	//        {
 				Display_ChannelValue(StartedChannelForDisplay);  //LCD 
 	//        }
-			//printf("[4:%d],",SysTickTestCount-temptest);	//5
-			//temptest = SysTickTestCount;
 			
 			Flag.IsDisplayRightNow=1;
 			Flag.StopRecording = 0;	//停止记录标志清0
         }
+		
     }else{
 		
 		if(Flag.StopRecording == 0)
@@ -202,21 +198,20 @@ static void WorkornotMode(void)
 
 
 /******************************************************************************
-  * @brief  Description 记录仪1s处理标志
+  * @brief  Description 记录仪 1s处理变量/标志
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
-static void OneSec_Timedeal(void)
+static void OneSecTimedeal(void)
 {
     
     //LCD显示处理
     display_ct++;          
     if(display_ct >= 36)//----------耗时80ms,调整显示的位置
     {
-		//printf("display_ct%d,",display_ct);
         display_ct = 0;
 		   
-        Display_Mem();	  //显示存储容量 
+        Display_Mem();	  //36s刷新 存储容量 显示
 		//Display_Signal(2);/*显示信号强度*/
 		
     }
@@ -320,47 +315,6 @@ static void OneSec_Timedeal(void)
 		}
 	}
 	
-	
-	/*****************************************************************/
-   /*检测外接电接入*/
-	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)         
-    {
-        PManage.HaveExternalPower++;
-        if(PManage.HaveExternalPower >= ExternalPowerchecktime)
-        {
-            Flag.Powerdowncountflag=1;
-            PManage.HaveExternalPower=0;
-        }
-    }    
-	/*****************************************************************
-	 *有外接电的情况
-	 *(1)接锂电池，检测其充满电
-	 *(2)未接锂电池
-	 *****************************************************************/
-	if(Flag.ExPwOn == 1)	
-	{
-		if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_CHGtest_PIN) == 1)         
-		{
-			PManage.BatChargeFullCount++;
-			
-			if(PManage.BatChargeFullCount >= ExternalPowerchecktime)/*检测60s*/
-			{
-				PManage.BatChargeFullCount=0;
-				Flag.BatChargeFull=1;/*接外接电，电池充满标志*/
-				
-				Flag.BatCharging = 0;/*接外接电未接电池，电池未充电*/
-			}	
-			
-		}else{
-			Flag.BatChargeFull=0;
-			Flag.BatCharging = 1;/*接外接电，电池正在充电中*/
-		}
-		
-	}else{
-		Flag.BatChargeFull=0;
-		Flag.BatCharging = 0;/*外接电未接*/
-	}
-	
 }
 
 /******************************************************************************
@@ -374,14 +328,13 @@ void JlySecDeal(void)
     {
         Flag.Sec = 0;
 
-        OneSec_Timedeal();
-
+        OneSecTimedeal();
 
         rtc_deel();
 
-		OutpowerShan();
+		ExternalPowerDetection();
 
-        VoltageTest();
+        BatteryVoltageDetection();//BatteryVoltageDetection
     
 		RecorderBootModeHandle();
 
@@ -389,7 +342,6 @@ void JlySecDeal(void)
 
 		StorageHistoryData();
 		
-		//----------------------测试
     }
 	
 	if(Conf.Jly.WorkStatueIsStop < 1) /*停止工作*/

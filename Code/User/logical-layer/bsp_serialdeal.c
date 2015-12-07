@@ -391,7 +391,7 @@ bool REALDATA_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	usNRegs *= 2;
 	if((usAddress == 0) &&(usNRegs % Queue.HIS_ONE_BYTES) ==0)
 	{
-		Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar); 
+		//Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar); 
 		SPI_FLASH_BufferRead(pucBuffer,(Queue.WriteFlashDataPointer-Queue.HIS_ONE_BYTES),usNRegs);
 		
 		return true;
@@ -424,17 +424,12 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	
 	if((usAddress == 0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
 	{
-		Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
-		Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
+		//优化这两个变量的读取，节省时间，复位测试读取数据ok
+		//Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
+		//Queue.ReadFlashDataPointer = ReadU32Pointer(FLASH_ReadDataAddr_Lchar);
 		
 		NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
-//		if(NoReadingDataNumTemp > Queue.FlashNoReadingDataNum)//要读的数据包数大于flash中未读数据包数
-//		{
-//			usNRegs = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;
-//			NoReadingDataNumTemp = Queue.FlashNoReadingDataNum;
-//		}
-		//if(Queue.FlashNoReadingDataNum >=2) //读最新的两条数据
-		//{
+
 				
 			if(Queue.FlashNoReadingDataNum >= NoReadingDataNumTemp)
 			{
@@ -473,17 +468,6 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 			}
 			WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);
 		
-			
-			//测试
-			/*
-			printf("Flag.RecordFlashOverFlow %d\r\n",Queue.FlashRecOverFlow);
-			printf("Queue.FlashNoReadingDataNum %d\r\n",Queue.FlashNoReadingDataNum);
-			printf("Queue.FlashSectorPointer %d\r\n",Queue.FlashSectorPointer);
-			printf("Queue.WriteFlashDataPointer %d\r\n",Queue.WriteFlashDataPointer);
-			printf("Queue.FlashReadDataBeginPointer %d\r\n",Queue.FlashReadDataBeginPointer);
-			printf("Queue.ReadFlashDataPointer %d\r\n",Queue.ReadFlashDataPointer);
-			*/
-		//}
 		
 		//rtc_deel();
 		
@@ -506,32 +490,43 @@ usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
   *****************************************************************************/
 bool HISTORY_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
+	uint8_t LessThanBytes=0,i=0;
+	uint32_t NoReadingDataNumTemp;
 	//usAddress *= 2;
 	usNRegs *= 2;
 	
 	if((usAddress % Queue.HIS_ONE_BYTES ==0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
 	{
-		Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
+		//Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
+		//Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
+		
+		NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
 		if(usAddress < Queue.FlashReadDataBeginPointer)//小于最小
 		{
 			usAddress = Queue.FlashReadDataBeginPointer;
-			SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);
-		}else{
-			if(usAddress >= Queue.FlashRecActualStorage)//超过最大存储地址
-			{
-				
-				return false;
-			}else{
-				if((Queue.FlashReadDataBeginPointer > (Queue.FlashRecActualStorage - FLASH_SectorPerSize))&&((usAddress + usNRegs) >= Queue.FlashRecActualStorage))
-				{
-					usNRegs = Queue.FlashRecActualStorage - usAddress;
-					
-				}
-				SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);
-			}
 		}
 		
-		
+			if(Queue.FlashNoReadingDataNum >= NoReadingDataNumTemp)
+			{
+				if((usAddress + usNRegs) <= Queue.FlashRecActualStorage)
+				{
+					SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);//读取usNRegs 字节的数据
+				}else{
+					SPI_FLASH_BufferRead(pucBuffer,usAddress,Queue.FlashRecActualStorage - usAddress);
+					LessThanBytes = Queue.FlashRecActualStorage - usAddress;
+					usNRegs = usNRegs - (Queue.FlashRecActualStorage - usAddress);
+					usAddress = 0;
+					SPI_FLASH_BufferRead(&pucBuffer[LessThanBytes],usAddress,usNRegs);//注意pucBuffer的起始地址
+				}
+			}else{
+				LessThanBytes = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;//只有这么多未读字节数
+				SPI_FLASH_BufferRead(pucBuffer,usAddress,LessThanBytes);
+				for(i=0;i<(usNRegs-LessThanBytes);i++)
+				{
+					pucBuffer[LessThanBytes+i] = 0xFF;
+				}
+				
+			}
 		
 		//测试
 		
