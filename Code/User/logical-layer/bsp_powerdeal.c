@@ -207,14 +207,14 @@ void FirstCheckExternPower(void)
   * @brief  Description 检测是否接外接电
 						接外接电并接电池而电未充满：电池符号一格一格往前跳
 						接外接电并接电池而电已充满：电池符号闪烁
-						不接外接电接电池：显示电池实际电量，电池符号不闪烁						
+						不接外接电接电池：显示电池实际电量，低电量电池符号空格闪烁						
   * @param  无
   * @retval 无
   *****************************************************************************/
 void ExternalPowerDetection(void)
 {
 	/*****************************************************************/
-    /*持续检测外接电接入 60s*/
+    /*程序运行中 插拔电持续检测外接电接入 60s*/
 	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)         
     {
         PManage.HaveExternalPower++;
@@ -224,6 +224,32 @@ void ExternalPowerDetection(void)
             PManage.HaveExternalPower=0;
         }
     }    
+	// --------------------------------------------------
+    if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)/*有外接电*/
+    {
+        if(Flag.Powerdowncountflag==1)
+        {
+            if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)
+            {
+                Flag.ExPwOn=1;
+                Flag.Powerdowncountflag=0;
+                
+                PManage.HaveExternalPower=0;
+				Flag.ExPwFirstDown = 0;
+            }
+        }
+    }
+    else
+    {
+        Flag.ExPwOn=0;
+		if(Flag.ExPwFirstDown == 0)
+		{
+			PManage.BatVoltage_TestTime=1;/*没有外接电立即开启电池电压检测*/
+			Flag.ExPwFirstDown = 1;
+		}
+        PManage.HaveExternalPower=0;
+        Flag.Powerdowncountflag=0;
+    }
 	/*****************************************************************
 	 *有外接电的情况
 	 *(1)接锂电池，检测其充满电
@@ -252,32 +278,7 @@ void ExternalPowerDetection(void)
 		Flag.BatChargeFull=0;
 		Flag.BatCharging = 0;/*外接电未接*/
 	}
-    // --------------------------------------------------
-    if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)/*有外接电*/
-    {
-        if(Flag.Powerdowncountflag==1)
-        {
-            if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)
-            {
-                Flag.ExPwOn=1;
-                Flag.Powerdowncountflag=0;
-                
-                PManage.HaveExternalPower=0;
-				Flag.ExPwFirstDown = 0;
-            }
-        }
-    }
-    else
-    {
-        Flag.ExPwOn=0;
-		if(Flag.ExPwFirstDown == 0)
-		{
-			PManage.BatVoltage_TestTime=1;/*没有外接电立即开启电池电压检测*/
-			Flag.ExPwFirstDown = 1;
-		}
-        PManage.HaveExternalPower=0;
-        Flag.Powerdowncountflag=0;
-    }
+    
     // ----------------------------------------------------
     if(Flag.ExPwOn==1)
     {

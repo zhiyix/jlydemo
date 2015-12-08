@@ -179,7 +179,7 @@ static void WorkornotMode(void)
 		
 		if(Flag.StopRecording == 0)
 		{
-			Flag.StopRecording = 1;	//停止记录
+			Flag.StopRecording = 1;	//停止记录,只执行一次
 			
 			OffPowerSupply();//关设备电源
 			if(JlyParam.FramErrorCode!=0)
@@ -318,7 +318,7 @@ static void OneSecTimedeal(void)
 }
 
 /******************************************************************************
-  * @brief  Description 记录仪处理函数
+  * @brief  Description 记录仪主体处理函数
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
@@ -359,6 +359,7 @@ void JlySecDeal(void)
 				displayErr(JlyParam.FramErrorCode);
 				/*!< Requesy LCD RAM update */
 				LCD_UpdateDisplayRequest();  
+				
 			}else{
 				lcd_OFF(JlyParam.ShowOffCode);
 			}
