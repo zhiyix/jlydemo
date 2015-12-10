@@ -228,6 +228,9 @@ eMBErrorCode
 eMBRegInputCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
+    //地址
+    int16_t         iRegAddress;
+    //偏移量
     int16_t         iRegIndex;
 
     //查询是否在寄存器范围内
@@ -237,16 +240,17 @@ eMBRegInputCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 		//返回错误状态，无寄存器
         eStatus = MB_ENOREG;
 		
-	} else if ( usAddress + usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
+	} else if ( usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
 	{
         eStatus = MB_ENOREG;
 		
 	} else  {
         //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
-        iRegIndex = ( int16_t )( usAddress - usRegInputStart );
+        iRegAddress = ( int16_t )( usAddress - usRegInputStart );
+		iRegAddress = 0x00UL;
+		iRegIndex = 0x00UL;
 		//用户回调函数
-		STORAGE_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
-			usAddress, usNRegs);
+		STORAGE_DATA_READ((uint8_t *)&usRegInputBuf[iRegAddress], usAddress, usNRegs);
         //逐个赋值
         while( usNRegs > 0 )
         {
@@ -269,6 +273,9 @@ eMBErrorCode
 eMBRegHistoryCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
+    //地址
+    int16_t         iRegAddress;
+    //偏移量
     int16_t         iRegIndex;
 
     //查询是否在寄存器范围内
@@ -278,16 +285,17 @@ eMBRegHistoryCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 		//返回错误状态，无寄存器
         eStatus = MB_ENOREG;
 		
-	} else if ( usAddress + usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
+	} else if ( usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
 	{
         eStatus = MB_ENOREG;
 		
 	} else  {
         //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
-        iRegIndex = ( int16_t )( usAddress - usRegInputStart );
+        iRegAddress = ( int16_t )( usAddress - usRegInputStart );
+		iRegAddress = 0x00UL;
+		iRegIndex = 0x00UL;
 		//用户回调函数
-		HISTORY_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
-			usAddress, usNRegs);
+		HISTORY_DATA_READ((uint8_t *)&usRegInputBuf[iRegAddress], usAddress, usNRegs);
         //逐个赋值
         while( usNRegs > 0 )
         {
@@ -310,6 +318,9 @@ eMBErrorCode
 eMBRegRealDataCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
+    //地址
+    int16_t         iRegAddress;
+    //偏移量
     int16_t         iRegIndex;
 
     //查询是否在寄存器范围内
@@ -319,16 +330,21 @@ eMBRegRealDataCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 		//返回错误状态，无寄存器
         eStatus = MB_ENOREG;
 		
-	} else if ( usAddress + usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
+	} else if ( usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNRegs > REG_INPUT_START + REG_INPUT_MAX )
 	{
         eStatus = MB_ENOREG;
 		
 	} else  {
         //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
-        iRegIndex = ( int16_t )( usAddress - usRegInputStart );
+        iRegAddress = ( int16_t )( usAddress - usRegInputStart );
+		iRegAddress = 0x00UL;
+		iRegIndex = 0x00UL;
 		//用户回调函数
-		REALDATA_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
-			usAddress, usNRegs);
+		REALDATA_DATA_READ((uint8_t *)&usRegInputBuf[iRegAddress], usAddress, usNRegs);
         //逐个赋值
         while( usNRegs > 0 )
         {
@@ -361,6 +377,8 @@ eMBRegHoldingCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs,
 {
     //错误状态
     eMBErrorCode    eStatus = MB_ENOERR;
+    //地址
+    int16_t         iRegAddress;
     //偏移量
     int16_t         iRegIndex;
     //数据长度
@@ -373,21 +391,26 @@ eMBRegHoldingCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs,
         //返回错误状态
         eStatus = MB_ENOREG;
 		
-	} else if ( usAddress + usNRegs > REG_HOLDING_START + REG_HOLDING_NREGS )
+	} else if ( usNRegs > REG_HOLDING_START + REG_HOLDING_NREGS )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNRegs > REG_HOLDING_START + REG_HOLDING_MAX )
 	{
         eStatus = MB_ENOREG;
 		
 	} else  {
         //计算偏移量
-        iRegIndex = ( int16_t )( usAddress - usRegHoldingStart );
+        iRegAddress = ( int16_t )( usAddress - usRegHoldingStart );
+		iRegAddress = 0x00UL;
+		iRegIndex = 0x00UL;
 
         switch ( eMode )
         {
             //读处理函数
         case MB_REG_READ:
 			//用户回调函数
-			PARAM_DATA_READ((uint8_t *)&usRegHoldingBuf[usAddress - usRegHoldingStart],
-				usAddress, iRegLength);
+			PARAM_DATA_READ((uint8_t *)&usRegHoldingBuf[iRegAddress], usAddress, iRegLength);
             while( usNRegs > 0 )
             {
                 *pucRegBuffer++ = ( uint8_t )( usRegHoldingBuf[iRegIndex] >> 8 );
@@ -407,8 +430,7 @@ eMBRegHoldingCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs,
                 usNRegs--;
             }
             //用户回调函数
-			PARAM_DATA_WRITE((uint8_t *)&usRegHoldingBuf[usAddress - usRegHoldingStart],
-				usAddress, iRegLength);
+			PARAM_DATA_WRITE((uint8_t *)&usRegHoldingBuf[iRegAddress], usAddress, iRegLength);
             break;
         }
         xMBOutput(__DEG, "Hold\r\n");

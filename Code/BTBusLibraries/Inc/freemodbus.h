@@ -75,7 +75,8 @@
 // 	<o> 保持寄存器数量
 //	   <i> MAXSingleQuantity=MB_PDU_FUNC_READ_REGCNT_MAX
 //	   <16-1024:16>
-#define REG_HOLDING_NREGS				0x3000
+#define REG_HOLDING_NREGS				0x200
+#define REG_HOLDING_MAX					0x1000
 //	</e>
 
 //	<e> (04) Input Register
@@ -87,7 +88,8 @@
 // 	<o> 输入寄存器数量
 //	   <i> MAXSingleQuantity=MB_PDU_FUNC_READ_REGCNT_MAX
 //	   <0x0-0x1000:0x100>
-#define REG_INPUT_NREGS					0x1000
+#define REG_INPUT_NREGS					0x200
+#define REG_INPUT_MAX					0x3000
 //	</e>
 
 //	<e> (99) LEDROW Register
