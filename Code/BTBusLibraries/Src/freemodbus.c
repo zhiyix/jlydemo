@@ -232,12 +232,19 @@ eMBRegInputCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 
     //查询是否在寄存器范围内
     //为了避免警告，修改为有符号整数
-    if( ( (int16_t)usAddress >= REG_INPUT_START ) && \
-          ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) )
-    {
+	if ( (int16_t)usAddress < REG_INPUT_START )
+	{
+		//返回错误状态，无寄存器
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else  {
         //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
         iRegIndex = ( int16_t )( usAddress - usRegInputStart );
-		//
+		//用户回调函数
 		STORAGE_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
 			usAddress, usNRegs);
         //逐个赋值
@@ -254,11 +261,6 @@ eMBRegInputCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
         }
         xMBOutput(__DEG, "Input\r\n");
     }
-    else
-    {
-        //返回错误状态，无寄存器
-        eStatus = MB_ENOREG;
-    }
 
     return eStatus;
 }
@@ -271,12 +273,19 @@ eMBRegHistoryCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 
     //查询是否在寄存器范围内
     //为了避免警告，修改为有符号整数
-    if( ( (int16_t)usAddress >= REG_INPUT_START ) && \
-          ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) )
-    {
+	if ( (int16_t)usAddress < REG_INPUT_START )
+	{
+		//返回错误状态，无寄存器
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else  {
         //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
         iRegIndex = ( int16_t )( usAddress - usRegInputStart );
-		//
+		//用户回调函数
 		HISTORY_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
 			usAddress, usNRegs);
         //逐个赋值
@@ -293,15 +302,9 @@ eMBRegHistoryCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
         }
         xMBOutput(__DEG, "Input\r\n");
     }
-    else
-    {
-        //返回错误状态，无寄存器
-        eStatus = MB_ENOREG;
-    }
 
     return eStatus;
 }
-
 
 eMBErrorCode
 eMBRegRealDataCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
@@ -311,12 +314,19 @@ eMBRegRealDataCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 
     //查询是否在寄存器范围内
     //为了避免警告，修改为有符号整数
-    if( ( (int16_t)usAddress >= REG_INPUT_START ) && \
-          ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) )
-    {
+	if ( (int16_t)usAddress < REG_INPUT_START )
+	{
+		//返回错误状态，无寄存器
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNRegs > REG_INPUT_START + REG_INPUT_NREGS )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else  {
         //获得操作偏移量，本次操作起始地址-输入寄存器的初始地址
         iRegIndex = ( int16_t )( usAddress - usRegInputStart );
-		//
+		//用户回调函数
 		REALDATA_DATA_READ((uint8_t *)&usRegInputBuf[iRegIndex], 
 			usAddress, usNRegs);
         //逐个赋值
@@ -332,11 +342,6 @@ eMBRegRealDataCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs )
             usNRegs--;
         }
         xMBOutput(__DEG, "Input\r\n");
-    }
-    else
-    {
-        //返回错误状态，无寄存器
-        eStatus = MB_ENOREG;
     }
 
     return eStatus;
@@ -362,9 +367,17 @@ eMBRegHoldingCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs,
     int16_t         iRegLength = usNRegs;
 
     //判断寄存器是不是在范围内
-    if( ( (int16_t)usAddress >= REG_HOLDING_START ) \
-            && ( usAddress + usNRegs <= REG_HOLDING_START + REG_HOLDING_NREGS ) )
-    {
+    //为了避免警告，修改为有符号整数
+	if ( (int16_t)usAddress < REG_HOLDING_START )
+	{
+        //返回错误状态
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNRegs > REG_HOLDING_START + REG_HOLDING_NREGS )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else  {
         //计算偏移量
         iRegIndex = ( int16_t )( usAddress - usRegHoldingStart );
 
@@ -372,7 +385,7 @@ eMBRegHoldingCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs,
         {
             //读处理函数
         case MB_REG_READ:
-			//
+			//用户回调函数
 			PARAM_DATA_READ((uint8_t *)&usRegHoldingBuf[usAddress - usRegHoldingStart],
 				usAddress, iRegLength);
             while( usNRegs > 0 )
@@ -393,22 +406,16 @@ eMBRegHoldingCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNRegs,
                 iRegIndex++;
                 usNRegs--;
             }
-            //
+            //用户回调函数
 			PARAM_DATA_WRITE((uint8_t *)&usRegHoldingBuf[usAddress - usRegHoldingStart],
 				usAddress, iRegLength);
             break;
         }
         xMBOutput(__DEG, "Hold\r\n");
     }
-    else
-    {
-        //返回错误状态
-        eStatus = MB_ENOREG;
-    }
 
     return eStatus;
 }
-
 
 /**
   * @brief  线圈寄存器处理函数，线圈寄存器可读，可读可写
@@ -430,9 +437,16 @@ eMBRegCoilsCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNCoils,
     int16_t         usBitOffset;
 
     //检查寄存器是否在指定范围内
-    if( ( (int16_t)usAddress >= REG_COILS_START ) &&
-            ( usAddress + usNCoils <= REG_COILS_START + REG_COILS_SIZE ) )
-    {
+	if ( (int16_t)usAddress < REG_COILS_START )
+	{
+        //返回错误状态
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNCoils > REG_COILS_START + REG_COILS_SIZE )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else  {
         //计算寄存器偏移量
         usBitOffset = ( int16_t )( usAddress - REG_COILS_START );
         switch ( eMode )
@@ -462,10 +476,7 @@ eMBRegCoilsCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNCoils,
         }
         xMBOutput(__DEG, "Coils\r\n");
     }
-    else
-    {
-        eStatus = MB_ENOREG;
-    }
+	
     return eStatus;
 }
 
@@ -480,9 +491,16 @@ eMBRegDiscreteCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
     uint16_t        usBitOffset;
 
     //判断寄存器时候再制定范围内
-    if( ( (int16_t)usAddress >= REG_DISCRETE_START ) &&
-            ( usAddress + usNDiscrete <= REG_DISCRETE_START + REG_DISCRETE_SIZE ) )
-    {
+	if ( (int16_t)usAddress < REG_DISCRETE_START )
+	{
+        //返回错误状态
+        eStatus = MB_ENOREG;
+		
+	} else if ( usAddress + usNDiscrete > REG_DISCRETE_START + REG_DISCRETE_SIZE )
+	{
+        eStatus = MB_ENOREG;
+		
+	} else  {
         //获得偏移量
         usBitOffset = ( uint16_t )( usAddress - REG_DISCRETE_START );
 
@@ -495,10 +513,7 @@ eMBRegDiscreteCB( UCHAR *pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
         }
         xMBOutput(__DEG, "Discrete\r\n");
     }
-    else
-    {
-        eStatus = MB_ENOREG;
-    }
+	
     return eStatus;
 }
 
