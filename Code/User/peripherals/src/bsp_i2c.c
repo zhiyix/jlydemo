@@ -545,9 +545,10 @@ bool Fram_Read(uint8_t *pData, uint16_t addr, uint16_t count)
 bool RTC8025_Reset(bool need_reset)
 {
 	bool need_clear = 0;
-	
 	RTC8025_Ctrl_Typedef ctrl;
-	RTC8025_Read((char*)&ctrl.Control, 0x0E, 2);
+	RTC8025_Alarm_Typedef RtcAlarm;
+	
+	RTC8025_Read((char*)&ctrl.Control, RX8025_Control1Addr, 2);
 	if (ctrl.STREG.PON)
 	{
 		//DebugOutPrintf(DEBUG_INF, "power-on reset was detected, ");
@@ -579,7 +580,25 @@ bool RTC8025_Reset(bool need_reset)
 	if (need_reset || need_clear)
 	{
 		/* 设置 RTC8025 固定周期中断功能 */
-		ctrl.STREG.CT = 5;		
+		if(JlyParam.NormalRecInterval >= 60)//记录间隔大于60s
+		{
+			ctrl.STREG.DALE = 0;
+			RTC8025_Write((char*)&ctrl.Control, RX8025_Control1Addr, 2);
+			
+			ctrl.STREG.DALE = 1;	//开启RX8025闹钟功能，1分钟中断一次
+			ctrl.STREG.CT = 0;	
+			
+			RtcAlarm.RX8025Alarm.Alarm_D_Minute = 0x32;
+			RtcAlarm.RX8025Alarm.Alarm_D_Hour = 0x15;
+		}else if((JlyParam.NormalRecInterval >0) && (JlyParam.NormalRecInterval < 60))
+		{
+			ctrl.STREG.DALE = 0;	//1s中断一次
+			ctrl.STREG.CT = 3;	
+			
+			RtcAlarm.RX8025Alarm.Alarm_D_Minute = 0x00;
+			RtcAlarm.RX8025Alarm.Alarm_D_Hour = 0x00;
+		}
+		
 		ctrl.STREG.PON = 0;
 		ctrl.STREG.VDET = 0;
 		ctrl.STREG.XST = 1;
@@ -587,8 +606,9 @@ bool RTC8025_Reset(bool need_reset)
 		ctrl.STREG.WAFG = 0;
 		ctrl.STREG.CTFG = 0;
 		ctrl.STREG.H12_24 = 1;
-		RTC8025_Write((char*)&ctrl.Control, 0x0E, 2);
-		RTC8025_Read((char*)&ctrl.Control, 0x0E, 2);
+		RTC8025_Write((char*)&ctrl.Control, RX8025_Control1Addr, 2);
+		RTC8025_Read((char*)&ctrl.Control, RX8025_Control1Addr, 2);
+		RTC8025_Write((char*)&RtcAlarm.Alarm[3], RX8025_Alarm_D_MinuteAddr, 2);
 	}
 	if (need_reset)
 	{

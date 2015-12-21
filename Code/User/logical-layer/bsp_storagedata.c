@@ -77,7 +77,8 @@ static void ChannelDataDeal(uint8_t channelnum,uint8_t clockchoose,uint8_t Gpsch
         DataBuf[i++]=Rtc.Day;
         DataBuf[i++]=Rtc.Hour;
         DataBuf[i++]=Rtc.Minute;
-    }else{
+    }else
+	{
 //        DataBuf[i++]=Rtc.Year;//(6)
 //        DataBuf[i++]=Rtc.Month;
 //        DataBuf[i++]=Rtc.Day;
@@ -161,8 +162,8 @@ void SetFlashOverFlow(uint8_t flowvalue)
   * @brief  Description 保存数据到flash,先用2k 模拟实现
 						未读条数减少，记录最大地址不变
 写满一个扇区时擦除下一个扇区
-flash写到 Queue.FLASH_SECTOR_PER_NUM - 1时，Queue.WriteFlashDataPointer++，
-此时Queue.WriteFlashDataPointer % Queue.FLASH_SECTOR_PER_NUM，擦除下一个扇区
+flash写到 (Queue.FlashSectorPointer * FLASH_SectorPerSize/Queue.HIS_ONE_BYTES)*Queue.HIS_ONE_BYTES)时，
+擦除下一个扇区
 flash中每个扇区的字节都利用起来
 测试：
 	(1)做实验反复测试存储，8通道测试ok
@@ -196,17 +197,18 @@ static void SaveHisDataToFlash(void)
 		}
 		WriteU16Pointer(FLASH_SectorWriteAddr_Lchar,Queue.FlashSectorPointer);	//保存Flash Sector存储指针 
 		
-		if(Queue.FlashRecOverFlow ==1)	//数据溢出，擦除当前扇区，读指针偏移 Queue.FLASH_SECTOR_PER_NUM
+		if(Queue.FlashRecOverFlow ==1)	//数据溢出，擦除当前扇区，读指针偏移 
 		{
 			//擦倒数第二个扇区
 			if(Queue.WriteFlashDataPointer < (Queue.FlashRecActualStorage - FLASH_SectorPerSize - Queue.HIS_ONE_BYTES))//数据记录指针小于8192-4096-10
 			{
 				Queue.SectorHeadBytes = Queue.HIS_ONE_BYTES - (Queue.FlashSectorPointer*FLASH_SectorPerSize) % Queue.HIS_ONE_BYTES;
 				Queue.FlashReadDataBeginPointer = Queue.FlashSectorPointer * FLASH_SectorPerSize + Queue.SectorHeadBytes;//Queue.FlashSectorPointer++之后 
-			}else{//写最后一个扇区时
+			}else
+			{//写最后一个扇区时
 				Queue.FlashReadDataBeginPointer = 0;
 			}
-			//当读和写都为0时,包括两种情况
+			//当读和写都为0时,包括两种情况 情况考虑清楚，没问题
 			//情况1：一条数据也未读，Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
 			//情况2：当数据存满溢出读和写都为0，Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
 			if(((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer) >= 0) &&((Queue.ReadFlashDataPointer - Queue.WriteFlashDataPointer) < FLASH_SectorPerSize))
@@ -214,12 +216,14 @@ static void SaveHisDataToFlash(void)
 				Queue.ReadFlashDataPointer = Queue.FlashReadDataBeginPointer;
 				WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);//保存读指针
 			}
-		}else{
+			
+		}else
+		{
 			Queue.FlashReadDataBeginPointer = 0;
 		}
 		WriteU32Pointer(FLASH_ReadDataBeginAddr_Lchar,Queue.FlashReadDataBeginPointer);//保存读数据起始指针
 	}
-	//历史数据写入flash，每次写入Queue.HIS_ONE_BYTES 大小
+	//--------------------------历史数据写入flash，每次写入Queue.HIS_ONE_BYTES 大小
 	SPI_FLASH_BufferWrite(DataBuf, Queue.WriteFlashDataPointer, Queue.HIS_ONE_BYTES);
 	Queue.WriteFlashDataPointer += Queue.HIS_ONE_BYTES;	//Flash写数据指针加 一帧Byte
 	if(Queue.WriteFlashDataPointer >= Queue.FlashRecActualStorage)
@@ -234,15 +238,26 @@ static void SaveHisDataToFlash(void)
 	}
 	WriteU32Pointer(FLASH_WriteDataAddr_Lchar,Queue.WriteFlashDataPointer); //保存Flash写数据指针
 		
-	
-		if(Queue.ReadFlashDataPointer > Queue.WriteFlashDataPointer)
-		{
-			Queue.FlashNoReadingDataNum = Queue.WriteFlashDataPointer/Queue.HIS_ONE_BYTES + (Queue.FlashRecActualStorage - Queue.ReadFlashDataPointer)/Queue.HIS_ONE_BYTES;
-		}else{
-			Queue.FlashNoReadingDataNum = (Queue.WriteFlashDataPointer - Queue.ReadFlashDataPointer)/Queue.HIS_ONE_BYTES;
-		}
-		
+	//--------------------------未读数据条数计算
+	if(Queue.ReadFlashDataPointer >= Queue.WriteFlashDataPointer)	//溢出后的处理
+	{
+		Queue.FlashNoReadingDataNum = (Queue.WriteFlashDataPointer + Queue.FlashRecActualStorage - Queue.ReadFlashDataPointer)/Queue.HIS_ONE_BYTES;
+		//Queue.FlashNoReadingDataNum = Queue.WriteFlashDataPointer/Queue.HIS_ONE_BYTES + (Queue.FlashRecActualStorage - Queue.ReadFlashDataPointer)/Queue.HIS_ONE_BYTES;
+	}else	//未溢出的处理
+	{
+		Queue.FlashNoReadingDataNum = (Queue.WriteFlashDataPointer - Queue.ReadFlashDataPointer)/Queue.HIS_ONE_BYTES;
+	}	
 	WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);//保存未读数据指针
+	
+	//--------------------------历史数据条数计算
+	if(Queue.FlashRecOverFlow < 1)
+	{
+		Queue.FlashHistoryDataNum = Queue.WriteFlashDataPointer/Queue.HIS_ONE_BYTES;//未溢出
+	}else
+	{
+		Queue.FlashHistoryDataNum = (Queue.WriteFlashDataPointer + Queue.FlashRecActualStorage - Queue.FlashReadDataBeginPointer)/Queue.HIS_ONE_BYTES;
+	}
+	WriteU32Pointer(FLASH_HistoryDataNumAddr,Queue.FlashHistoryDataNum);//保存历史数据条数
 }
 
 /******************************************************************************
@@ -519,42 +534,45 @@ void DownFlash_HisData(void)
 void SaveDataOnTimeDeal(void)
 {
     
-	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
-	{
-		Rtc.SCount++;
-		if(Rtc.SCount >= 60)
-		{
-			Rtc.SCount = 0;
-		}
-		if(Rtc.SCount % JlyParam.NormalRecInterval ==0)
-		{
+//	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
+//	{
+//		Rtc.SCount++;
+//		if(Rtc.SCount >= 60)
+//		{
+//			Rtc.SCount = 0;
+//		}
+//		if(Rtc.SCount % JlyParam.NormalRecInterval ==0)
+//		{
+//			
+//			ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
+//			SaveHisDataToFlash();
+//		}
+//	}
+//	else
+//	{
+	
+		read_time();
+    
+//		RtcBcdToD10(&Rtc);
+//		
+//		Rtc.TMPS=DateToSeconds(&Rtc);
+//		
+//		RtcD10ToBcd(&Rtc);
+		
+		
+		RtcBcdToD10(&Rtc);
+		Rtc.TMPS=RTC_Date_Time_To_Second(&Rtc);
+		
+		RTC_Second_To_Date_Time(Rtc.TMPS,&Rtc);
+		RtcD10ToBcd(&Rtc);
+		
+		if(Rtc.TMPS % JlyParam.NormalRecIntervalMin ==0)
+		{   
 			
 			ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
 			SaveHisDataToFlash();
 		}
-	}
-	else
-	{
-		read_time();
-    
-		RtcBcdToD10(&Rtc);
-		
-		Rtc.TMPS=DateToSeconds(&Rtc);
-		
-		RtcD10ToBcd(&Rtc);
-		
-		Rtc.TMPS = Rtc.TMPS/60;	//分钟
-		if(Rtc.TMPS % JlyParam.NormalRecIntervalMin ==0)//1分钟-
-		{   
-			if(Rtc.TMPS!=Rtc.TCPS)
-			{
-				Rtc.TCPS=Rtc.TMPS;
-				
-				ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
-				SaveHisDataToFlash();
-			}
-		}
-	}
+//	}
 	
 }
 /******************************************************************************
@@ -564,9 +582,14 @@ void SaveDataOnTimeDeal(void)
   *****************************************************************************/
 void StorageHistoryData(void)
 {
-	if((Conf.Jly.WorkStatueIsStop >= 1)&&(JlyParam.ChannelNumActual >0))
+	if((Conf.Jly.WorkStatueIsOrNotStop >= 1)&&(JlyParam.ChannelNumActual >0))
 	{
-		SaveDataOnTimeDeal();
+		if(Flag.StorageData ==1)
+		{
+			Flag.StorageData =0;
+			SaveDataOnTimeDeal();
+		}
+		
 	}
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

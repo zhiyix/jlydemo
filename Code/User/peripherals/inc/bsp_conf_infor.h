@@ -150,7 +150,7 @@ struct JlyConfDataStr
 	uint16_t :16;			/*!< Reserv */
 	uint16_t :16;			/*!< 34个byte */
 	 
-	uint8_t WorkStatueIsStop;  /*!< 记录仪工作状态
+	uint8_t WorkStatueIsOrNotStop;  /*!< 记录仪工作状态
 									0x00：停止记录 
 									0x01：正在记录 */
 	uint8_t PowerMode;         /*!< 记录仪功耗模式 
@@ -275,20 +275,22 @@ struct TempHumiAdjustConfDataStr
 //! \brief fram flash存储指针结构
 struct CircularQueueStr
 {
+	uint8_t  HIS_ONE_BYTES;			//一包数据大小
 	uint8_t  SectorHeadBytes;		
 	uint8_t  FlashRecOverFlow;		//flash存储数据溢出
-	uint8_t  HIS_ONE_BYTES;			//一包数据大小
-	uint16_t FRAM_MAX_NUM;			//fram中存储数据的最大包数
+	uint8_t  DownHistoryDataFirstOverFlow;//下载历史数据第一次读到最大地址
+	uint8_t  IDCode;				//未读数据时，补传标识码
 	
     uint16_t RecFramWritePointer;   //fram中记录数据指针
-	uint16_t FLASH_SECTOR_PER_NUM;  //flash中一个扇区存储数据条数
     uint16_t FlashSectorPointer;	//flash中扇区指针
 	
 	uint32_t FlashRecActualStorage;	//flash中实际存储容量
 	uint32_t FlashNoReadingDataNum;	//flash中未读数据条数
+	uint32_t FlashHistoryDataNum;	//flash中历史数据条数
     uint32_t WriteFlashDataPointer;  //flash中记录数据指针
     uint32_t FlashReadDataBeginPointer;  //flash中读数据起始指针
 	uint32_t ReadFlashDataPointer;		 //flash中读数据指针
+	uint32_t ReadFlashDataLastTimePointer; //flash中上一次读数据指针
 };
 //! \brief 配置表
 /*!< 基本配置数据地址表   1 (Display="Hex",ADDRESS_OFFSET=0x0000):
@@ -318,32 +320,6 @@ union ConfDataTable
 	};
 	uint8_t Buf[3232];
 };
-//RX8025 控制寄存器
-struct STREGStr
-{
-	uint8_t CT:3;
-	uint8_t :1;	//TEST
-	uint8_t :1;
-	uint8_t H12_24:1;
-	uint8_t DALE:1;
-	uint8_t WALE:1;
-	
-	uint8_t DAFG:1;
-	uint8_t WAFG:1;
-	uint8_t CTFG:1;
-	uint8_t :1;
-	uint8_t PON:1;
-	uint8_t XST:1;
-	uint8_t VDET:1;
-	uint8_t VDSL:1;
-};
-typedef union
-{
-	struct STREGStr STREG;
-	uint8_t Control[2];
-}RTC8025_Ctrl_Typedef;
-
-
 
 
 extern union  ConfDataTable     Conf;

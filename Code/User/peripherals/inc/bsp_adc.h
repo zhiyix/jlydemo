@@ -8,8 +8,8 @@ extern __IO uint16_t ADC_ConvertedValue[32];
 extern float ChannelDataFloat[32];
 
 void ADC1_Init(void);
-//void Sample(void);
-void  Dealing_Gather(unsigned char all_channel_code);
+
+//void  Dealing_Gather(unsigned char all_channel_code);
 
 #endif /* __ADC_H */
 

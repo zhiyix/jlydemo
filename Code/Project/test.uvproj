@@ -357,7 +357,7 @@
               <MiscControls></MiscControls>
               <Define>STM32L1XX_HD,USE_STDPERIPH_DRIVER,USE_HAL_DRIVER,STM32L152xE,MB_SLAVE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Libraries\CMSIC\startup;..\Libraries\CMSIC;..\Libraries\inc;..\Libraries\src;..\Doc;..\User;..\User\init;..\User\SysTick;..\User\peripherals\inc;..\User\peripherals\src;..\Libraries;..\User\logical-layer;..\BTBusLibraries\FreeModbus\modbus;..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc;..\BTBusLibraries\Inc</IncludePath>
+              <IncludePath>..\Libraries\CMSIC\startup;..\Libraries\CMSIC;..\Libraries\inc;..\Libraries\src;..\Doc;..\User;..\User\init;..\User\SysTick;..\User\peripherals\inc;..\User\peripherals\src;..\Libraries;..\User\logical-layer;..\User\LowPowerConsumption;..\BTBusLibraries\FreeModbus\modbus;..\BTBusLibraries\HAL_Drivers\STM32L1xx_HAL_Driver\Inc;..\BTBusLibraries\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -652,6 +652,11 @@
               <FileName>bsp_storagedata.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\logical-layer\bsp_storagedata.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_LowPowerDeal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\LowPowerConsumption\bsp_LowPowerDeal.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -113,5 +113,4 @@ void OffPowerSupply(void);
 void WriteSetFramFlag(void);
 int16_t ReadSetFramFlag(void);
 
-void EnterStopModePower(void);
 #endif

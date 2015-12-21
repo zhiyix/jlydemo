@@ -59,7 +59,7 @@
 #include "bsp_sensordeal.h"
 #include "bsp_serialdeal.h"
 #include "bsp_storagedata.h"
-
+#include "bsp_LowPowerDeal.h"
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/

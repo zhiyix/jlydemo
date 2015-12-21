@@ -200,7 +200,7 @@ void Display_NUL(void);
 void Display_LOW(void);
 void displayErr(uint8_t Er);
 void lcd_OFF(uint8_t offcode);
-void displayYEAR(unsigned char year);
+void displayYEAR(uint8_t cen,uint8_t year);
 void displayDAY(uint8_t month,uint8_t day);
 void displayTIME(uint8_t hour,uint8_t min);
 void Display_ChannelValue(uint8_t started_channel0);

@@ -45,6 +45,9 @@
 
 /* Private variables ---------------------------------------------------------*/
 
+/* ******************************* 月份对应的日期数 ************************************ */
+uint16_t month_days[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
 /* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************
@@ -80,6 +83,7 @@ void  Reset_Time(void)
   * @param  无
   * @retval 无		
   *****************************************************************************/
+/*
 static int8_t ReadRX8025Control1(void)
 {
 	uint8_t TempBuf[1];
@@ -90,6 +94,7 @@ static int8_t ReadRX8025Control1(void)
 	RX8025Flag = TempBuf[0];
 	return RX8025Flag;
 }
+*/
 /******************************************************************************
   * @brief  Description 读取设置过RX8025 Control2标志
   * @param  无
@@ -105,28 +110,7 @@ int8_t ReadRX8025Control2(void)
 	RX8025Flag = TempBuf[0];
 	return RX8025Flag;
 }
-/******************************************************************************
-  * @brief  Description RX8025初始化
-  * @param  无
-  * @retval 无		
-  *****************************************************************************/
-bool RX8025_RTC_Init(void)
-{
-    /*检查是不是第一次配置时钟 */
-	/*从指定的寄存器中读出数据：读出了与写入的指定数据不相乎,RX8025掉电复位时间到出厂日期*/
-	if((ReadRX8025Control1() != 0x25) )// && (ReadRX8025Control2() != 0x08)
-	{
-		printf("\r\n\r\n RX8025_RTC configured....\n\r");
-		Reset_Time();	/*设置时间出厂时间,设置配置RX8025标志*/
-		
-		return 1;	/*返回1，第一次初始化*/
-	}
-	else
-	{
-		printf("\n\r No need to configure RX8025_RTC....\n\r");
-	}
-    return 0;	/*返回0，已经初始化过*/
-}
+
 /******************************************************************************
   * @brief  Description 读取RX8025时间
   * @param  无
@@ -135,10 +119,10 @@ bool RX8025_RTC_Init(void)
 void read_time(void)
 {
 //    unsigned char i;
-	uint8_t readbuf[7];//16
+	uint8_t readbuf[16];//16 7
 
     //RTC8025_Read(&readbuf[1],(RX8025_ADDR_CONTROL1&RX8025_READ_MODE),1);
-	RTC8025_Read(readbuf,RX8025_SecondsAddr,7);	/*读取时钟时间*/
+	RTC8025_Read(readbuf,RX8025_SecondsAddr,16);	/*读取时钟时间*/
 	
 	Rtc.Second = readbuf[0];
     Rtc.Minute = readbuf[1];
@@ -228,7 +212,7 @@ void rtc_deel(void)
     if((rtc_pt==22)||(rtc_pt==52))
     {
         while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
-		displayYEAR(Rtc.Year);
+		displayYEAR(Conf.Time.Time_Cen,Rtc.Year);
         clearP;
         LCD_UpdateDisplayRequest();
     }
@@ -321,6 +305,76 @@ void RtcD10ToBcd(struct   RTCRX8025Str *Rtc)
     Rtc->Month=(uint8_t)(D10_TO_BCD(Rtc->Month));
     Rtc->Year=(uint8_t)(D10_TO_BCD(Rtc->Year));
 }
+
+/* **********************************************************************************
+ * 函数名：Date_Time_To_Second
+ * 描述  ：将公历时间日期转换成秒数据
+ * 输入  ：时间日期数据结构
+ * 输出  ：秒数据
+ * **********************************************************************************/
+uint32_t RTC_Date_Time_To_Second(struct   RTCRX8025Str *Rtc)
+{
+	Rtc->Year += STARTOFTIME;
+	if (Rtc->Month > 2) 			/* 1..12 -> 11,12,1..10 */
+	{								
+		Rtc->Month -= 2;
+	}else
+	{
+		Rtc->Month += 10;		/* Puts Feb last since it has leap day */
+		Rtc->Year -= 1;
+	}
+
+	return (((
+		(uint32_t) (Rtc->Year/4 - Rtc->Year/100 + Rtc->Year/400 + 367*Rtc->Month/12 + Rtc->Day) +
+			Rtc->Year*365 - 730456
+	    )*24 + Rtc->Hour /* now have hours 719499 */
+	  )*60 + Rtc->Minute /* now have minutes */
+	)*60 + Rtc->Second; /* finally seconds */
+	
+}
+
+/* **********************************************************************************
+ * 函数名：Second_To_Date_Time
+ * 描述  ：将秒数据转换成公历的时间日期
+ * 输入  ：当前的秒数据、时间数据结构；
+ * 输出  ：无
+ * **********************************************************************************/
+void RTC_Second_To_Date_Time(uint32_t tim,struct   RTCRX8025Str *Rtc)
+{
+	register uint32_t    i;
+	register long   hms, day;
+
+	day = tim / SECDAY;
+	hms = tim % SECDAY;
+
+	/* Hours, minutes, seconds are easy */
+	Rtc->Hour = hms / 3600;
+	Rtc->Minute = (hms % 3600) / 60;
+	Rtc->Second = (hms % 3600) % 60;
+
+	/* Number of years in days */ /*算出当前年份，起始的计数年份为1970年*/
+	for (i = STARTOFTIME; day >= days_in_year(i); i++) {
+		day -= days_in_year(i);
+	}
+	Rtc->Year = i;
+
+	/* Number of months in days left */ /*计算当前的月份*/
+	if (leapyear(Rtc->Year)) {
+		days_in_month(FEBRUARY) = 29;
+	}
+	for (i = 1; day >= days_in_month(i); i++) {
+		day -= days_in_month(i);
+	}
+	days_in_month(FEBRUARY) = 28;
+	Rtc->Month = i;
+
+	/* Days are what is left over (+1) from all that. *//*计算当前日期*/
+	Rtc->Day = day + 1;
+	
+	Rtc->Year -= STARTOFTIME;
+}
+
+
 #endif /* __BSPRTC_C */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -185,14 +185,36 @@ void EXTI0_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line0) != RESET) //PA0唤醒引脚
 	{
-		// Toggle LED1 
-		//LED1_TOGGLE;
+
+		if(JlyParam.NormalRecInterval >= 60)//记录间隔大于60s
+		{
+			Flag.StorageData = 1;	//存储标志
+			Flag.StartSample = 1;	//采集标志
+			
+		}else if((JlyParam.NormalRecInterval >0) && (JlyParam.NormalRecInterval < 60))
+		{
+			JlyParam.RtcSecCount++;
+			if(JlyParam.RtcSecCount >= JlyParam.NormalRecInterval)//到秒记录间隔
+			{
+				JlyParam.RtcSecCount = 0;
+				
+				Flag.StorageData = 1;	//存储标志
+				Flag.StartSample = 1;	//采集标志
+			}
+		}
+		
 		
 		/* Clear the EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line0);
 	}
 }
-
+/*
+void RTC中断(void)
+{
+	存储标志=1;
+	采集标志=1;
+}
+*/
 /**
   * @brief  This function handles External lines 15 to 10 interrupt request.
   * @param  None
@@ -202,7 +224,7 @@ void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line13) != RESET) //机械按键key1
 	{
-		SysClock_ReConfig();
+		//SysClock_ReConfig();
 		printf("\r\n Sys Clock ReConfig Exit StopMode \r\n");
 		TOUCHKEY_POWER(ON);		  //开触摸按键电源
 		JlyParam.WakeUpSource = 2;//表示按键唤醒
@@ -244,6 +266,20 @@ void TIM2_IRQHandler(void)
     {
 //        time++;
         Flag.Sec = 1;//1s定时时间到
+		
+		
+		if((--JlyParam.SampleTimeCount) <=0)//采样时间
+		{
+			JlyParam.SampleTimeCount = JlyParam.SampleInterval;//采集时间 单位:s
+			Flag.StartSample = 1;
+		}
+		if(JlySensor.SensorStableCount >0)//传感器稳定时间
+		{
+			JlySensor.SensorStableCount--;
+		}
+		
+		
+		
 		JlyParam.AlarmTimeDelayCount ++;
 		if(JlyParam.AlarmTimeDelayCount >= JlyParam.SoundLightAlarmTimeDelay)
 		{
@@ -260,21 +296,27 @@ void TIM2_IRQHandler(void)
 				Flag.WakeUpStopModeOnTime = 1;
 			}
 		}
-		//这里重要，上电首次进入低功耗，adc
-		if(Flag.FirstNotEnterStopMode == 1)
-		{
-			JlyParam.FirstEnterStopModeCount ++;
-			if(JlyParam.FirstEnterStopModeCount >= FirstEnterStopModeTime)
-			{
-				Flag.FirstNotEnterStopMode = 0;
-				Flag.FirstEnterStopMode = 1;
-				JlyParam.FirstEnterStopModeCount =0;
-			}
-		}
+		
 		
         TIM_ClearITPendingBit(TIM2 , TIM_FLAG_Update);
     }
 }
+/*
+void TIM2中断(void)
+{
+	if (采集计数器-- == 0)
+	{
+		采集标志=1;
+	}
+	if ( 休眠计数器 > 0)
+	{
+		休眠计数器  --;
+	}
+	if (传感器稳定计数器 > 0)
+	{
+		传感器稳定计数器 --;
+	}
+}*/
 /******************************************************************************/
 /*                 STM32L1xx Peripherals Interrupt Handlers                   */
 /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */

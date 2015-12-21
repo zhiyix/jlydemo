@@ -21,6 +21,7 @@ struct RTCRX8025Str      	Rtc;
 struct CircularQueueStr  	Queue;
 struct JLYPARAMETERStr   	JlyParam;
 struct KEYStr			    Key;
+struct JlySensorStr			JlySensor;
 
 union ConfDataTable 	    Conf;
 

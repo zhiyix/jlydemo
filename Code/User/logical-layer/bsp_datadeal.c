@@ -48,152 +48,77 @@
 /* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************
-  * @brief  Description 正常、省电模式处理
-						省电模式：采集间隔最小10s
-						正常模式：采集间隔最小2s
+  * @brief  Description 
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
-static void LOWorNomal_Mode(void)
+static void LOWorNomalMode(void)
 {
-	uint8_t i=0;
-    if((Conf.Jly.PowerMode >= 1)&&(Conf.Jly.WorkStatueIsStop >= 1)) /*低功耗模式*/
+	if(Conf.Jly.PowerMode >= 1) /*低功耗模式*/
     {
-		//开启adc电压后(AVCC1_POWER(ON)),由于电压不稳没有立即去采集，而是利用程序执行延时后在这个地方开启采集
-		if(Flag.StartSample==1)
+		JlySensor.bAdcComplete = FALSE;
+		if(Flag.StartSample ==1)//定时器开采集标志
         {
-            Flag.StartSample=0;
-            //Flag.EndSample=1;
-			Flag.IsDisplayRightNow = 1; //第一次采样完显示
+			JlySensor.bAdcComplete = SensorDataSampleAndDeal();//传感器数据采集
 			
-            Dealing_Gather(Started_Channel);
-			
-            AVCC1_POWER(OFF);
-            DoGatherChannelDataFloat(Started_Channel);
-			
-        }
-        if(JlyParam.SampleTime == JlyParam.SampleInterval-1)//
-        {
-			/*判断传感器接口类型 模拟/数字*/
-			for(i=0;i<JlyParam.ChannelNumOld;i++)
+			if(JlySensor.bAdcComplete)
 			{
-				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
-				{
-					Flag.StartSample=1;
-				}
-				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
-				{
-					
-				}
+				Flag.StartSample =0;//采集标志清零
+				
+				Flag.IsDisplayRightNow = 1;//adc数据采集完 控制显示
 			}
-			if(Flag.StartSample == 1 )
-			{
-				AVCC1_POWER(ON);	/*打开传感器电源*/
-			}
-        }
+		}
 		
-//        if(Flag.EndSample==1)
-//        {
-//            Flag.EndSample=0;
-//            
-//            if(Flag.MucReset==1)//???? MCU???,???????????
-//            {
-//                Flag.MucReset=0;
-//            }
-//        }
-    }//END 
-    else if(Conf.Jly.WorkStatueIsStop >= 1)//正常模式
-    {
+	}
+}
+/******************************************************************************
+  * @brief  Description 记录仪停止记录后的处理
+  * @param  无  		
+  * @retval 无		
+  *****************************************************************************/
+static void JlyOffDeal(void)
+{
+	if(Flag.StopRecording == 0)
+	{
+		Flag.StopRecording = 1;	//停止记录,只执行一次
 		
-		if(Flag.StartSample==1)
-        {
-            Flag.StartSample=0;
-            //Flag.EndSample=1;
-                
+		RecorderBootModeHandle();
+		OffPowerSupply();//关设备电源
+		if(JlyParam.FramErrorCode!=0)
+		{
+			/*!< Wait Until the last LCD RAM update finish */
+			while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+			displayErr(JlyParam.FramErrorCode);
+			/*!< Requesy LCD RAM update */
+			LCD_UpdateDisplayRequest();  
 			
-			Dealing_Gather(Started_Channel);
-            AVCC1_POWER(OFF);
-            DoGatherChannelDataFloat(Started_Channel);
-        }
-        if((JlyParam.SampleTime>1) && JlyParam.SampleTime%2==0)//2s采集一次
-        {
-			/*判断传感器接口类型 模拟/数字*/
-			for(i=0;i<JlyParam.ChannelNumOld;i++)
-			{
-				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
-				{
-					Flag.StartSample=1;
-				}
-				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
-				{
-					
-				}
-			}
-			if(Flag.StartSample == 1 )
-			{
-				AVCC1_POWER(ON);	/*打开传感器电源*/
-			}
-        }
-		
-//        if(Flag.EndSample==1)
-//        {
-//            Flag.EndSample=0;
-//            
-//            if(Flag.MucReset==1)
-//            {
-//                Flag.MucReset=0;
-//            }
-//        }
-    }
-	
-	if((--JlyParam.SampleTime)<=0)
-    {
-        JlyParam.SampleTime = JlyParam.SampleInterval;//采集时间 单位:s
-    }
+		}else
+		{
+			lcd_OFF(JlyParam.ShowOffCode);
+		}
+	}
 }
 /******************************************************************************
   * @brief  Description 记录仪数据采集、数据显示、通道报警处理
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
-static void WorkornotMode(void)
+static void WorkOrNotMode(void)
 {
-    if(Conf.Jly.WorkStatueIsStop >= 1)
+    if((Conf.Jly.WorkStatueIsOrNotStop >= 1)&&(JlyParam.ChannelNumActual >0))
     {
+		//当实际通道数 >0 时开启采样 
+        
+		LOWorNomalMode();
 
-		//当实际通道数 >0 时开启采样 存储 显示
-        if(JlyParam.ChannelNumActual >0)
-		{
-			LOWorNomal_Mode();
-			
-	//        if((Flag.buttonS2flag==0)&&(Flag.buttonS3flag==0)&&(Flag.buttonS4flag==0))
-	//        {
-				Display_ChannelValue(StartedChannelForDisplay);  //LCD 
-	//        }
-			
-			Flag.IsDisplayRightNow=1;
-			Flag.StopRecording = 0;	//停止记录标志清0
-        }
+		Flag.StopRecording = 0;	//停止记录标志清0
 		
-    }else{
+    }else
+	{
 		
-		if(Flag.StopRecording == 0)
-		{
-			Flag.StopRecording = 1;	//停止记录,只执行一次
-			
-			OffPowerSupply();//关设备电源
-			if(JlyParam.FramErrorCode!=0)
-			{
-				/*!< Wait Until the last LCD RAM update finish */
-				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-				displayErr(JlyParam.FramErrorCode);
-				/*!< Requesy LCD RAM update */
-				LCD_UpdateDisplayRequest();  
-			}else{
-				lcd_OFF(JlyParam.ShowOffCode);
-			}
-		}
+		JlyOffDeal();
 	}
+	
 }
 
 
@@ -334,36 +259,21 @@ void JlySecDeal(void)
 
 		ExternalPowerDetection();
 
-        BatteryVoltageDetection();//BatteryVoltageDetection
-    
+        BatteryVoltageDetection();
+		
 		RecorderBootModeHandle();
 
-        WorkornotMode();
-
-		StorageHistoryData();
+		Display_ChannelValue(StartedChannelForDisplay);
 		
     }
 	
-	if(Conf.Jly.WorkStatueIsStop < 1) /*停止工作*/
+	WorkOrNotMode();
+	
+	StorageHistoryData();
+	
+	if(Conf.Jly.WorkStatueIsOrNotStop < 1) /*停止工作*/
     {	
-		if(Flag.StopRecording == 0)
-		{
-			Flag.StopRecording = 1;	//停止记录,只执行一次
-			
-			RecorderBootModeHandle();
-			OffPowerSupply();//关设备电源
-			if(JlyParam.FramErrorCode!=0)
-			{
-				/*!< Wait Until the last LCD RAM update finish */
-				while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-				displayErr(JlyParam.FramErrorCode);
-				/*!< Requesy LCD RAM update */
-				LCD_UpdateDisplayRequest();  
-				
-			}else{
-				lcd_OFF(JlyParam.ShowOffCode);
-			}
-		}
+		JlyOffDeal();
     }
 }
 #endif /* __BSPDATADEAL_C */

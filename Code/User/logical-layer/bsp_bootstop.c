@@ -52,7 +52,7 @@
   * @param  无  		
   * @retval 无		
   * 说明：
-		 0FF:控制(手动)停机状态
+		 0FF:手动控制记录仪启停
 	    00FF:记录仪记满停机
 		10FF:定点启动方式，还未开始记录
 		20FF:定点停止方式，已到时停机
@@ -68,11 +68,11 @@ void RecorderBootModeHandle(void)
 {
     if(JlyParam.FramErrorCode != 0)
     {
-        if(Conf.Jly.WorkStatueIsStop == 1)	/* 工作状态 */
+        if(Conf.Jly.WorkStatueIsOrNotStop == 1)	/* 工作状态 */
         {
             
-            Conf.Jly.WorkStatueIsStop = 0;	/*停止工作*/
-            Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+            Conf.Jly.WorkStatueIsOrNotStop = 0;	/*停止工作*/
+            Fram_Write(&Conf.Jly.WorkStatueIsOrNotStop,FRAM_WorkStatueIsStopAddr,1);
 			
             JlyParam.ShowOffCode = 0x09;	/*出现故障*/
 			Flag.StopRecording = 0;	//停止记录标志清0
@@ -81,15 +81,15 @@ void RecorderBootModeHandle(void)
     }
     if(Conf.Jly.RecBootMode == 0x00)	/* 延时启动(默认延时时间0，即立即启动)*/
     {
-		if((JlyParam.delay_start_time--) <= 0 && (!Conf.Jly.WorkStatueIsStop))	//&& (!Conf.Jly.WorkStatueIsStop)
+		if((JlyParam.delay_start_time--) <= 0 && (!Conf.Jly.WorkStatueIsOrNotStop))	//&& (!Conf.Jly.WorkStatueIsOrNotStop)
         {
             JlyParam.delay_start_time = -1;
-            Conf.Jly.WorkStatueIsStop = 1;	/*开启工作*/
+            Conf.Jly.WorkStatueIsOrNotStop = 1;	/*开启工作*/
 			Conf.Jly.RecBootMode = 0xFF;	//当前记录方式启动后，不会再执行当前程序，提高代码效率
         }
         if((JlyParam.delay_start_time)>0)
         {
-            Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+            Conf.Jly.WorkStatueIsOrNotStop = 0;	/* 停止工作 */
 			
             JlyParam.ShowOffCode = 0x05;	/*表示延时启动方式，还未开始记录*/
         }
@@ -102,10 +102,11 @@ void RecorderBootModeHandle(void)
 		if((Rtc.Year == Conf.Jly.MixBoot_Year)&&(Rtc.Month == Conf.Jly.MixBoot_Month)&&(Rtc.Day == Conf.Jly.MixBoot_Day)\
 			&&(Rtc.Hour == Conf.Jly.MixBoot_Hour)&&(Rtc.Minute == Conf.Jly.MixBoot_Min))
 		{
-			Conf.Jly.WorkStatueIsStop = 1;	/*到时间点开启工作*/	
+			Conf.Jly.WorkStatueIsOrNotStop = 1;	/*到时间点开启工作*/	
 			Conf.Jly.RecBootMode = 0xFF;	//当前记录方式启动后，不会再执行当前程序，提高代码效率
-		}else{
-			Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+		}else
+		{
+			Conf.Jly.WorkStatueIsOrNotStop = 0;	/* 停止工作 */
 			JlyParam.ShowOffCode = 0x03;	/*表示定时启动方式，还未开始记录*/
 		}
 	}
@@ -118,48 +119,47 @@ void RecorderBootModeHandle(void)
 			if((Rtc.Year == Conf.Jly.MixBoot_Year)&&(Rtc.Month == Conf.Jly.MixBoot_Month)&&(Rtc.Day == Conf.Jly.MixBoot_Day)\
 				&&(Rtc.Hour == Conf.Jly.MixBoot_Hour)&&(Rtc.Minute == Conf.Jly.MixBoot_Min))
 			{
-				Conf.Jly.WorkStatueIsStop = 1;	/*到时间点开启工作*/
+				Conf.Jly.WorkStatueIsOrNotStop = 1;	/*到时间点开启工作*/
 				Flag.RecTimeDingDianBoot = 1;	/* 时间点定点已启动 */
-			}else{
-				Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+			}else
+			{
+				Conf.Jly.WorkStatueIsOrNotStop = 0;	/* 停止工作 */
 				JlyParam.ShowOffCode = 0x01;	/*表示定点启动方式，还未开始记录*/
 				Flag.RecTimeDingDianBoot = 0;
 			}
 		}
 		
-		if(Conf.Jly.WorkStatueIsStop) /* 时间点定点停止 */
+		if(Conf.Jly.WorkStatueIsOrNotStop >=1) /* 时间点定点停止 */
 		{
 			/*读取时钟时间*/
 			read_time();
 			if((Rtc.Year == Conf.Jly.FixedStop_Year)&&(Rtc.Month == Conf.Jly.FixedStop_Month)&&(Rtc.Day == Conf.Jly.FixedStop_Day)\
 				&&(Rtc.Hour == Conf.Jly.FixedStop_Hour)&&(Rtc.Minute == Conf.Jly.FixedStop_Min))
 			{
-				Conf.Jly.WorkStatueIsStop = 0;	/* 到时间点停止工作 */
+				Conf.Jly.WorkStatueIsOrNotStop = 0;	/* 到时间点停止工作 */
 				JlyParam.ShowOffCode = 0x02;	/*表示定点停止方式 ，已到时停机*/
 				
 				Flag.RecTimeDingDianBoot = 0;
 				Conf.Jly.RecBootMode = 0xFF;	//当前记录方式启动停止后，不会再执行当前程序，提高代码效率
-			}else{
-				
-				Conf.Jly.WorkStatueIsStop = 1;	
 			}
 		}
 	}
 	else if(Conf.Jly.RecBootMode == 0x03 )	/* 机械按键手动启动*/
     {
-		if(Conf.Jly.WorkStatueIsStop >= 1)//由工作到停止
+		if(Conf.Jly.WorkStatueIsOrNotStop >= 1)//由工作到停止
 		{
-			Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+			Conf.Jly.WorkStatueIsOrNotStop = 0;	/* 停止工作 */
 			Conf.Jly.RecBootMode = 0xFF;
             //写入fram
-			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+			Fram_Write(&Conf.Jly.WorkStatueIsOrNotStop,FRAM_WorkStatueIsStopAddr,1);
 			JlyParam.ShowOffCode = 0xFF;
 			Flag.StopRecording = 0;	//停止记录标志清0  这样的话在别的启动方式未生效前任可修改到别的记录方式
-		}else{//由停止到工作
-			Conf.Jly.WorkStatueIsStop = 1;
+		}else
+		{//由停止到工作
+			Conf.Jly.WorkStatueIsOrNotStop = 1;
 			Conf.Jly.RecBootMode = 0xFF;
 			Flag.StopRecording = 0;	//停止记录标志清0  这样的话在别的启动方式未生效前任可修改到别的记录方式
-			Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+			Fram_Write(&Conf.Jly.WorkStatueIsOrNotStop,FRAM_WorkStatueIsStopAddr,1);
 		}
     }
     else if(Conf.Jly.RecBootMode == 0x10)	/* 异常条件启动 */
@@ -177,16 +177,16 @@ void RecorderStopModeHandle(void)
     uint8_t  IsWriteLasestStopTimeToFram;
     IsWriteLasestStopTimeToFram = 0;
     
-    if(Conf.Jly.WorkStatueIsStop)
+    if(Conf.Jly.WorkStatueIsOrNotStop)
     {
         if(Conf.Jly.RecStopMode == 0){};	/* 先进先出的记录停止方式 */
         if(Conf.Jly.RecStopMode == 1)		/* 存储器记满的记录停止方式 */
         {
             if((Queue.WriteFlashDataPointer >= Queue.FlashRecActualStorage)) //&&IsReadingI2c==0,下载数据
             {
-                Conf.Jly.WorkStatueIsStop = 0;	/* 停止工作 */
+                Conf.Jly.WorkStatueIsOrNotStop = 0;	/* 停止工作 */
 				
-				Fram_Write(&Conf.Jly.WorkStatueIsStop,FRAM_WorkStatueIsStopAddr,1);
+				Fram_Write(&Conf.Jly.WorkStatueIsOrNotStop,FRAM_WorkStatueIsStopAddr,1);
                 IsWriteLasestStopTimeToFram = 1;
                 JlyParam.ShowOffCode = 0;	/*记录仪记满停机*/
             }

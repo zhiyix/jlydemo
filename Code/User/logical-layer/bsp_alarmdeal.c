@@ -167,9 +167,11 @@ void AlarmDeal(uint8_t channel)
 								AlarmAction(channel);
 								Conf.Sensor[channel-1].AlarmStatus = 1;//上限报警状态
 								WriteU16Pointer(((channel-1)*FRAM_SensorChanelOffset32+FRAM_AlarmStatusBaseAddr),Conf.Sensor[channel-1].AlarmStatus);
-							}else{
+							}else
+							{
 								CloseAlarm();
 							}
+							
 						}else if(Conf.Alarm.AlarmTime_Mode & 0x02)	// 下班时间 
 						{
 							AlarmAction(channel);
@@ -180,6 +182,7 @@ void AlarmDeal(uint8_t channel)
 					}
 				}
 			} 
+			
         }else if(ChannelDataFloat[channel-1] <= Conf.Sensor[channel-1].SensorAlarm_Low.ft)//下限超标
 		{
 			if(Flag.AlarmXiaoYin == 1)
@@ -205,9 +208,11 @@ void AlarmDeal(uint8_t channel)
 								AlarmAction(channel);
 								Conf.Sensor[channel-1].AlarmStatus = 2;//下限报警状态
 								WriteU16Pointer(((channel-1)*FRAM_SensorChanelOffset32+FRAM_AlarmStatusBaseAddr),Conf.Sensor[channel-1].AlarmStatus);
-							}else{
+							}else
+							{
 								CloseAlarm();
 							}
+							
 						}else if(Conf.Alarm.AlarmTime_Mode & 0x02)	// 下班时间 
 						{
 							AlarmAction(channel);
@@ -217,7 +222,9 @@ void AlarmDeal(uint8_t channel)
 					}
 				}
 			}
-		}else{
+			
+		}else
+		{
 			Flag.AlarmXiaoYin = 0;
             Flag.AlarmHuiFu[channel-1] = 0;//消音恢复
 			

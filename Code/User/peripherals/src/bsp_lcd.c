@@ -440,6 +440,10 @@ static void Lcd_Dis2Value(uint8_t value)
 		case 0x09:
 			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT5;
 			break;
+		
+		case 'd':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT5;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT4+D_BIT5;
+			break;
 		case '-':
 			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT4;LCD->RAM[6] |= D_ZERO;
 			break;
@@ -506,6 +510,9 @@ static void Lcd_Dis3Value(uint8_t value)
 		case 'F':
 			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT6;
 			break;
+		case 'L':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			break;
 		case 'O':
 			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
 			break; 
@@ -567,6 +574,10 @@ static void Lcd_Dis4Value(uint8_t value)
         case 0x09:
 			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8+D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT9;
 			break; 
+		
+		case 'd':
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			break;
 		case 'r':
 			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT8;
 			break; 
@@ -1153,15 +1164,15 @@ static void Lcd_Dis15Value(uint8_t value)
   * @param  None
   * @retval None
   ******************************************************************************/
-void displayYEAR(unsigned char year)
+void displayYEAR(uint8_t cen,uint8_t year)
 {
 	Lcd_Dis12Value(0xff);
 	Lcd_Dis13Value(0xff);
 	Lcd_Dis14Value(0xff);
 	Lcd_Dis15Value(0xff);
 	
-    Lcd_Dis12Value(2);//1  
-    Lcd_Dis13Value(0);//2
+    Lcd_Dis12Value(cen/16);//1  
+    Lcd_Dis13Value(cen%16);//2
     if(year>9)
     {
         Lcd_Dis14Value(year/16); 
@@ -1484,15 +1495,25 @@ void lcd_OFF(uint8_t offcode)
 	if(offcode==0xFF)
 	{
 		Lcd_Dis1Value(0xFF);
-	}
-	else
+		/*显示0FF*/
+		Lcd_Dis2Value(0);
+		Lcd_Dis3Value('F');
+		Lcd_Dis4Value('F');
+	}else if(offcode==0x0D)
+	{
+		Lcd_Dis1Value(0xFF);
+		/*显示DLd*/
+		Lcd_Dis2Value('d');
+		Lcd_Dis3Value('L');
+		Lcd_Dis4Value('d');
+	}else
 	{
 		Lcd_Dis1Value(offcode);
+		/*显示0FF*/
+		Lcd_Dis2Value(0);
+		Lcd_Dis3Value('F');
+		Lcd_Dis4Value('F');
 	}
-	/*显示0FF*/
-	Lcd_Dis2Value(0);
-	Lcd_Dis3Value('F');
-	Lcd_Dis4Value('F');
 	
 	/*!< Requesy LCD RAM update */
 	LCD_UpdateDisplayRequest();  
@@ -1535,7 +1556,8 @@ void Lcd_ChannelValue(uint8_t temp,float humi)
 	{
 		clearP2;
 		Display_NUL();
-	}else{
+	}else
+	{
 		if(FlagSeniorErr[chanel-1]==1)
 		{
 			/*!< 显示传感器故障 */
@@ -1594,7 +1616,8 @@ void Lcd_ChannelValue(uint8_t temp,float humi)
 	{
 		clearC;  
 		showRH;
-	}else{
+	}else
+	{
 		clearRH;
 		showC;
 	}
@@ -1610,36 +1633,42 @@ void Lcd_ChannelValue(uint8_t temp,float humi)
 void Display_ChannelValue(uint8_t started_channel0)
 {
     uint8_t channel_cp;
-    if(!(display_ct%channeldisplaytime)&&Flag.IsDisplayRightNow)
+	
+	if((Conf.Jly.WorkStatueIsOrNotStop >= 1)&&(JlyParam.ChannelNumActual >0))
     {
-        
-        channel_cp = started_channel0;
-        
-        while(channel_cp & 0x01)
-        {
-			ChannelForDisplay++;//ChannelForDisplay
+		//当实际通道数 >0 时开启 显示
 
-			if(Conf.Sensor[ChannelForDisplay-1].ChannelSwitch ==0)
+		if(Flag.IsDisplayRightNow)//!(display_ct%channeldisplaytime)&&
+		{
+			
+			channel_cp = started_channel0;
+			
+			while(channel_cp & 0x01)
 			{
-				Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
-				
-				AlarmDeal(ChannelForDisplay);
-				
-			}
+				ChannelForDisplay++;//ChannelForDisplay
 
-            break;
-        }
-        
-        StartedChannelForDisplay=StartedChannelForDisplay>>1;
-        
-        if(!StartedChannelForDisplay)
-        {
-            StartedChannelForDisplay = Started_Channel;
-            ChannelForDisplay = 0;
-        }
-        
-//        Transact_alarm(AlarmCode);
-    }
-    Flag.IsDisplayRightNow = 0;
+				if(Conf.Sensor[ChannelForDisplay-1].ChannelSwitch ==0)
+				{
+					Lcd_ChannelValue(ChannelForDisplay,ChannelDataFloat[ChannelForDisplay-1]);
+					
+					AlarmDeal(ChannelForDisplay);
+					
+				}
+
+				break;
+			}
+			
+			StartedChannelForDisplay=StartedChannelForDisplay>>1;
+			
+			if(!StartedChannelForDisplay)
+			{
+				StartedChannelForDisplay = Started_Channel;
+				ChannelForDisplay = 0;
+			}
+			
+	//        Transact_alarm(AlarmCode);
+		}
+		
+	}
 }
 

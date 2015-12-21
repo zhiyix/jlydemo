@@ -344,6 +344,8 @@ static void General_GPIO_Config(void)
 static void SetJlyParamData(void)
 {
 	uint8_t i;
+	//补传 标识码，第一次人为设置不一样
+	Queue.IDCode = 0xFF;
 	//按键使能 重要参数
 	Flag.KeyEnableOrDisable = Conf.Jly.KeyEnableOrDisable;
 	//数据存储环形队列 重要参数
@@ -381,8 +383,7 @@ static void SetJlyParamData(void)
 	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumActual*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
 	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
 	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//一个字节 这里配置会修改通道数，即一帧数据会被修改需要写入fram
-	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
-	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+
 	Queue.FlashRecActualStorage = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES*Queue.HIS_ONE_BYTES; //flash中实际存储字节数
 	
 	Conf.Basic.FlashRecMaxSize = FLASH_RecMaxSize;//flash最大存储容量 
@@ -390,11 +391,12 @@ static void SetJlyParamData(void)
 	/*------------------------------------------------------*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
 	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
-	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
+	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval;//正常记录间隔 单位：min
 	
-	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
-	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
-	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s
+	//采集时间间隔 这一版本不考虑ms；按协议中设计的 uint16_t 最大65535 s,
+	//JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
+	JlyParam.SampleInterval = Conf.Jly.SampleInterval;
+	JlyParam.SampleTimeCount = JlyParam.SampleInterval;  		//采集时间计数
 	
 	//报警参数设置
 	JlyParam.ContinueExcessiveTimes = 3; //连续超标次数 0-10可设置 默认3
@@ -410,7 +412,7 @@ static void FirstScanSysData(void)
 {
 	if(JlyParam.FramErrorCode != 1)//Fram is ok
 	{
-		if(ReadSetFramFlag() == 0x5050)
+		if(ReadSetFramFlag() == 0x5050)	//配置过Fram
 		{
 			Fram_Read(Conf.Buf,FRAM_BasicConfAddr,FRAM_ConfSize);	//系统上电读取配置信息表
 			SetJlyParamData();
@@ -420,7 +422,7 @@ static void FirstScanSysData(void)
 			JlyParam.ChannelNumOld = 0;
 		}
 	}else{//fram出错
-		Conf.Jly.WorkStatueIsStop = 0;//停止工作
+		Conf.Jly.WorkStatueIsOrNotStop = 0;//停止工作
 		JlyParam.ChannelNumActual = 0;
 		JlyParam.ChannelNumOld = 0;
 	}
@@ -465,34 +467,36 @@ static void TestFramIsOrNotOk(void)
 	uint8_t Fram_Buf_Write[256];
 	uint8_t Fram_Buf_Read[256];
 	uint16_t i;
- 
-	for ( i=0; i<=255; i++ ) //填充缓冲
-	{   
-		Fram_Buf_Write[i] = i;
-		//printf("0x%02X ", Fram_Buf_Write[i]);
-		//if(i%16 == 15)    
-		//printf("\r\n");    
-	}
-
-	//将Fram_Buf_Write中顺序递增的数据写入FRAM中 
-	Fram_Write( Fram_Buf_Write, FRAM_TestIsOkAddr, 256);
 	
-	//将FRAM读出数据顺序存储到Fram_Buf_Read
-	Fram_Read(Fram_Buf_Read, FRAM_TestIsOkAddr, 256); 
-
-	//将I2c_Buf_Read中的数据通过串口打印
-	for (i=0; i<256; i++)
-	{	
-		if(Fram_Buf_Read[i] != Fram_Buf_Write[i])
-		{
-			//printf("0x%02X ", Fram_Buf_Read[i]);
-			//printf("错误:I2C EEPROM写入与读出的数据不一致\r\n");
-			JlyParam.FramErrorCode = 1;
-			return;
+	//没有配置过Fram的情况下检测Fram
+	if(ReadSetFramFlag() != 0x5050)
+	{
+		for ( i=0; i<=255; i++ ) //填充缓冲
+		{   
+			Fram_Buf_Write[i] = i;
+			
 		}
-		//printf("0x%02X ", Fram_Buf_Read[i]);
-		//if(i%16 == 15)    
-		//	printf("\r\n");
+
+		//将Fram_Buf_Write中顺序递增的数据写入FRAM中 
+		Fram_Write( Fram_Buf_Write, FRAM_TestIsOkAddr, 256);
+		
+		//将FRAM读出数据顺序存储到Fram_Buf_Read
+		Fram_Read(Fram_Buf_Read, FRAM_TestIsOkAddr, 256); 
+
+		//将I2c_Buf_Read中的数据通过串口打印
+		for (i=0; i<256; i++)
+		{	
+			if(Fram_Buf_Read[i] != Fram_Buf_Write[i])
+			{
+				//printf("0x%02X ", Fram_Buf_Read[i]);
+				//printf("错误:I2C EEPROM写入与读出的数据不一致\r\n");
+				JlyParam.FramErrorCode = 1;
+				return;
+			}
+			//printf("0x%02X ", Fram_Buf_Read[i]);
+			//if(i%16 == 15)    
+			//	printf("\r\n");
+		}
 	}
 }
 
@@ -516,10 +520,43 @@ void OffPowerSupply(void)
 	BEEP(OFF);
 	LED1(OFF);LED2(OFF);
 	LcdBackLight(OFF);
-	MODEL_PWRCTRL(OFF);
-	TOUCHKEY_POWER(OFF);
+	//MODEL_PWRCTRL(OFF);
+	//TOUCHKEY_POWER(OFF);
 	HAC_POWER(OFF);
 }
+/******************************************************************************
+  * @brief  Description 外设初始化
+  * @param  None
+  * @retval None
+  *****************************************************************************/
+void PeripheralInit(void)
+{
+	SysClock_Config();
+
+	//GPIO_ReConfig();//影响ADC正常工作,烧写程序时必须reset复位
+
+	SysTick_Init();
+	
+	WakeUp_GPIO_Config();
+	
+	KEY_GPIO_Config();
+	EXTI15_10_Config();
+
+	General_GPIO_Config();	
+	I2C_GPIO_Config();
+
+	LCD_GLASS_Init();
+
+	USART1_Config(Usart1_DefaultBaudRate);
+
+	LCD_GLASS_Clear();
+
+	ADC1_Init();
+
+	SPI_FLASH_Init();
+	
+}
+
 /******************************************************************************
   * @brief  Description 系统初始化
   * @param  None
@@ -548,13 +585,13 @@ void SysInit(void)
 		JudgingChannelNumberDisplay(JlyParam.ChannelNumActual);
 	}
 	
+	RTC8025_Reset(true);
 	
     TIM2_Configuration();	//开启定时器
 	
-	//WakeUp_GPIO_Config();
+	
 	
     Flag.MucReset = 1;
-	Flag.FirstNotEnterStopMode = 1;
 	
 	MODEL_PWRCTRL(ON);	  //开对外接口电源
 	TOUCHKEY_POWER(ON);	  //开触摸按键电源
@@ -562,83 +599,4 @@ void SysInit(void)
 	BellNn(1); //这里开启系统滴答时钟对进低功耗有影响
 		
 }
-/******************************************************************************
-  * @brief  Description 外设初始化
-  * @param  None
-  * @retval None
-  *****************************************************************************/
-void PeripheralInit(void)
-{
-	SysClock_Config();
 
-	//GPIO_ReConfig();//影响ADC正常工作,烧写程序时必须reset复位
-
-	SysTick_Init();
-	
-	KEY_GPIO_Config();
-	EXTI15_10_Config();
-
-	General_GPIO_Config();	
-	I2C_GPIO_Config();
-
-	LCD_GLASS_Init();
-
-	USART1_Config(Usart1_DefaultBaudRate);
-
-	LCD_GLASS_Clear();
-
-	ADC1_Init();
-
-	SPI_FLASH_Init();
-
-	//RX8025_RTC_Init();
-	RTC8025_Reset(true);
-	
-	
-}
-/******************************************************************************
-  * @brief  Description 进入低功耗模式
-  * @param  None
-  * @retval None
-  *****************************************************************************/
-void EnterStopModePower(void)
-{
-	if(ReadRX8025Control2() & RX8025_Control2CTFG)
-	{
-		RTC8025_Reset(true);
-	}
-	read_time();
-	if(Rtc.Second >= 0x30)
-	{
-	  
-		/* Check and Clear the Wakeup flag */
-		if (PWR_GetFlagStatus(PWR_FLAG_WU) != RESET)
-		{
-			PWR_ClearFlag(PWR_FLAG_WU);
-		}
-		{
-			
-//			printf("\r\n ... \r\n");
-//			printf("\r\n Enter StopMode \r\n");
-			Display_LOW();
-			OffPowerSupply();
-			
-			/* Deselect the FLASH: Chip Select high */
-			SPI_FLASH_CS_HIGH();
-			ADC_Cmd(ADC1, DISABLE);	//关adc
-			
-			//关闭滴答定时器
-			SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-			//使能电源管理单元时钟
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-			PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
-		}
-		if(JlyParam.WakeUpSource != 2)
-		{
-			SysClock_ReConfig();
-		}
-		Display_SN();//显示SN号
-		//rtc_deel();
-//		printf("\r\n Exit StopMode \r\n");
-	}
-}

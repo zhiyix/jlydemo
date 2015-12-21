@@ -46,25 +46,14 @@
 #define  ID_BYTES            2 //SN号2个字节
 //通道数为32时一包数据字节数(一个通道2个字节)
 #define  HIS_ONE_MAX_BYTES   (uint16_t)(32*2+8*Gps_choose+5+Clock_choose)
-//! \brief 外接电池宏定义   
-#define  VOLTAGE 
-#define  vtest_cnt           5
-#define  voltagetesttimenum   30//300 5分钟检测一次        
-#define  voltagetesttimenum1  10//60//600 10分钟检测一次
 
-#define  ExternalPowerchecktime 60 //外接电源检测时间
+
 //Lcd背光点亮时间 10 s
 #define  LcdBackLightTime	 10
 //! \brief LCD显示的时间
 #define  channeldisplaytime  2       //display_ct%channeldisplaytime 
 
-//温湿度 梯度
-#define  TempHumi_Offset	 10
-//! \brief AD最小、最大值
-#define  ADC_ERR_L           10
-#define  ADC_ERR_H           4090
-//上电20s过后开启进入低功耗
-#define FirstEnterStopModeTime 20
+
 //唤醒时间
 #define WakeUpTime             10
 /****************************************************************************************/
@@ -113,7 +102,7 @@
 //Flash扇区写指针
 #define FLASH_SectorWriteAddr_Lchar		 FRAM_BasicConfAddr+26 		
 #define FLASH_SectorWriteAddr_Hchar		 
-//flash存储最大容量
+//flash存储最大容量地址
 #define FLASH_RecMaxSizeAddr			 FRAM_BasicConfAddr+28
 //flash未读数据地址
 #define FLASH_NoReadingDataNumAddr_Lchar 	FRAM_BasicConfAddr+32	
@@ -135,6 +124,10 @@
 #define FLASH_ReadDataAddr_MidLchar      
 #define FLASH_ReadDataAddr_MidHchar      
 #define FLASH_ReadDataAddr_Hchar         
+//flash中历史数据条数地址
+#define FLASH_HistoryDataNumAddr			 FRAM_BasicConfAddr+48
+
+
 
 //检测fram是否焊接好
 #define FRAM_TestIsOkAddr					 0xE00
@@ -196,14 +189,52 @@ struct RTCRX8025Str
     uint8_t Day;   	 //
     uint8_t Week;  	 //--
     uint8_t Month; 	 //--
-    uint8_t Year;  	 //--
+    uint16_t Year;  	 //--
 };
+//RX8025 控制寄存器
+struct STREGStr
+{
+	uint8_t CT:3;
+	uint8_t :1;	//TEST
+	uint8_t :1;
+	uint8_t H12_24:1;
+	uint8_t DALE:1;
+	uint8_t WALE:1;
+	
+	uint8_t DAFG:1;
+	uint8_t WAFG:1;
+	uint8_t CTFG:1;
+	uint8_t :1;
+	uint8_t PON:1;
+	uint8_t XST:1;
+	uint8_t VDET:1;
+	uint8_t VDSL:1;
+};
+typedef union
+{
+	struct STREGStr STREG;
+	uint8_t Control[2];
+}RTC8025_Ctrl_Typedef;
+//RX8025 闹钟功能寄存器
+struct RTCRX8025AlarmStr
+{
+	uint8_t Alarm_W_Minute;
+	uint8_t Alarm_W_Hour;
+	uint8_t Alarm_W_Weekday;
+	uint8_t Alarm_D_Minute;
+	uint8_t Alarm_D_Hour;
+};
+typedef union
+{
+	struct RTCRX8025AlarmStr RX8025Alarm;
+	uint8_t Alarm[5];
+}RTC8025_Alarm_Typedef;
 //! \brief 全局标志
 struct FLAGStr
 {
     __IO uint8_t Sec:1;             	//TIM2定时1s时间
 //    __IO uint8_t SysTickSec:1;      	//系统滴答时钟
-	__IO uint8_t FirstNotEnterStopMode:1;//首次上电不进入低功耗
+
 	__IO uint8_t FirstEnterStopMode:1;  //首次上电时间到进入低功耗
 	__IO uint8_t Key1AnXia:1;       	//机械按键key1 按下
 	__IO uint8_t WakeUpStopModeOnTime:1;	//时间到唤醒 StopMode低功耗模式
@@ -214,11 +245,12 @@ struct FLAGStr
 	__IO uint8_t TouchKey2DuanAn:1;     //触摸按键key2 短按
 	__IO uint8_t KeyEnableOrDisable:1;	//按键是否打开/关闭
 	__IO uint8_t AlarmTimeDelayIsOut:1; //声光报警时间到
+	__IO uint8_t StartSample:1;         //开始采样
+	__IO uint8_t StorageData:1;			//存储数据
 	
 		 uint8_t Keyflag:1;				//机械按键长短按标志
 		 uint8_t Key1DuanAn:1;			//机械按键Key1短按
 		 uint8_t Key1ChangAn:1;			//机械按键Key1长按
-		 uint8_t Powerdowncountflag:1;	//接入外接电标志
          uint8_t Low_Voltage:1;     	//电池低电压标志
 		 uint8_t BatLowShan:1;     	    //电池低电压闪烁
 	
@@ -230,7 +262,8 @@ struct FLAGStr
 	     uint8_t ExPwFirstDown:1;		//外接电首次断掉
 	
          uint8_t IsDisplayRightNow:1;   //LCD显示,第一次采样完成后显示，检索报警
-         uint8_t StartSample:1;         //开始采样
+         
+		 uint8_t OpenAdcPower:1;		//打开adc电源
          uint8_t EndSample:1;           //结束采样
          uint8_t MucReset:1;            //上电复位？？
          uint8_t RtcShan:1;             //时钟 : 闪烁
@@ -238,7 +271,6 @@ struct FLAGStr
 		 uint8_t RecTimeDingDianBoot:1; //记录仪时间点定点启动
 		 
 		 uint8_t SensorTypeIsChange:1;  //通道类型有未改变
-		 //uint8_t FirstSampleOkAlarm:1;	//第一次采样完成后，
 		 uint8_t ChannelSwitchIsOn:1;	//通道使能打开
 		 uint8_t StopRecording:1;		//停止记录标志
 		 
@@ -248,12 +280,19 @@ struct FLAGStr
 //! \brief 电源管理
 struct PowerManagementStr
 {
-		 uint8_t  BatChargeFullCount;	   //电池充满电检测计数
-	     uint8_t  HaveExternalPower;	   //接入外接电检测计数
+//! \brief 外接电池宏定义   
+#define  VOLTAGE 
+#define  vtest_cnt           5
+#define  LowVoltageTestTimeNum     30//300 电池达到低电压时 5分钟检测一次        
+#define  NormalVoltageTestTimeNum  10//60//600 电池没达到低电压时 10分钟检测一次
+
+//#define  ExternalPowerchecktime 3 //外接电源检测时间
+	
+		 //uint8_t  BatChargeFullCount;	   //电池充满电检测计数
+	     //uint8_t  HaveExternalPower;	   //接入外接电检测计数
 	     uint8_t  JinDuCounts;			   //表示电池一格一格往前
 	
 	__IO uint16_t BatVoltage_TestTime;     //多长时间检测,电池电压检测时间间隔	
-	__IO uint16_t BatADC_ConvertedValue;   //存放电池AD值
 	
          uint16_t BatVoltage;              //电池实际电量
 };
@@ -261,7 +300,7 @@ struct PowerManagementStr
 //! \brief 记录仪工作状态等参数
 struct JLYPARAMETERStr
 {
-    uint8_t  WorkStatueIsStop:1; 	//记录仪工作状态，0停止工作
+    uint8_t  WorkStatueIsOrNotStop:1; //记录仪工作状态，0停止工作
     uint8_t  LowMode:1;          	//功耗模式，1低功耗，0正常功耗 
     uint8_t  FramErrorCode:1;		//错误码 
 	uint8_t  ShowOffCode;			//启动方式 ,停止方式 ，故障码显示 
@@ -271,7 +310,8 @@ struct JLYPARAMETERStr
 	
 	uint8_t  ContinueExcessiveTimes;//连续超标次数 0-10可设置
 	
-	uint8_t  FirstEnterStopModeCount;//上电第一次进入低功耗时间
+	uint8_t  RtcSecCount;			//rx8025 秒计数
+
 	uint8_t  LcdBackLightCount;		//Lcd亮多长时间计数
 	uint8_t  ChannelNumActual;		//实际通道数量，32个通道中使能与不使能之后的数量,
 	uint8_t  ChannelNumActualOld;   //实际通道数量备份,Conf.Jly.ChannelNum不变，有通道开关
@@ -286,10 +326,9 @@ struct JLYPARAMETERStr
 	
 	
 	uint32_t SampleInterval;    	//采集时间间隔 单位：s
-    uint32_t SampleTime;			//采集时间 单位：s
+    uint32_t SampleTimeCount;		//采集时间计数
     uint32_t NormalRecInterval;  	//正常记录间隔 单位：s
-    //uint32_t SaveHisDataTime;       //存储间隔
-	int32_t delay_start_time;		// 延时启动时间 
+	int32_t  delay_start_time;		// 延时启动时间 
 	uint32_t DataNumInFlash;		//测试flash中数据数量 使用变量---------------
 };
 //按键
@@ -298,6 +337,25 @@ struct KEYStr
 	uint8_t DuanAnCount;	//机械按键key1短按计数
 	uint8_t ChangAnCount;	//机械按键key1长按计数
 	uint8_t KeyNum;			//按键识别码
+};
+
+//传感器
+struct JlySensorStr
+{
+//! \brief AD最小、最大值
+#define  ADC_ERR_L           10
+#define  ADC_ERR_H           4090
+//温湿度 梯度
+#define  TempHumi_Offset	 10
+//adc 采样次数
+#define  ADCSamplingNum		 10
+//传感器稳定计数时间
+#define  SensorStableTimes	 6 //湿度响应时间 6s
+	
+	bool bAdcComplete:1;	//adc数据采集完成
+	
+	__IO uint8_t SensorStableCount;//传感器稳定计数器
+	
 };
 //----------------------------
 extern uint8_t      rtc_pt;
@@ -318,7 +376,9 @@ extern struct       RTCRX8025Str       Rtc;
 extern struct       PowerManagementStr PManage;
 extern struct       JLYPARAMETERStr    JlyParam;
 extern struct 		KEYStr			   Key;
-extern const char RESET_CHANNEL_SETUP_TABLE[104];
+extern struct JlySensorStr			JlySensor;
+
+extern const char   RESET_CHANNEL_SETUP_TABLE[104];
 extern const unsigned char *AdjustCurveFirAddress[];
 extern const uint32_t ConfMap_Address[6][2];
 /*============================ INTERFACE =====================================*/

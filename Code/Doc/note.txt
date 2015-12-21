@@ -19,6 +19,7 @@
 3、Configure the Pulse On Duration解决液晶显示隐影问题
 4、flash溢出标志读取不正确，高低字节写反了
 5、adc 工作不正常，HSE和HSI配置问题
+6、while(DMA_GetFlagStatus(DMA1_FLAG_TC1) == RESET);//等待DMA 传输完adc采集的数据, 使用前需要 DMA_ClearFlag(DMA1_FLAG_TC1);
 Debug版：
 低功耗时注意：
 	1.电池电压检测时间

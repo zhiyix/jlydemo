@@ -110,17 +110,17 @@ static void JlyConfDataUpData(void)
 	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumOld*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
 	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
 	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//这里配置会修改通道数，即一帧数据会被修改需要写入fram
-	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
-	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+
 	Queue.FlashRecActualStorage = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES*Queue.HIS_ONE_BYTES; //flash中实际存储字节数
 	/*------------------------------------------------------*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
 	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
-	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval/60;//正常记录间隔 单位：min
+	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval;//正常记录间隔 单位：min
 	
-	//采集时间间隔 单位:ms转s,按协议中设计的 uint16_t 最大65535ms 65s,
-	JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
-	JlyParam.SampleTime = JlyParam.SampleInterval;  		//采集时间 单位:s	
+	//采集时间间隔 这一版本不考虑ms；按协议中设计的 uint16_t 最大65535 s,
+	//JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
+	JlyParam.SampleInterval = Conf.Jly.SampleInterval;
+	JlyParam.SampleTimeCount = JlyParam.SampleInterval;  		//采集时间 单位:s	
 }
 
 /******************************************************************************
@@ -235,8 +235,7 @@ static void SetJlyParamJudgeSensorTypeChannelSwitch(void)
 	Queue.HIS_ONE_BYTES = (uint16_t)(JlyParam.ChannelNumActual*2+8*Gps_choose+5+Clock_choose); //一帧数据大小
 	Conf.Basic.HisOneBytes = Queue.HIS_ONE_BYTES;
 	Fram_Write(&Conf.Basic.HisOneBytes,HisOneBytesAddr,1);//这里配置会修改通道数，即一帧数据会被修改需要写入fram
-	//Queue.FRAM_MAX_NUM = FRAM_RecMaxSize/Queue.HIS_ONE_BYTES;	//fram中存储数据的最大包数 4096/
-	Queue.FLASH_SECTOR_PER_NUM = FLASH_SectorPerSize/Queue.HIS_ONE_BYTES; //flash中一个扇区存储数据的最大包数
+
 	Queue.FlashRecActualStorage = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES*Queue.HIS_ONE_BYTES; //flash中实际存储字节数
 	
 }
@@ -392,10 +391,12 @@ bool REALDATA_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 	if((usAddress == 0) &&(usNRegs % Queue.HIS_ONE_BYTES) ==0)
 	{
 		//Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar); 
-		SPI_FLASH_BufferRead(pucBuffer,(Queue.WriteFlashDataPointer-Queue.HIS_ONE_BYTES),usNRegs);
+		SPI_FLASH_BufferRead(pucBuffer,(Queue.WriteFlashDataPointer - Queue.HIS_ONE_BYTES),usNRegs);
 		
 		return true;
-	}else{
+		
+	}else
+	{
 		
 		return false;
 	}
@@ -411,18 +412,18 @@ usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
 2.溢出 r>w 测试最大边界
 3.溢出 r<w 测试r追上w
   * @param  pucBuffer   存放读出数据的指针
-  * @param  usAddress	读出数据的地址 0,在本函数中没有实际意义
-  * @param  usNRegs   读取数据的字节数,为一帧数据的整数倍
+  * @param  IDCode	    标识码，在补传一条数据时使用
+  * @param  usNRegs     读取数据的字节数,为一帧数据的整数倍
   * @retval 无
   *****************************************************************************/
-bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT IDCode, USHORT usNRegs)//usAddress
 {
 	uint8_t LessThanBytes=0,i=0;
 	uint32_t NoReadingDataNumTemp;
 	//usAddress *= 2;
 	usNRegs *= 2;
 	
-	if((usAddress == 0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
+	if((IDCode == 0 || IDCode == 1) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
 	{
 		//优化这两个变量的读取，节省时间，复位测试读取数据ok
 		//Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
@@ -430,7 +431,34 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		
 		NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
 
-				
+		if(Queue.IDCode == IDCode)	//数据丢包，补发上一次的数据
+		{
+			//只发送上一帧数据，不对读数据指针和未读数据帧数做修改
+			Queue.ReadFlashDataLastTimePointer = Queue.ReadFlashDataPointer - usNRegs; //上次读数据指针
+			if(Queue.FlashNoReadingDataNum >= NoReadingDataNumTemp)
+			{
+				if((Queue.ReadFlashDataLastTimePointer + usNRegs) <= Queue.FlashRecActualStorage)
+				{
+					SPI_FLASH_BufferRead(pucBuffer,Queue.ReadFlashDataLastTimePointer,usNRegs);//读取usNRegs 字节的数据
+				}else{
+					SPI_FLASH_BufferRead(pucBuffer,Queue.ReadFlashDataLastTimePointer,Queue.FlashRecActualStorage - Queue.ReadFlashDataLastTimePointer);
+					LessThanBytes = Queue.FlashRecActualStorage - Queue.ReadFlashDataLastTimePointer;
+					usNRegs = usNRegs - (Queue.FlashRecActualStorage - Queue.ReadFlashDataLastTimePointer);
+					Queue.ReadFlashDataLastTimePointer = 0;
+					SPI_FLASH_BufferRead(&pucBuffer[LessThanBytes],Queue.ReadFlashDataLastTimePointer,usNRegs);//注意pucBuffer的起始地址
+				}
+			}else{
+				LessThanBytes = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;//只有这么多未读字节数
+				SPI_FLASH_BufferRead(pucBuffer,Queue.ReadFlashDataLastTimePointer,LessThanBytes);
+				for(i=0;i<(usNRegs-LessThanBytes);i++)
+				{
+					pucBuffer[LessThanBytes+i] = 0xFF;
+				}
+			}
+			
+		}else
+		{
+			Queue.IDCode = IDCode;
 			if(Queue.FlashNoReadingDataNum >= NoReadingDataNumTemp)
 			{
 				if((Queue.ReadFlashDataPointer + usNRegs) <= Queue.FlashRecActualStorage)
@@ -450,16 +478,16 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 				{
 					pucBuffer[LessThanBytes+i] = 0xFF;
 				}
-				usNRegs = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;
+				usNRegs = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES; //读取的这么多字节数
 				NoReadingDataNumTemp = Queue.FlashNoReadingDataNum;
 			}
-			Queue.ReadFlashDataPointer += usNRegs;
+			
+			Queue.ReadFlashDataPointer += usNRegs;	//读数据指针加usNRegs
 			if(Queue.ReadFlashDataPointer >= Queue.FlashRecActualStorage)
 			{
 				Queue.ReadFlashDataPointer = 0;
 			}
 			WriteU32Pointer(FLASH_ReadDataAddr_Lchar,Queue.ReadFlashDataPointer);
-			
 			
 			Queue.FlashNoReadingDataNum = Queue.FlashNoReadingDataNum - NoReadingDataNumTemp; //未读条数减
 			if(Queue.FlashNoReadingDataNum <= 0)
@@ -467,12 +495,13 @@ bool STORAGE_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 				Queue.FlashNoReadingDataNum = 0;
 			}
 			WriteU32Pointer(FLASH_NoReadingDataNumAddr_Lchar,Queue.FlashNoReadingDataNum);
-		
-		
-		//rtc_deel();
-		
+
+		}
+			
 		return true;
-	}else{
+		
+	}else
+	{
 		
 		return false;
 	}
@@ -484,54 +513,63 @@ usAddress不是 Queue.HIS_ONE_BYTES整数倍时处理
 usNRegs 不是 Queue.HIS_ONE_BYTES整数倍时处理
 						(1)读数据测试ok
   * @param  pucBuffer   存放读出数据的指针
-  * @param  usAddress	读数据起始地址,为一帧数据的整数倍
+  * @param  FrameNumber	帧序号，取值暂定0-65535(包括0和65535)
   * @param  usNRegs		读取数据的字节数
   * @retval 无
   *****************************************************************************/
-bool HISTORY_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
+bool HISTORY_DATA_READ(uint8_t *pucBuffer, USHORT FrameNumber, USHORT usNRegs)
 {
 	uint8_t LessThanBytes=0,i=0;
-	uint32_t NoReadingDataNumTemp;
-	//usAddress *= 2;
 	usNRegs *= 2;
 	
-	if((usAddress % Queue.HIS_ONE_BYTES ==0) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
+	if((FrameNumber <= Queue.FlashHistoryDataNum+1) && (usNRegs % Queue.HIS_ONE_BYTES ==0))
 	{
 		//Queue.FlashReadDataBeginPointer = ReadU32Pointer(FLASH_ReadDataBeginAddr_Lchar);
 		//Queue.FlashNoReadingDataNum = ReadU32Pointer(FLASH_NoReadingDataNumAddr_Lchar);
-		
-		NoReadingDataNumTemp = usNRegs/Queue.HIS_ONE_BYTES;
-		if(usAddress < Queue.FlashReadDataBeginPointer)//小于最小
+		//停止记录
+		Conf.Jly.WorkStatueIsOrNotStop = 0;	/* 停止工作 */
+        JlyParam.ShowOffCode = 0x0D;	    /*表示正在下载历史数据*/
+
+		if(FrameNumber <= Queue.FlashHistoryDataNum)
 		{
-			usAddress = Queue.FlashReadDataBeginPointer;
+			FrameNumber = FrameNumber * Queue.HIS_ONE_BYTES;
+			
+			if((Queue.FlashReadDataBeginPointer + FrameNumber + usNRegs) <= Queue.FlashRecActualStorage)
+			{
+				SPI_FLASH_BufferRead(pucBuffer,(Queue.FlashReadDataBeginPointer + FrameNumber),usNRegs);//读取usNRegs 字节的数据
+			}else
+			{
+				if(Queue.DownHistoryDataFirstOverFlow ==0)
+				{
+					Queue.DownHistoryDataFirstOverFlow = 1;//下载历史数据第一次读到最大地址
+					SPI_FLASH_BufferRead(pucBuffer,(Queue.FlashReadDataBeginPointer + FrameNumber),Queue.FlashRecActualStorage - (Queue.FlashReadDataBeginPointer + FrameNumber));
+					LessThanBytes = Queue.FlashRecActualStorage - (Queue.FlashReadDataBeginPointer + FrameNumber);
+					usNRegs = usNRegs - LessThanBytes;//超出的那部分字节数
+					
+					SPI_FLASH_BufferRead(&pucBuffer[LessThanBytes],0,usNRegs);//注意pucBuffer的起始地址
+				}else
+				{
+					if((Queue.FlashReadDataBeginPointer + FrameNumber-Queue.FlashRecActualStorage) <= Queue.WriteFlashDataPointer)
+					{
+						SPI_FLASH_BufferRead(pucBuffer,(Queue.FlashReadDataBeginPointer + FrameNumber-Queue.FlashRecActualStorage),usNRegs);
+					}
+					
+				}
+			}
+			
+		}else
+		{
+			for(i=0;i<usNRegs;i++)
+			{
+				pucBuffer[i] = 0xFF;
+			}
+			Queue.DownHistoryDataFirstOverFlow = 0;//读完历史数据清除标志
 		}
 		
-			if(Queue.FlashNoReadingDataNum >= NoReadingDataNumTemp)
-			{
-				if((usAddress + usNRegs) <= Queue.FlashRecActualStorage)
-				{
-					SPI_FLASH_BufferRead(pucBuffer,usAddress,usNRegs);//读取usNRegs 字节的数据
-				}else{
-					SPI_FLASH_BufferRead(pucBuffer,usAddress,Queue.FlashRecActualStorage - usAddress);
-					LessThanBytes = Queue.FlashRecActualStorage - usAddress;
-					usNRegs = usNRegs - (Queue.FlashRecActualStorage - usAddress);
-					usAddress = 0;
-					SPI_FLASH_BufferRead(&pucBuffer[LessThanBytes],usAddress,usNRegs);//注意pucBuffer的起始地址
-				}
-			}else{
-				LessThanBytes = Queue.FlashNoReadingDataNum * Queue.HIS_ONE_BYTES;//只有这么多未读字节数
-				SPI_FLASH_BufferRead(pucBuffer,usAddress,LessThanBytes);
-				for(i=0;i<(usNRegs-LessThanBytes);i++)
-				{
-					pucBuffer[LessThanBytes+i] = 0xFF;
-				}
-				
-			}
-		
-		//测试
-		
 		return true;
-	}else{
+		
+	}else
+	{
 		return false;
 	}
 }

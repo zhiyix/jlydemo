@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file              : 
+  * @file              : bsp_LowPowerDeal.h
   * @author            : 
   * @version           : 
   * @date              : 
@@ -16,8 +16,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __BSPSENSORDEAL_H
-#define __BSPSENSORDEAL_H
+#ifndef __BSPLOWPOWER_H
+#define __BSPLOWPOWER_H
 
 //#ifdef __cplusplus
 // extern "C" {
@@ -27,31 +27,28 @@
 //! @name include
 //! @{
 #include "stm32l1xx.h"
-
 //! @}
 
 /*============================ MACROS ========================================*/
 //! @{
 //! \brief 
-
 //! @}
 
 /*============================ TYPES =========================================*/
 //!
 
-
 /*============================ INTERFACE =====================================*/
 
 /*============================ PROTOTYPES ====================================*/
-// MCU:
+
 /*============================ EXTERN FUNCTIONS ==============================*/
 
-void JudgingChannelNumberDisplay(uint8_t ChannelNum);
-bool SensorDataSampleAndDeal(void);
+void  EnterLowPower(void);
 //#ifdef __cplusplus
 //}
 //#endif
 
-#endif /* __BSPSENSORDEAL_H */
+#endif /* bsp_LowPowerDeal.h */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

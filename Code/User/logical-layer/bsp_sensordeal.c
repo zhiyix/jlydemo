@@ -352,7 +352,7 @@ static float HumiChang_to_Shishu(uint16_t adcvalue)
   * @param  dat_x       输入温度数值，输出校准之后的数据也是该值 
   * @retval bool		
   *****************************************************************************/
-bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
+static bool Temp_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 {
     int idx = 0;
 	// 校准源表
@@ -438,7 +438,7 @@ APP_TEMP_CALIB_END:
   * @param  dat_x       输入温度数值，输出校准之后的数据也是该值 
   * @retval bool		
   *****************************************************************************/
-bool Humi_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
+static bool Humi_Adjust(int16_t *pchAry, uint8_t uCount, float *dat_x)
 {
     int idx = 0;
 	// 校准源表
@@ -503,7 +503,7 @@ APP_TEMP_CALIB_END:
   * @param  i			传感器通道
   * @retval bool		
   *****************************************************************************/
-static void Sensor_Deal(uint8_t sensortype,uint8_t i)
+static void SensorTypeDataDeal(uint8_t sensortype,uint8_t i)
 {
     float temp;
     
@@ -569,11 +569,11 @@ static void Sensor_Deal(uint8_t sensortype,uint8_t i)
 }
 
 /******************************************************************************
-  * @brief  Description 把通道对应数据转换成实际对应的物理量
+  * @brief  Description 把通道对应adc数据转换成实际对应的物理量
   * @param  ChannelCode 启动的通道
   * @retval 无		
   *****************************************************************************/
-void DoGatherChannelDataFloat(uint8_t ChannelCode)
+static void DoGatherChannelDataFloat(uint8_t ChannelCode)
 {
     uint8_t i;
     uint8_t ChiFang2 = 0x01;
@@ -581,14 +581,141 @@ void DoGatherChannelDataFloat(uint8_t ChannelCode)
     {
         if(ChannelCode & ChiFang2)
         {
-			Sensor_Deal(Conf.Sensor[i].SensorType ,i);	/*根据传感器类型进行处理*/
+			SensorTypeDataDeal(Conf.Sensor[i].SensorType ,i);	//根据传感器类型进行处理
         }else{
-			ChannelDataFloat[i] = 0.0;/*没有配置成打开通道 数据清零*/
+			ChannelDataFloat[i] = 0.0;	//没有配置成打开通道 数据清零
 		}
         ChiFang2 = ChiFang2*2;
     }
 }
 
+/*******************************************************************************
+  * @brief  Description 开启adc数据采集
+  * @param  无
+  * @retval 无
+  ******************************************************************************/
+static void StartAdcSampleData(uint8_t all_channel_code)
+{
+	uint8_t m;
+	if(!all_channel_code)
+    {
+        for(m=0;m<JlyParam.ChannelNumOld;m++)
+		{
+			adc[m] = 0;
+		}
+        return;
+    }
+	
+	DMA_ClearFlag(DMA1_FLAG_TC1);
+	/* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
+	ADC_SoftwareStartConv(ADC1);
+}
+/*******************************************************************************
+  * @brief  Description 采集到的数据整合
+  * @param  无
+  * @retval 无
+  ******************************************************************************/
+static void SamplingDataDealGather(uint8_t all_channel_code)
+{
+	uint8_t m,channel_cp;
+	
+	channel_cp = all_channel_code;
+	
+	for(m = 0;m < JlyParam.ChannelNumOld;m++)//
+	{
+		if(channel_cp & 0x01)
+		{
+			adcCopy[m] = adcCopy[m] + ADC_ConvertedValue[m];
+		}                		
+		else
+		{
+			adc[m] = 0; 
+		}
+		channel_cp>>=1;
+	}
+}
+/*******************************************************************************
+  * @brief  Description 采集到的数据求平均值
+  * @param  无
+  * @retval 无
+  ******************************************************************************/
+static void SamplingDataAveraging(void)
+{
+	uint8_t m;
+	for(m = 0;m < JlyParam.ChannelNumOld;m++)//GatherMaxCt
+	{
+		adc[m] = adcCopy[m] / ADCSamplingNum;
+		adcCopy[m] = 0;
+	}
+}
+/******************************************************************************
+  * @brief  Description 传感器数据采集处理
+  * @param  None
+  * @retval 无		
+  *****************************************************************************/
+bool SensorDataSampleAndDeal(void)
+{
+	static uint8_t s_FSM = 0; //有限状态机
+	static uint8_t SampleMaxCount = 0;//采样次数
+	bool   bStatus = FALSE;
+	uint8_t i;
+	
+	switch(s_FSM)
+	{
+		case 0:
+			/*判断传感器接口类型 模拟/数字*/
+			for(i=0;i<JlyParam.ChannelNumOld;i++)
+			{
+				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
+				{
+					Flag.OpenAdcPower = 1;
+				}
+				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
+				{
+					
+				}
+			}
+			if(Flag.OpenAdcPower == 1 )
+			{
+				Flag.OpenAdcPower =0;
+				AVCC1_POWER(ON);	/*打开传感器电源*/
+			}
+			JlySensor.SensorStableCount = SensorStableTimes;//传感器稳定计数等于设定值
+			s_FSM++;
+			break;
+		case 1:
+			if(JlySensor.SensorStableCount ==0)
+			{
+				StartAdcSampleData(Started_Channel);//ADC采集开启转换
+				s_FSM++;
+			}
+			break;
+		case 2:
+			if(DMA_GetFlagStatus(DMA1_FLAG_TC1) == SET)//DMA 传输完adc采集的数据
+			{
+				if(SampleMaxCount++ == ADCSamplingNum)//采集完
+				{
+					SampleMaxCount = 0;	//采样次数清零
+					
+					SamplingDataAveraging();//采集数据求平均
+					AVCC1_POWER(OFF);//关闭adc电源
+					DoGatherChannelDataFloat(Started_Channel);//数据转换
+					
+					s_FSM = 0;
+					bStatus = TRUE;
+				}else
+				{
+					SamplingDataDealGather(Started_Channel);//采集到的数据相加
+					
+					s_FSM = 1;
+				}
+			}
+			break;
+		
+	}
+	
+	return bStatus;
+}
 /******************************************************************************
   * @brief  Description  判断通道数量并显示
   * @param  chanel_num   
@@ -606,6 +733,7 @@ void JudgingChannelNumberDisplay(uint8_t ChannelNum)
             Display_NUL();//配置的通道数为0,显示NUL
 			/*!< Requesy LCD RAM update */
 			LCD_UpdateDisplayRequest();  
+			
 		}else{
 			Started_Channel = GetStartChanel(ChannelNum); //通道数转换为 启动的通道
 			StartedChannelForDisplay = Started_Channel;
