@@ -358,40 +358,40 @@ static void Lcd_Dis1Value(uint8_t value)
 	/*!< Wait Until the last LCD RAM update finish */
 //	while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
 	switch(value)
-	{
+	{	//LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_BIT6;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_BIT6;
 		case 0x00:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_BIT6;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_ZERO;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_BIT6;
 			break;
 		case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_ZERO;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_ZERO;LCD->RAM[6] |= D_ZERO;LCD->RAM[7] |= D_ZERO;
 			break;
 		case 0x02:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT2;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_ZERO;LCD->RAM[4] |= D_ZERO;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_BIT6;
 			break;
 		case 0x03:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_ZERO;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_ZERO;
 			break;
 		case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[3] |= D_BIT6;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_ZERO;LCD->RAM[7] |= D_ZERO;
 			break;
 		case 0x05:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_ZERO;LCD->RAM[3] |= D_BIT6;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_ZERO;
 			break;
 		case 0x06:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_ZERO;LCD->RAM[3] |= D_BIT6;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_BIT6;
 			break;
 		case 0x07:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT3;	   LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_ZERO;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_ZERO;LCD->RAM[6] |= D_ZERO;LCD->RAM[7] |= D_ZERO;
 			break;
 		case 0x08:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT2+D_BIT3;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_BIT6;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_BIT6;
 			break;
 		case 0x09:
-			LCD->RAM[0] |= D_BIT3;LCD->RAM[2] |= D_BIT2+D_BIT3;LCD->RAM[4] |= D_BIT2+D_BIT3;LCD->RAM[6] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT1;LCD->RAM[2] |= D_BIT1;LCD->RAM[3] |= D_BIT6;LCD->RAM[4] |= D_BIT1;LCD->RAM[5] |= D_BIT6;LCD->RAM[6] |= D_BIT1;LCD->RAM[7] |= D_ZERO;
 			break;
 		
 		case 0xFF:
-			LCD->RAM[0] &= ~D_BIT3;LCD->RAM[2] &= ~(D_BIT2+D_BIT3);LCD->RAM[4] &= ~(D_BIT2+D_BIT3);LCD->RAM[6] &= ~(D_BIT2+D_BIT3);
+			LCD->RAM[0] &= ~D_BIT1;LCD->RAM[2] &= ~D_BIT1;LCD->RAM[3] &= ~D_BIT6;LCD->RAM[4] &= ~D_BIT1;LCD->RAM[5] &= ~D_BIT6;LCD->RAM[6] &= ~D_BIT1;LCD->RAM[7] &= ~D_BIT6;
 			break;
 		default:
 			break;
@@ -411,51 +411,51 @@ static void Lcd_Dis2Value(uint8_t value)
 	switch(value)
 	{
 		case 0x00:
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_BIT4+D_BIT5;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT3+D_BIT5;LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_BIT3+D_BIT5;
 			break;
 		case 0x01:
 			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT5;	   LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_ZERO;
 			break;
 		case 0x02:
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT5;	   LCD->RAM[4] |= D_BIT4;LCD->RAM[6] |= D_BIT4+D_BIT5;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT5;	   LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_BIT3+D_BIT5;
 			break;
 		case 0x03:
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT5;	   LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT5;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT5;	   LCD->RAM[4] |= D_BIT3+D_BIT5;LCD->RAM[6] |= D_BIT5;
 			break;
 		case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT3+D_BIT5;LCD->RAM[4] |= D_BIT3+D_BIT5;LCD->RAM[6] |= D_ZERO;
 			break;
 		case 0x05:
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT5;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT3;LCD->RAM[4] |= D_BIT3+D_BIT5;LCD->RAM[6] |= D_BIT5;
 			break;
 		case 0x06:
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT4+D_BIT5;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT3;LCD->RAM[4] |= D_BIT3+D_BIT5;LCD->RAM[6] |= D_BIT3+D_BIT5;
 			break;
 		case 0x07:
 			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT5;	   LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_ZERO;
 			break;
 		case 0x08:
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT4+D_BIT5;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT3+D_BIT5;LCD->RAM[4] |= D_BIT3+D_BIT5;LCD->RAM[6] |= D_BIT3+D_BIT5;
 			break;
 		case 0x09:
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT5;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT3+D_BIT5;LCD->RAM[4] |= D_BIT3+D_BIT5;LCD->RAM[6] |= D_BIT5;
 			break;
 		
 		case 'd':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT5;LCD->RAM[4] |= D_BIT4+D_BIT5;LCD->RAM[6] |= D_BIT4+D_BIT5;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT5;LCD->RAM[4] |= D_BIT3+D_BIT5;LCD->RAM[6] |= D_BIT3+D_BIT5;
 			break;
 		case '-':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT4;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT3;LCD->RAM[6] |= D_ZERO;
 			break;
 		case 'n':
-			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT4+D_BIT5;LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_BIT4;
+			LCD->RAM[0] |= D_BIT5;LCD->RAM[2] |= D_BIT3+D_BIT5;LCD->RAM[4] |= D_BIT5;LCD->RAM[6] |= D_BIT3;
 			break;
 		case 'L':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT4;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT4+D_BIT5;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT3;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT3+D_BIT5;
 			break;
 		
 		case 0xFF:
-			LCD->RAM[0] &= ~D_BIT5;LCD->RAM[2] &= ~(D_BIT4+D_BIT5);LCD->RAM[4] &= ~(D_BIT4+D_BIT5);LCD->RAM[6] &= ~(D_BIT4+D_BIT5);
+			LCD->RAM[0] &= ~D_BIT5;LCD->RAM[2] &= ~(D_BIT3+D_BIT5);LCD->RAM[4] &= ~(D_BIT3+D_BIT5);LCD->RAM[6] &= ~(D_BIT3+D_BIT5);
 			break;
 		default:
 			break;
@@ -475,56 +475,56 @@ static void Lcd_Dis3Value(uint8_t value)
 	switch(value)
 	{
 		case 0x00:
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6+D_BIT7;LCD->RAM[4] |= D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT24+D_BIT7;LCD->RAM[4] |= D_BIT7;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break;
         case 0x01:
 			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT7;LCD->RAM[4] |= D_BIT7;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT7;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT7;LCD->RAM[4] |= D_BIT24;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT7;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT7;LCD->RAM[4] |= D_BIT24+D_BIT7;LCD->RAM[6] |= D_BIT7;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT6+D_BIT7;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT24+D_BIT7;LCD->RAM[4] |= D_BIT24+D_BIT7;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT24;LCD->RAM[4] |= D_BIT24+D_BIT7;LCD->RAM[6] |= D_BIT7;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT24;LCD->RAM[4] |= D_BIT24+D_BIT7;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break; 
         case 0x07:
 			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT7;LCD->RAM[4] |= D_BIT7;LCD->RAM[6] |= D_ZERO;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6+D_BIT7;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT24+D_BIT7;LCD->RAM[4] |= D_BIT24+D_BIT7;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6+D_BIT7;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT24+D_BIT7;LCD->RAM[4] |= D_BIT24+D_BIT7;LCD->RAM[6] |= D_BIT7;
 			break; 
 		case 'E':
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT24;LCD->RAM[4] |= D_BIT24;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break;
 		case 'F':
-			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT6;
+			LCD->RAM[0] |= D_BIT7;LCD->RAM[2] |= D_BIT24;LCD->RAM[4] |= D_BIT24;LCD->RAM[6] |= D_BIT24;
 			break;
 		case 'L':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT24;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break;
 		case 'O':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT6+D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT24+D_BIT7;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break; 
 		case '-':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT24;LCD->RAM[6] |= D_ZERO;
 			break;
 		case 'U':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT6+D_BIT7;LCD->RAM[4] |= D_BIT7;LCD->RAM[6] |= D_BIT6+D_BIT7;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT24+D_BIT7;LCD->RAM[4] |= D_BIT7;LCD->RAM[6] |= D_BIT24+D_BIT7;
 			break;
 		
         case 0xFF:
-            LCD->RAM[0] &= ~D_BIT7;LCD->RAM[2] &= ~(D_BIT6+D_BIT7);LCD->RAM[4] &= ~(D_BIT6+D_BIT7);LCD->RAM[6] &= ~(D_BIT6+D_BIT7);
+            LCD->RAM[0] &= ~D_BIT7;LCD->RAM[2] &= ~(D_BIT24+D_BIT7);LCD->RAM[4] &= ~(D_BIT24+D_BIT7);LCD->RAM[6] &= ~(D_BIT24+D_BIT7);
             break;
 		default:
 			break;
@@ -545,54 +545,54 @@ static void Lcd_Dis4Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8+D_BIT9;LCD->RAM[4] |= D_BIT9;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT10+D_BIT8;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT10+D_BIT8;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT9;LCD->RAM[4] |= D_BIT9;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT9;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT10;LCD->RAM[6] |= D_BIT10+D_BIT8;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT9;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT10+D_BIT8;LCD->RAM[6] |= D_BIT8;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT8+D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT10+D_BIT8;LCD->RAM[4] |= D_BIT10+D_BIT8;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT9;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT10;LCD->RAM[4] |= D_BIT10+D_BIT8;LCD->RAM[6] |= D_BIT8;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT10;LCD->RAM[4] |= D_BIT10+D_BIT8;LCD->RAM[6] |= D_BIT10+D_BIT8;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT9;LCD->RAM[4] |= D_BIT9;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_ZERO;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8+D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT10+D_BIT8;LCD->RAM[4] |= D_BIT10+D_BIT8;LCD->RAM[6] |= D_BIT10+D_BIT8;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8+D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT9;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT10+D_BIT8;LCD->RAM[4] |= D_BIT10+D_BIT8;LCD->RAM[6] |= D_BIT8;
 			break; 
 		
 		case 'd':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT9;LCD->RAM[4] |= D_BIT8+D_BIT9;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT10+D_BIT8;LCD->RAM[6] |= D_BIT10+D_BIT8;
 			break;
 		case 'r':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT8;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT10;LCD->RAM[6] |= D_BIT10;
 			break; 
 		case 'F':
-			LCD->RAM[0] |= D_BIT9;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_BIT8;
+			LCD->RAM[0] |= D_BIT8;LCD->RAM[2] |= D_BIT10;LCD->RAM[4] |= D_BIT10;LCD->RAM[6] |= D_BIT10;
 			break;	
 		case '-':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT8;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT10;LCD->RAM[6] |= D_ZERO;
 			break;
 		case 'L':
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT8;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT8+D_BIT9;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT10;LCD->RAM[4] |= D_ZERO;LCD->RAM[6] |= D_BIT10+D_BIT8;
 			break;
 		
         case 0xFF:
-            LCD->RAM[0] &= ~D_BIT9;LCD->RAM[2] &= ~(D_BIT8+D_BIT9);LCD->RAM[4] &= ~(D_BIT8+D_BIT9);LCD->RAM[6] &= ~(D_BIT8+D_BIT9);
+            LCD->RAM[0] &= ~D_BIT8;LCD->RAM[2] &= ~(D_BIT10+D_BIT8);LCD->RAM[4] &= ~(D_BIT10+D_BIT8);LCD->RAM[6] &= ~(D_BIT10+D_BIT8);
             break;    
         default:
 			break;
@@ -613,40 +613,40 @@ static void Lcd_Dis5Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT23+D_BIT25;LCD->RAM[2] |= D_BIT25;LCD->RAM[4] |= D_BIT23+D_BIT25;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_BIT1+D_BIT3;LCD->RAM[3] |= D_BIT3;LCD->RAM[5] |= D_BIT1+D_BIT3;LCD->RAM[7] |= D_BIT3;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT25;LCD->RAM[4] |= D_BIT25;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT3;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT23+D_BIT25;LCD->RAM[2] |= D_BIT23;LCD->RAM[4] |= D_BIT25;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_BIT1+D_BIT3;LCD->RAM[3] |= D_BIT1;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_BIT3;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT25;LCD->RAM[2] |= D_BIT23+D_BIT25;LCD->RAM[4] |= D_BIT25;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_BIT3;LCD->RAM[3] |= D_BIT1+D_BIT3;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_BIT3;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT23+D_BIT25;LCD->RAM[4] |= D_BIT23+D_BIT25;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT1+D_BIT3;LCD->RAM[5] |= D_BIT1+D_BIT3;LCD->RAM[7] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT25;LCD->RAM[2] |= D_BIT23+D_BIT25;LCD->RAM[4] |= D_BIT23;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_BIT3;LCD->RAM[3] |= D_BIT1+D_BIT3;LCD->RAM[5] |= D_BIT1;LCD->RAM[7] |= D_BIT3;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT23+D_BIT25;LCD->RAM[2] |= D_BIT23+D_BIT25;LCD->RAM[4] |= D_BIT23;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_BIT1+D_BIT3;LCD->RAM[3] |= D_BIT1+D_BIT3;LCD->RAM[5] |= D_BIT1;LCD->RAM[7] |= D_BIT3;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT25;LCD->RAM[4] |= D_BIT25;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT3;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_BIT3;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT23+D_BIT25;LCD->RAM[2] |= D_BIT23+D_BIT25;LCD->RAM[4] |= D_BIT23+D_BIT25;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_BIT1+D_BIT3;LCD->RAM[3] |= D_BIT1+D_BIT3;LCD->RAM[5] |= D_BIT1+D_BIT3;LCD->RAM[7] |= D_BIT3;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT25;LCD->RAM[2] |= D_BIT23+D_BIT25;LCD->RAM[4] |= D_BIT23+D_BIT25;LCD->RAM[6] |= D_BIT25;
+			LCD->RAM[1] |= D_BIT3;LCD->RAM[3] |= D_BIT1+D_BIT3;LCD->RAM[5] |= D_BIT1+D_BIT3;LCD->RAM[7] |= D_BIT3;
 			break; 
         case 0x0c:
-            LCD->RAM[0] |= D_BIT23+D_BIT25;LCD->RAM[2] |= D_ZERO;LCD->RAM[4] |= D_BIT23;LCD->RAM[6] |= D_BIT25;
+            LCD->RAM[1] |= D_BIT1+D_BIT3;LCD->RAM[3] |= D_ZERO;LCD->RAM[5] |= D_BIT1;LCD->RAM[7] |= D_BIT3;
             break;
         case 0xFF:
-            LCD->RAM[0] &= ~(D_BIT23+D_BIT25);LCD->RAM[2] &= ~(D_BIT23+D_BIT25);LCD->RAM[4] &= ~(D_BIT23+D_BIT25);LCD->RAM[6] &= ~D_BIT25;
+            LCD->RAM[1] &= ~(D_BIT1+D_BIT3);LCD->RAM[3] &= ~(D_BIT1+D_BIT3);LCD->RAM[5] &= ~(D_BIT1+D_BIT3);LCD->RAM[7] &= ~D_BIT3;
             break;    
         default:
 			break;
@@ -667,37 +667,37 @@ static void Lcd_Dis6Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[1] |= D_BIT1+D_BIT2;LCD->RAM[3] |= D_BIT1;LCD->RAM[5] |= D_BIT1+D_BIT2;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_BIT27+D_BIT25;LCD->RAM[2] |= D_BIT27;LCD->RAM[4] |= D_BIT27+D_BIT25;LCD->RAM[6] |= D_BIT27;
 			break;
         case 0x01:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT1;LCD->RAM[5] |= D_BIT1;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT27;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[1] |= D_BIT1+D_BIT2;LCD->RAM[3] |= D_BIT2;LCD->RAM[5] |= D_BIT1;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_BIT27+D_BIT25;LCD->RAM[2] |= D_BIT25;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_BIT27;
 			break;   
         case 0x03:
-			LCD->RAM[1] |= D_BIT1;LCD->RAM[3] |= D_BIT1+D_BIT2;LCD->RAM[5] |= D_BIT1;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_BIT27;LCD->RAM[2] |= D_BIT27+D_BIT25;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_BIT27;
 			break;
         case 0x04:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT1+D_BIT2;LCD->RAM[5] |= D_BIT1+D_BIT2;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT27+D_BIT25;LCD->RAM[4] |= D_BIT27+D_BIT25;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[1] |= D_BIT1;LCD->RAM[3] |= D_BIT1+D_BIT2;LCD->RAM[5] |= D_BIT2;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_BIT27;LCD->RAM[2] |= D_BIT27+D_BIT25;LCD->RAM[4] |= D_BIT25;LCD->RAM[6] |= D_BIT27;
 			break;  
         case 0x06:
-			LCD->RAM[1] |= D_BIT1+D_BIT2;LCD->RAM[3] |= D_BIT1+D_BIT2;LCD->RAM[5] |= D_BIT2;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_BIT27+D_BIT25;LCD->RAM[2] |= D_BIT27+D_BIT25;LCD->RAM[4] |= D_BIT25;LCD->RAM[6] |= D_BIT27;
 			break; 
         case 0x07:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT1;LCD->RAM[5] |= D_BIT1;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT27;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_BIT27;
 			break;  
         case 0x08:
-			LCD->RAM[1] |= D_BIT1+D_BIT2;LCD->RAM[3] |= D_BIT1+D_BIT2;LCD->RAM[5] |= D_BIT1+D_BIT2;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_BIT27+D_BIT25;LCD->RAM[2] |= D_BIT27+D_BIT25;LCD->RAM[4] |= D_BIT27+D_BIT25;LCD->RAM[6] |= D_BIT27;
 			break;  
         case 0x09:
-			LCD->RAM[1] |= D_BIT1;LCD->RAM[3] |= D_BIT1+D_BIT2;LCD->RAM[5] |= D_BIT1+D_BIT2;LCD->RAM[7] |= D_BIT1;
+			LCD->RAM[0] |= D_BIT27;LCD->RAM[2] |= D_BIT27+D_BIT25;LCD->RAM[4] |= D_BIT27+D_BIT25;LCD->RAM[6] |= D_BIT27;
 			break; 
         case 0xFF:
-            LCD->RAM[1] &= ~(D_BIT1+D_BIT2);LCD->RAM[3] &= ~(D_BIT1+D_BIT2);LCD->RAM[5] &= ~(D_BIT1+D_BIT2);LCD->RAM[7] &= ~D_BIT1;
+            LCD->RAM[0] &= ~(D_BIT27+D_BIT25);LCD->RAM[2] &= ~(D_BIT27+D_BIT25);LCD->RAM[4] &= ~(D_BIT27+D_BIT25);LCD->RAM[6] &= ~D_BIT27;
             break;    
         default:
 			break;
@@ -718,37 +718,37 @@ static void Lcd_Dis7Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT31+D_BIT32;LCD->RAM[2] |= D_BIT31;LCD->RAM[4] |= D_BIT31+D_BIT32;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_BIT11+D_BIT18;LCD->RAM[2] |= D_BIT11;LCD->RAM[4] |= D_BIT11+D_BIT18;LCD->RAM[6] |= D_BIT11;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT31;LCD->RAM[4] |= D_BIT31;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT11;LCD->RAM[4] |= D_BIT11;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT31+D_BIT32;LCD->RAM[2] |= D_BIT32;LCD->RAM[4] |= D_BIT31;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_BIT11+D_BIT18;LCD->RAM[2] |= D_BIT18;LCD->RAM[4] |= D_BIT11;LCD->RAM[6] |= D_BIT11;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT31;LCD->RAM[2] |= D_BIT31+D_BIT32;LCD->RAM[4] |= D_BIT31;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_BIT11;LCD->RAM[2] |= D_BIT11+D_BIT18;LCD->RAM[4] |= D_BIT11;LCD->RAM[6] |= D_BIT11;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT31+D_BIT32;LCD->RAM[4] |= D_BIT31+D_BIT32;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT11+D_BIT18;LCD->RAM[4] |= D_BIT11+D_BIT18;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT31;LCD->RAM[2] |= D_BIT31+D_BIT32;LCD->RAM[4] |= D_BIT32;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_BIT11;LCD->RAM[2] |= D_BIT11+D_BIT18;LCD->RAM[4] |= D_BIT18;LCD->RAM[6] |= D_BIT11;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT31+D_BIT32;LCD->RAM[2] |= D_BIT31+D_BIT32;LCD->RAM[4] |= D_BIT32;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_BIT11+D_BIT18;LCD->RAM[2] |= D_BIT11+D_BIT18;LCD->RAM[4] |= D_BIT18;LCD->RAM[6] |= D_BIT11;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT31;LCD->RAM[4] |= D_BIT31;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT11;LCD->RAM[4] |= D_BIT11;LCD->RAM[6] |= D_BIT11;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT31+D_BIT32;LCD->RAM[2] |= D_BIT31+D_BIT32;LCD->RAM[4] |= D_BIT31+D_BIT32;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_BIT11+D_BIT18;LCD->RAM[2] |= D_BIT11+D_BIT18;LCD->RAM[4] |= D_BIT11+D_BIT18;LCD->RAM[6] |= D_BIT11;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT31;LCD->RAM[2] |= D_BIT31+D_BIT32;LCD->RAM[4] |= D_BIT31+D_BIT32;LCD->RAM[6] |= D_BIT31;
+			LCD->RAM[0] |= D_BIT11;LCD->RAM[2] |= D_BIT11+D_BIT18;LCD->RAM[4] |= D_BIT11+D_BIT18;LCD->RAM[6] |= D_BIT11;
 			break; 
         case 0xFF:
-            LCD->RAM[0] &= ~(D_BIT31+D_BIT32);LCD->RAM[2] &= ~(D_BIT31+D_BIT32);LCD->RAM[4] &= ~(D_BIT31+D_BIT32);LCD->RAM[6] &= ~D_BIT31;
+            LCD->RAM[0] &= ~(D_BIT11+D_BIT18);LCD->RAM[2] &= ~(D_BIT11+D_BIT18);LCD->RAM[4] &= ~(D_BIT11+D_BIT18);LCD->RAM[6] &= ~D_BIT11;
             break;    
         default:
 			break;
@@ -768,37 +768,37 @@ static void Lcd_Dis8Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT29+D_BIT30;LCD->RAM[2] |= D_BIT29;LCD->RAM[4] |= D_BIT29+D_BIT30;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_BIT17+D_BIT9;LCD->RAM[2] |= D_BIT17;LCD->RAM[4] |= D_BIT17+D_BIT9;LCD->RAM[6] |= D_BIT17;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT29;LCD->RAM[4] |= D_BIT29;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT17;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT29+D_BIT30;LCD->RAM[2] |= D_BIT30;LCD->RAM[4] |= D_BIT29;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_BIT17+D_BIT9;LCD->RAM[2] |= D_BIT9;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_BIT17;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT29;LCD->RAM[2] |= D_BIT29+D_BIT30;LCD->RAM[4] |= D_BIT29;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_BIT17;LCD->RAM[2] |= D_BIT17+D_BIT9;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_BIT17;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT29+D_BIT30;LCD->RAM[4] |= D_BIT29+D_BIT30;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT17+D_BIT9;LCD->RAM[4] |= D_BIT17+D_BIT9;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT29;LCD->RAM[2] |= D_BIT29+D_BIT30;LCD->RAM[4] |= D_BIT30;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_BIT17;LCD->RAM[2] |= D_BIT17+D_BIT9;LCD->RAM[4] |= D_BIT9;LCD->RAM[6] |= D_BIT17;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT29+D_BIT30;LCD->RAM[2] |= D_BIT29+D_BIT30;LCD->RAM[4] |= D_BIT30;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_BIT17+D_BIT9;LCD->RAM[2] |= D_BIT17+D_BIT9;LCD->RAM[4] |= D_BIT9;LCD->RAM[6] |= D_BIT17;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT29;LCD->RAM[4] |= D_BIT29;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT17;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_BIT17;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT29+D_BIT30;LCD->RAM[2] |= D_BIT29+D_BIT30;LCD->RAM[4] |= D_BIT29+D_BIT30;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_BIT17+D_BIT9;LCD->RAM[2] |= D_BIT17+D_BIT9;LCD->RAM[4] |= D_BIT17+D_BIT9;LCD->RAM[6] |= D_BIT17;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT29;LCD->RAM[2] |= D_BIT29+D_BIT30;LCD->RAM[4] |= D_BIT29+D_BIT30;LCD->RAM[6] |= D_BIT29;
+			LCD->RAM[0] |= D_BIT17;LCD->RAM[2] |= D_BIT17+D_BIT9;LCD->RAM[4] |= D_BIT17+D_BIT9;LCD->RAM[6] |= D_BIT17;
 			break; 
         case 0xFF:
-            LCD->RAM[0] &= ~(D_BIT29+D_BIT30);LCD->RAM[2] &= ~(D_BIT29+D_BIT30);LCD->RAM[4] &= ~(D_BIT29+D_BIT30);LCD->RAM[6] &= ~D_BIT29;
+            LCD->RAM[0] &= ~(D_BIT17+D_BIT9);LCD->RAM[2] &= ~(D_BIT17+D_BIT9);LCD->RAM[4] &= ~(D_BIT17+D_BIT9);LCD->RAM[6] &= ~D_BIT17;
             break;    
         default:
 			break;
@@ -818,37 +818,37 @@ static void Lcd_Dis9Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT27+D_BIT28;LCD->RAM[2] |= D_BIT27;LCD->RAM[4] |= D_BIT27+D_BIT28;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_BIT23+D_BIT6;LCD->RAM[2] |= D_BIT23;LCD->RAM[4] |= D_BIT23+D_BIT6;LCD->RAM[6] |= D_BIT23;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT27;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT23;LCD->RAM[4] |= D_BIT23;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT27+D_BIT28;LCD->RAM[2] |= D_BIT28;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_BIT23+D_BIT6;LCD->RAM[2] |= D_BIT6;LCD->RAM[4] |= D_BIT23;LCD->RAM[6] |= D_BIT23;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT27;LCD->RAM[2] |= D_BIT27+D_BIT28;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_BIT23;LCD->RAM[2] |= D_BIT23+D_BIT6;LCD->RAM[4] |= D_BIT23;LCD->RAM[6] |= D_BIT23;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT27+D_BIT28;LCD->RAM[4] |= D_BIT27+D_BIT28;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT23+D_BIT6;LCD->RAM[4] |= D_BIT23+D_BIT6;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT27;LCD->RAM[2] |= D_BIT27+D_BIT28;LCD->RAM[4] |= D_BIT28;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_BIT23;LCD->RAM[2] |= D_BIT23+D_BIT6;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT23;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT27+D_BIT28;LCD->RAM[2] |= D_BIT27+D_BIT28;LCD->RAM[4] |= D_BIT28;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_BIT23+D_BIT6;LCD->RAM[2] |= D_BIT23+D_BIT6;LCD->RAM[4] |= D_BIT6;LCD->RAM[6] |= D_BIT23;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT27;LCD->RAM[4] |= D_BIT27;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT23;LCD->RAM[4] |= D_BIT23;LCD->RAM[6] |= D_BIT23;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT27+D_BIT28;LCD->RAM[2] |= D_BIT27+D_BIT28;LCD->RAM[4] |= D_BIT27+D_BIT28;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_BIT23+D_BIT6;LCD->RAM[2] |= D_BIT23+D_BIT6;LCD->RAM[4] |= D_BIT23+D_BIT6;LCD->RAM[6] |= D_BIT23;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT27;LCD->RAM[2] |= D_BIT27+D_BIT28;LCD->RAM[4] |= D_BIT27+D_BIT28;LCD->RAM[6] |= D_BIT27;
+			LCD->RAM[0] |= D_BIT23;LCD->RAM[2] |= D_BIT23+D_BIT6;LCD->RAM[4] |= D_BIT23+D_BIT6;LCD->RAM[6] |= D_BIT23;
 			break; 
         case 0xFF:
-            LCD->RAM[0] &= ~(D_BIT27+D_BIT28);LCD->RAM[2] &= ~(D_BIT27+D_BIT28);LCD->RAM[4] &= ~(D_BIT27+D_BIT28);LCD->RAM[6] &= ~D_BIT27;
+            LCD->RAM[0] &= ~(D_BIT23+D_BIT6);LCD->RAM[2] &= ~(D_BIT23+D_BIT6);LCD->RAM[4] &= ~(D_BIT23+D_BIT6);LCD->RAM[6] &= ~D_BIT23;
             break;    
         default:
 			break;
@@ -868,37 +868,37 @@ static void Lcd_Dis10Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[1] |= D_BIT7+D_BIT8;LCD->RAM[3] |= D_BIT7;LCD->RAM[5] |= D_BIT7+D_BIT8;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT2+D_BIT4;LCD->RAM[2] |= D_BIT2;LCD->RAM[4] |= D_BIT2+D_BIT4;LCD->RAM[6] |= D_BIT2;
 			break;
         case 0x01:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT7;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT2;LCD->RAM[4] |= D_BIT2;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[1] |= D_BIT7+D_BIT8;LCD->RAM[3] |= D_BIT8;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT2+D_BIT4;LCD->RAM[2] |= D_BIT4;LCD->RAM[4] |= D_BIT2;LCD->RAM[6] |= D_BIT2;
 			break;   
         case 0x03:
-			LCD->RAM[1] |= D_BIT7;LCD->RAM[3] |= D_BIT7+D_BIT8;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT2;LCD->RAM[2] |= D_BIT2+D_BIT4;LCD->RAM[4] |= D_BIT2;LCD->RAM[6] |= D_BIT2;
 			break;
         case 0x04:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT7+D_BIT8;LCD->RAM[5] |= D_BIT7+D_BIT8;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT2+D_BIT4;LCD->RAM[4] |= D_BIT2+D_BIT4;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[1] |= D_BIT7;LCD->RAM[3] |= D_BIT7+D_BIT8;LCD->RAM[5] |= D_BIT8;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT2;LCD->RAM[2] |= D_BIT2+D_BIT4;LCD->RAM[4] |= D_BIT4;LCD->RAM[6] |= D_BIT2;
 			break;  
         case 0x06:
-			LCD->RAM[1] |= D_BIT7+D_BIT8;LCD->RAM[3] |= D_BIT7+D_BIT8;LCD->RAM[5] |= D_BIT8;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT2+D_BIT4;LCD->RAM[2] |= D_BIT2+D_BIT4;LCD->RAM[4] |= D_BIT4;LCD->RAM[6] |= D_BIT2;
 			break; 
         case 0x07:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT7;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT2;LCD->RAM[4] |= D_BIT2;LCD->RAM[6] |= D_BIT2;
 			break;  
         case 0x08:
-			LCD->RAM[1] |= D_BIT7+D_BIT8;LCD->RAM[3] |= D_BIT7+D_BIT8;LCD->RAM[5] |= D_BIT7+D_BIT8;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT2+D_BIT4;LCD->RAM[2] |= D_BIT2+D_BIT4;LCD->RAM[4] |= D_BIT2+D_BIT4;LCD->RAM[6] |= D_BIT2;
 			break;  
         case 0x09:
-			LCD->RAM[1] |= D_BIT7;LCD->RAM[3] |= D_BIT7+D_BIT8;LCD->RAM[5] |= D_BIT7+D_BIT8;LCD->RAM[7] |= D_BIT7;
+			LCD->RAM[0] |= D_BIT2;LCD->RAM[2] |= D_BIT2+D_BIT4;LCD->RAM[4] |= D_BIT2+D_BIT4;LCD->RAM[6] |= D_BIT2;
 			break; 
         case 0xFF:
-            LCD->RAM[1] &= ~(D_BIT7+D_BIT8);LCD->RAM[3] &= ~(D_BIT7+D_BIT8);LCD->RAM[5] &= ~(D_BIT7+D_BIT8);LCD->RAM[7] &= ~D_BIT7;
+            LCD->RAM[0] &= ~(D_BIT2+D_BIT4);LCD->RAM[2] &= ~(D_BIT2+D_BIT4);LCD->RAM[4] &= ~(D_BIT2+D_BIT4);LCD->RAM[6] &= ~D_BIT2;
             break;    
         default:
 			break;
@@ -919,37 +919,37 @@ static void Lcd_Dis11Value(uint8_t value)
    	switch(value)
 	{
         case 0x00:
-			LCD->RAM[1] |= D_BIT5+D_BIT6;LCD->RAM[3] |= D_BIT5;LCD->RAM[5] |= D_BIT5+D_BIT6;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_BIT7+D_BIT5;LCD->RAM[3] |= D_BIT7;LCD->RAM[5] |= D_BIT7+D_BIT5;LCD->RAM[7] |= D_BIT7;
 			break;
         case 0x01:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT5;LCD->RAM[5] |= D_BIT5;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT7;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[1] |= D_BIT5+D_BIT6;LCD->RAM[3] |= D_BIT6;LCD->RAM[5] |= D_BIT5;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_BIT7+D_BIT5;LCD->RAM[3] |= D_BIT5;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_BIT7;
 			break;   
         case 0x03:
-			LCD->RAM[1] |= D_BIT5;LCD->RAM[3] |= D_BIT5+D_BIT6;LCD->RAM[5] |= D_BIT5;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_BIT7;LCD->RAM[3] |= D_BIT7+D_BIT5;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_BIT7;
 			break;
         case 0x04:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT5+D_BIT6;LCD->RAM[5] |= D_BIT5+D_BIT6;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT7+D_BIT5;LCD->RAM[5] |= D_BIT7+D_BIT5;LCD->RAM[7] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[1] |= D_BIT5;LCD->RAM[3] |= D_BIT5+D_BIT6;LCD->RAM[5] |= D_BIT6;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_BIT7;LCD->RAM[3] |= D_BIT7+D_BIT5;LCD->RAM[5] |= D_BIT5;LCD->RAM[7] |= D_BIT7;
 			break;  
         case 0x06:
-			LCD->RAM[1] |= D_BIT5+D_BIT6;LCD->RAM[3] |= D_BIT5+D_BIT6;LCD->RAM[5] |= D_BIT6;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_BIT7+D_BIT5;LCD->RAM[3] |= D_BIT7+D_BIT5;LCD->RAM[5] |= D_BIT5;LCD->RAM[7] |= D_BIT7;
 			break; 
         case 0x07:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT5;LCD->RAM[5] |= D_BIT5;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT7;LCD->RAM[5] |= D_BIT7;LCD->RAM[7] |= D_BIT7;
 			break;  
         case 0x08:
-			LCD->RAM[1] |= D_BIT5+D_BIT6;LCD->RAM[3] |= D_BIT5+D_BIT6;LCD->RAM[5] |= D_BIT5+D_BIT6;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_BIT7+D_BIT5;LCD->RAM[3] |= D_BIT7+D_BIT5;LCD->RAM[5] |= D_BIT7+D_BIT5;LCD->RAM[7] |= D_BIT7;
 			break;  
         case 0x09:
-			LCD->RAM[1] |= D_BIT5;LCD->RAM[3] |= D_BIT5+D_BIT6;LCD->RAM[5] |= D_BIT5+D_BIT6;LCD->RAM[7] |= D_BIT5;
+			LCD->RAM[1] |= D_BIT7;LCD->RAM[3] |= D_BIT7+D_BIT5;LCD->RAM[5] |= D_BIT7+D_BIT5;LCD->RAM[7] |= D_BIT7;
 			break; 
         case 0xFF:
-            LCD->RAM[1] &= ~(D_BIT5+D_BIT6);LCD->RAM[3] &= ~(D_BIT5+D_BIT6);LCD->RAM[5] &= ~(D_BIT5+D_BIT6);LCD->RAM[7] &= ~D_BIT5;
+            LCD->RAM[1] &= ~(D_BIT7+D_BIT5);LCD->RAM[3] &= ~(D_BIT7+D_BIT5);LCD->RAM[5] &= ~(D_BIT7+D_BIT5);LCD->RAM[7] &= ~D_BIT7;
             break;    
         default:
 			break;
@@ -969,37 +969,37 @@ static void Lcd_Dis12Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[1] |= D_BIT3+D_BIT4;LCD->RAM[3] |= D_BIT3;LCD->RAM[5] |= D_BIT3+D_BIT4;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT20+D_BIT19;LCD->RAM[2] |= D_BIT20;LCD->RAM[4] |= D_BIT20+D_BIT19;LCD->RAM[6] |= D_BIT20;
 			break;
         case 0x01:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT3;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT20;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[1] |= D_BIT3+D_BIT4;LCD->RAM[3] |= D_BIT4;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT20+D_BIT19;LCD->RAM[2] |= D_BIT19;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_BIT20;
 			break;   
         case 0x03:
-			LCD->RAM[1] |= D_BIT3;LCD->RAM[3] |= D_BIT3+D_BIT4;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT20;LCD->RAM[2] |= D_BIT20+D_BIT19;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_BIT20;
 			break;
         case 0x04:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT3+D_BIT4;LCD->RAM[5] |= D_BIT3+D_BIT4;LCD->RAM[7] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT20+D_BIT19;LCD->RAM[4] |= D_BIT20+D_BIT19;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[1] |= D_BIT3;LCD->RAM[3] |= D_BIT3+D_BIT4;LCD->RAM[5] |= D_BIT4;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT20;LCD->RAM[2] |= D_BIT20+D_BIT19;LCD->RAM[4] |= D_BIT19;LCD->RAM[6] |= D_BIT20;
 			break;  
         case 0x06:
-			LCD->RAM[1] |= D_BIT3+D_BIT4;LCD->RAM[3] |= D_BIT3+D_BIT4;LCD->RAM[5] |= D_BIT4;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT20+D_BIT19;LCD->RAM[2] |= D_BIT20+D_BIT19;LCD->RAM[4] |= D_BIT19;LCD->RAM[6] |= D_BIT20;
 			break; 
         case 0x07:
-			LCD->RAM[1] |= D_ZERO;LCD->RAM[3] |= D_BIT3;LCD->RAM[5] |= D_BIT3;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT20;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_BIT20;
 			break;  
         case 0x08:
-			LCD->RAM[1] |= D_BIT3+D_BIT4;LCD->RAM[3] |= D_BIT3+D_BIT4;LCD->RAM[5] |= D_BIT3+D_BIT4;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT20+D_BIT19;LCD->RAM[2] |= D_BIT20+D_BIT19;LCD->RAM[4] |= D_BIT20+D_BIT19;LCD->RAM[6] |= D_BIT20;
 			break;  
         case 0x09:
-			LCD->RAM[1] |= D_BIT3;LCD->RAM[3] |= D_BIT3+D_BIT4;LCD->RAM[5] |= D_BIT3+D_BIT4;LCD->RAM[7] |= D_BIT3;
+			LCD->RAM[0] |= D_BIT20;LCD->RAM[2] |= D_BIT20+D_BIT19;LCD->RAM[4] |= D_BIT20+D_BIT19;LCD->RAM[6] |= D_BIT20;
 			break; 
         case 0xFF:
-            LCD->RAM[1] &= ~(D_BIT3+D_BIT4);LCD->RAM[3] &= ~(D_BIT3+D_BIT4);LCD->RAM[5] &= ~(D_BIT3+D_BIT4);LCD->RAM[7] &= ~D_BIT3;
+            LCD->RAM[0] &= ~(D_BIT20+D_BIT19);LCD->RAM[2] &= ~(D_BIT20+D_BIT19);LCD->RAM[4] &= ~(D_BIT20+D_BIT19);LCD->RAM[6] &= ~D_BIT20;
             break;    
         default:
 			break;
@@ -1019,37 +1019,37 @@ static void Lcd_Dis13Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT17+D_BIT18;LCD->RAM[2] |= D_BIT17;LCD->RAM[4] |= D_BIT17+D_BIT18;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_BIT22+D_BIT21;LCD->RAM[2] |= D_BIT22;LCD->RAM[4] |= D_BIT22+D_BIT21;LCD->RAM[6] |= D_BIT22;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT17;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT22;LCD->RAM[4] |= D_BIT22;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT17+D_BIT18;LCD->RAM[2] |= D_BIT18;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_BIT22+D_BIT21;LCD->RAM[2] |= D_BIT21;LCD->RAM[4] |= D_BIT22;LCD->RAM[6] |= D_BIT22;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT17;LCD->RAM[2] |= D_BIT17+D_BIT18;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_BIT22;LCD->RAM[2] |= D_BIT22+D_BIT21;LCD->RAM[4] |= D_BIT22;LCD->RAM[6] |= D_BIT22;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT17+D_BIT18;LCD->RAM[4] |= D_BIT17+D_BIT18;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT22+D_BIT21;LCD->RAM[4] |= D_BIT22+D_BIT21;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT17;LCD->RAM[2] |= D_BIT17+D_BIT18;LCD->RAM[4] |= D_BIT18;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_BIT22;LCD->RAM[2] |= D_BIT22+D_BIT21;LCD->RAM[4] |= D_BIT21;LCD->RAM[6] |= D_BIT22;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT17+D_BIT18;LCD->RAM[2] |= D_BIT17+D_BIT18;LCD->RAM[4] |= D_BIT18;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_BIT22+D_BIT21;LCD->RAM[2] |= D_BIT22+D_BIT21;LCD->RAM[4] |= D_BIT21;LCD->RAM[6] |= D_BIT22;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT17;LCD->RAM[4] |= D_BIT17;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT22;LCD->RAM[4] |= D_BIT22;LCD->RAM[6] |= D_BIT22;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT17+D_BIT18;LCD->RAM[2] |= D_BIT17+D_BIT18;LCD->RAM[4] |= D_BIT17+D_BIT18;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_BIT22+D_BIT21;LCD->RAM[2] |= D_BIT22+D_BIT21;LCD->RAM[4] |= D_BIT22+D_BIT21;LCD->RAM[6] |= D_BIT22;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT17;LCD->RAM[2] |= D_BIT17+D_BIT18;LCD->RAM[4] |= D_BIT17+D_BIT18;LCD->RAM[6] |= D_BIT17;
+			LCD->RAM[0] |= D_BIT22;LCD->RAM[2] |= D_BIT22+D_BIT21;LCD->RAM[4] |= D_BIT22+D_BIT21;LCD->RAM[6] |= D_BIT22;
 			break; 
         case 0xFF:
-            LCD->RAM[0] &= ~(D_BIT17+D_BIT18);LCD->RAM[2] &= ~(D_BIT17+D_BIT18);LCD->RAM[4] &= ~(D_BIT17+D_BIT18);LCD->RAM[6] &= ~D_BIT17;
+            LCD->RAM[0] &= ~(D_BIT22+D_BIT21);LCD->RAM[2] &= ~(D_BIT22+D_BIT21);LCD->RAM[4] &= ~(D_BIT22+D_BIT21);LCD->RAM[6] &= ~D_BIT22;
             break;    
         default:
 			break;
@@ -1069,37 +1069,37 @@ static void Lcd_Dis14Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT12+D_BIT14;LCD->RAM[2] |= D_BIT14;LCD->RAM[4] |= D_BIT12+D_BIT14;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_BIT14+D_BIT16;LCD->RAM[2] |= D_BIT16;LCD->RAM[4] |= D_BIT14+D_BIT16;LCD->RAM[6] |= D_BIT16;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT14;LCD->RAM[4] |= D_BIT14;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT16;LCD->RAM[4] |= D_BIT16;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT12+D_BIT14;LCD->RAM[2] |= D_BIT12;LCD->RAM[4] |= D_BIT14;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_BIT14+D_BIT16;LCD->RAM[2] |= D_BIT14;LCD->RAM[4] |= D_BIT16;LCD->RAM[6] |= D_BIT16;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT14;LCD->RAM[2] |= D_BIT12+D_BIT14;LCD->RAM[4] |= D_BIT14;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_BIT16;LCD->RAM[2] |= D_BIT14+D_BIT16;LCD->RAM[4] |= D_BIT16;LCD->RAM[6] |= D_BIT16;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT12+D_BIT14;LCD->RAM[4] |= D_BIT12+D_BIT14;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT14+D_BIT16;LCD->RAM[4] |= D_BIT14+D_BIT16;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT14;LCD->RAM[2] |= D_BIT12+D_BIT14;LCD->RAM[4] |= D_BIT12;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_BIT16;LCD->RAM[2] |= D_BIT14+D_BIT16;LCD->RAM[4] |= D_BIT14;LCD->RAM[6] |= D_BIT16;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT12+D_BIT14;LCD->RAM[2] |= D_BIT12+D_BIT14;LCD->RAM[4] |= D_BIT12;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_BIT14+D_BIT16;LCD->RAM[2] |= D_BIT14+D_BIT16;LCD->RAM[4] |= D_BIT14;LCD->RAM[6] |= D_BIT16;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT14;LCD->RAM[4] |= D_BIT14;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT16;LCD->RAM[4] |= D_BIT16;LCD->RAM[6] |= D_BIT16;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT12+D_BIT14;LCD->RAM[2] |= D_BIT12+D_BIT14;LCD->RAM[4] |= D_BIT12+D_BIT14;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_BIT14+D_BIT16;LCD->RAM[2] |= D_BIT14+D_BIT16;LCD->RAM[4] |= D_BIT14+D_BIT16;LCD->RAM[6] |= D_BIT16;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT14;LCD->RAM[2] |= D_BIT12+D_BIT14;LCD->RAM[4] |= D_BIT12+D_BIT14;LCD->RAM[6] |= D_BIT14;
+			LCD->RAM[0] |= D_BIT16;LCD->RAM[2] |= D_BIT14+D_BIT16;LCD->RAM[4] |= D_BIT14+D_BIT16;LCD->RAM[6] |= D_BIT16;
 			break; 
         case 0xFF:
-            LCD->RAM[0] &= ~(D_BIT12+D_BIT14);LCD->RAM[2] &= ~(D_BIT12+D_BIT14);LCD->RAM[4] &= ~(D_BIT12+D_BIT14);LCD->RAM[6] &= ~D_BIT14;
+            LCD->RAM[0] &= ~(D_BIT14+D_BIT16);LCD->RAM[2] &= ~(D_BIT14+D_BIT16);LCD->RAM[4] &= ~(D_BIT14+D_BIT16);LCD->RAM[6] &= ~D_BIT16;
             break;    
         default:
 			break;
@@ -1120,37 +1120,37 @@ static void Lcd_Dis15Value(uint8_t value)
 	switch(value)
 	{
         case 0x00:
-			LCD->RAM[0] |= D_BIT16+D_BIT20;LCD->RAM[2] |= D_BIT20;LCD->RAM[4] |= D_BIT16+D_BIT20;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_BIT30+D_BIT32;LCD->RAM[2] |= D_BIT32;LCD->RAM[4] |= D_BIT30+D_BIT32;LCD->RAM[6] |= D_BIT32;
 			break;
         case 0x01:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT20;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT32;LCD->RAM[4] |= D_BIT32;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x02:
-			LCD->RAM[0] |= D_BIT16+D_BIT20;LCD->RAM[2] |= D_BIT16;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_BIT30+D_BIT32;LCD->RAM[2] |= D_BIT30;LCD->RAM[4] |= D_BIT32;LCD->RAM[6] |= D_BIT32;
 			break;   
         case 0x03:
-			LCD->RAM[0] |= D_BIT20;LCD->RAM[2] |= D_BIT16+D_BIT20;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_BIT32;LCD->RAM[2] |= D_BIT30+D_BIT32;LCD->RAM[4] |= D_BIT32;LCD->RAM[6] |= D_BIT32;
 			break;
         case 0x04:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT16+D_BIT20;LCD->RAM[4] |= D_BIT16+D_BIT20;LCD->RAM[6] |= D_ZERO;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT30+D_BIT32;LCD->RAM[4] |= D_BIT30+D_BIT32;LCD->RAM[6] |= D_ZERO;
 			break;
         case 0x05:
-			LCD->RAM[0] |= D_BIT20;LCD->RAM[2] |= D_BIT16+D_BIT20;LCD->RAM[4] |= D_BIT16;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_BIT32;LCD->RAM[2] |= D_BIT30+D_BIT32;LCD->RAM[4] |= D_BIT30;LCD->RAM[6] |= D_BIT32;
 			break;  
         case 0x06:
-			LCD->RAM[0] |= D_BIT16+D_BIT20;LCD->RAM[2] |= D_BIT16+D_BIT20;LCD->RAM[4] |= D_BIT16;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_BIT30+D_BIT32;LCD->RAM[2] |= D_BIT30+D_BIT32;LCD->RAM[4] |= D_BIT30;LCD->RAM[6] |= D_BIT32;
 			break; 
         case 0x07:
-			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT20;LCD->RAM[4] |= D_BIT20;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_ZERO;LCD->RAM[2] |= D_BIT32;LCD->RAM[4] |= D_BIT32;LCD->RAM[6] |= D_BIT32;
 			break;  
         case 0x08:
-			LCD->RAM[0] |= D_BIT16+D_BIT20;LCD->RAM[2] |= D_BIT16+D_BIT20;LCD->RAM[4] |= D_BIT16+D_BIT20;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_BIT30+D_BIT32;LCD->RAM[2] |= D_BIT30+D_BIT32;LCD->RAM[4] |= D_BIT30+D_BIT32;LCD->RAM[6] |= D_BIT32;
 			break;  
         case 0x09:
-			LCD->RAM[0] |= D_BIT20;LCD->RAM[2] |= D_BIT16+D_BIT20;LCD->RAM[4] |= D_BIT16+D_BIT20;LCD->RAM[6] |= D_BIT20;
+			LCD->RAM[0] |= D_BIT32;LCD->RAM[2] |= D_BIT30+D_BIT32;LCD->RAM[4] |= D_BIT30+D_BIT32;LCD->RAM[6] |= D_BIT32;
 			break; 
         case 0xFF:
-            LCD->RAM[0] &= ~(D_BIT16+D_BIT20);LCD->RAM[2] &= ~(D_BIT16+D_BIT20);LCD->RAM[4] &= ~(D_BIT16+D_BIT20);LCD->RAM[6] &= ~D_BIT20;
+            LCD->RAM[0] &= ~(D_BIT30+D_BIT32);LCD->RAM[2] &= ~(D_BIT30+D_BIT32);LCD->RAM[4] &= ~(D_BIT30+D_BIT32);LCD->RAM[6] &= ~D_BIT32;
             break;    
         default:
 			break;
@@ -1369,6 +1369,8 @@ void FisrtPowerOnDisplay(void)
 		LCD_UpdateDisplayRequest();
 	}
 }
+
+
 /*******************************************************************************
   * @brief  显示仪器SN号
   * @param  None
@@ -1637,7 +1639,6 @@ void Display_ChannelValue(uint8_t started_channel0)
 	if((Conf.Jly.WorkStatueIsOrNotStop >= 1)&&(JlyParam.ChannelNumActual >0))
     {
 		//当实际通道数 >0 时开启 显示
-
 		if(Flag.IsDisplayRightNow)//!(display_ct%channeldisplaytime)&&
 		{
 			
@@ -1672,3 +1673,83 @@ void Display_ChannelValue(uint8_t started_channel0)
 	}
 }
 
+/******************************************************************************
+  * @brief  Description  计算开启的通道
+  * @param  chanel_num   总的通道数量		
+  * @retval start_chanel 开启的通道		
+  *****************************************************************************/
+static uint32_t GetStartChanel(uint8_t chanel_num)
+{
+    uint8_t  i;
+    uint32_t start_chanel;
+   
+    for(i=0;i<chanel_num;i++)
+    {
+        start_chanel |= (0x01<<i);
+    }
+    return start_chanel;
+}
+/******************************************************************************
+  * @brief  Description  判断通道数量并显示
+  * @param  chanel_num   
+  * @retval start_chanel 
+  *****************************************************************************/
+void JudgingChannelNumberDisplay(uint8_t ChannelNum)
+{
+	if(JlyParam.FramErrorCode != 1)
+	{
+		if(ChannelNum <= 0)
+		{
+			/*!< Wait Until the last LCD RAM update finish */
+			while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+			
+            Display_NUL();//配置的通道数为0,显示NUL
+			/*!< Requesy LCD RAM update */
+			LCD_UpdateDisplayRequest();  
+			
+		}else{
+			Started_Channel = GetStartChanel(ChannelNum); //通道数转换为 启动的通道
+			StartedChannelForDisplay = Started_Channel;
+		}
+	}
+}
+/******************************************************************************
+  * @brief  Description  测试LCD段
+  * @param  None  
+  * @retval None
+  *****************************************************************************/
+void LcdTest(void)
+{
+	uint8_t i=0;
+	LCD_GLASS_Clear();
+	
+	
+	for(i=0;i<33;i++)
+	{
+		while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
+		
+//		LCD->RAM[0] = lcd_test[i];
+		if(i==10)
+		{
+			
+		}
+		if(i==20)
+		{
+			
+		}
+		if(i==30)
+		{
+			
+		}
+//		LCD->RAM[1] += lcd_test[i];
+//		LCD->RAM[2] += lcd_test[i];
+//		LCD->RAM[3] += lcd_test[i];
+//		LCD->RAM[4] += lcd_test[i];
+//		LCD->RAM[5] += lcd_test[i];
+//		LCD->RAM[6] += lcd_test[i];
+		LCD->RAM[7] += lcd_test[i];
+		
+		LCD_UpdateDisplayRequest();  
+	}
+	
+}

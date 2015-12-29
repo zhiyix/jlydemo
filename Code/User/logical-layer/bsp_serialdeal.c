@@ -114,8 +114,9 @@ static void JlyConfDataUpData(void)
 	Queue.FlashRecActualStorage = FLASH_RecMaxSize/Queue.HIS_ONE_BYTES*Queue.HIS_ONE_BYTES; //flash中实际存储字节数
 	/*------------------------------------------------------*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
-	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
-	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval;//正常记录间隔 单位：min
+	JlyParam.NormalRecIntervalSec = ReadNormalRecIntervalTime;	//读取正常记录间隔 转换为s
+//	JlyParam.NormalRecIntervalMin = Conf.Jly.NormalRec_Min;	//正常记录间隔 单位：min
+//	JlyParam.NormalRecIntervalHour = Conf.Jly.NormalRec_Hour;	//正常记录间隔 单位：hour
 	
 	//采集时间间隔 这一版本不考虑ms；按协议中设计的 uint16_t 最大65535 s,
 	//JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
@@ -260,10 +261,10 @@ bool PARAM_DATA_WRITE(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 		/*写配置表数据到Fram，每个地址有两个字节数据，offset * 2*/
 		size = 8*2;//基本配置表只有前8个字节需要配置到fram中
 		Fram_Write(pucBuffer,ConfMap_Address[0][1] + offset * 2,size);
-		Display_SN();//如果修改SN号,则刷新显示
-		WriteSetFramFlag();//设置过fram标志
 		/*更新配置表数据 */
 		Fram_Read(Conf.Buf,ConfMap_Address[0][1] + offset * 2,size);
+		WriteSetFramFlag();//设置过fram标志
+		Display_SN();//如果修改SN号,则刷新显示
 	} else if (usAddress < VirJlyTimeConfAddr)
 	{
 		/* 记录仪配置数据地址表 */
@@ -388,10 +389,13 @@ bool REALDATA_DATA_READ(uint8_t *pucBuffer, USHORT usAddress, USHORT usNRegs)
 {
 	usAddress *= 2;
 	usNRegs *= 2;
-	if((usAddress == 0) &&(usNRegs % Queue.HIS_ONE_BYTES) ==0)
+	if((usAddress == 0) &&(usNRegs % Queue.HIS_ONE_BYTES) ==2)	//两个字节的标志
 	{
 		//Queue.WriteFlashDataPointer = ReadU32Pointer(FLASH_WriteDataAddr_Lchar); 
 		SPI_FLASH_BufferRead(pucBuffer,(Queue.WriteFlashDataPointer - Queue.HIS_ONE_BYTES),usNRegs);
+		
+		pucBuffer[usNRegs-2] = 0xA0;	//区分其他表的标志
+		pucBuffer[usNRegs-1] = 0xA0;
 		
 		return true;
 		

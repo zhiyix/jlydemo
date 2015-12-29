@@ -141,13 +141,13 @@
 //8m flash全部用来存储历史数据
 //! \brief
 #define FLASH_PAGE_NUM              32768   //flash总的页数
-//测试 用3个扇区模拟数据存储
-#define FLASH_RecMaxSize            12288  //flash中存储数据的字节总数 (800000) 8M  8388608
+//测试 用5个扇区模拟数据存储
+#define FLASH_RecMaxSize            20480  //flash中存储数据的字节总数 (800000) 8M  8388608
 
 #define FLASH_RecFirstAddr           0x000000   //Flash中存放数据的首地址
 #define FLASH_SectorFirstAddr		 0x000000
-//测试 3个扇区
-#define FLASH_SectorNum				 3		//8M的flash有2048 sector 2048
+//测试 5个扇区
+#define FLASH_SectorNum				 5		//8M的flash有2048 sector 2048
 #define FLASH_SectorPerSize          4096		//Flash每个扇区的大小
 
 //! @}
@@ -293,6 +293,8 @@ struct PowerManagementStr
 	     uint8_t  JinDuCounts;			   //表示电池一格一格往前
 	
 	__IO uint16_t BatVoltage_TestTime;     //多长时间检测,电池电压检测时间间隔	
+	     uint16_t BatADCValueCopy;   	   
+		 uint16_t BatADCValue;			   //存放电池AD值
 	
          uint16_t BatVoltage;              //电池实际电量
 };
@@ -311,7 +313,9 @@ struct JLYPARAMETERStr
 	uint8_t  ContinueExcessiveTimes;//连续超标次数 0-10可设置
 	
 	uint8_t  RtcSecCount;			//rx8025 秒计数
-
+	uint8_t  NormalRecIntervalMin;	//正常记录间隔 单位：min 
+	uint8_t  NormalRecIntervalHour;	//正常记录间隔 单位：hour 
+	
 	uint8_t  LcdBackLightCount;		//Lcd亮多长时间计数
 	uint8_t  ChannelNumActual;		//实际通道数量，32个通道中使能与不使能之后的数量,
 	uint8_t  ChannelNumActualOld;   //实际通道数量备份,Conf.Jly.ChannelNum不变，有通道开关
@@ -322,12 +326,11 @@ struct JLYPARAMETERStr
 	
 	uint16_t SoundLightAlarmTimeDelay;	//声光报警延时 单位s 1s到18小时可设置
 	uint16_t AlarmTimeDelayCount;	//声光报警延时计数
-	uint16_t NormalRecIntervalMin;	//正常记录间隔 单位：min 
 	
 	
 	uint32_t SampleInterval;    	//采集时间间隔 单位：s
     uint32_t SampleTimeCount;		//采集时间计数
-    uint32_t NormalRecInterval;  	//正常记录间隔 单位：s
+    uint32_t NormalRecIntervalSec;  //正常记录间隔 单位：s
 	int32_t  delay_start_time;		// 延时启动时间 
 	uint32_t DataNumInFlash;		//测试flash中数据数量 使用变量---------------
 };
@@ -367,8 +370,10 @@ extern uint16_t     adcCopy[32];
 extern uint16_t	    MsCount;
 extern uint32_t     SYS_CLK;
 
+//测试变量
 extern uint32_t		SysTickTestCount;
 extern uint32_t     temptest;
+extern uint32_t	    PowerCount;
 
 extern struct 		CircularQueueStr   Queue;
 extern struct 		FLAGStr			   Flag;
@@ -376,7 +381,7 @@ extern struct       RTCRX8025Str       Rtc;
 extern struct       PowerManagementStr PManage;
 extern struct       JLYPARAMETERStr    JlyParam;
 extern struct 		KEYStr			   Key;
-extern struct JlySensorStr			JlySensor;
+extern struct 	    JlySensorStr	   JlySensor;
 
 extern const char   RESET_CHANNEL_SETUP_TABLE[104];
 extern const unsigned char *AdjustCurveFirAddress[];

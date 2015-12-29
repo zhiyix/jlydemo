@@ -57,9 +57,10 @@ static void LOWorNomalMode(void)
 	if(Conf.Jly.PowerMode >= 1) /*低功耗模式*/
     {
 		JlySensor.bAdcComplete = FALSE;
+		
 		if(Flag.StartSample ==1)//定时器开采集标志
         {
-			JlySensor.bAdcComplete = SensorDataSampleAndDeal();//传感器数据采集
+			JlySensor.bAdcComplete = SensorDataSampleDealAndBatteryVoltageDeal();//传感器数据采集
 			
 			if(JlySensor.bAdcComplete)
 			{
@@ -132,7 +133,7 @@ static void OneSecTimedeal(void)
     
     //LCD显示处理
     display_ct++;          
-    if(display_ct >= 36)//----------耗时80ms,调整显示的位置
+    if(display_ct >= 36)//
     {
         display_ct = 0;
 		   
@@ -258,12 +259,13 @@ void JlySecDeal(void)
         rtc_deel();
 
 		ExternalPowerDetection();
-
-        BatteryVoltageDetection();
 		
 		RecorderBootModeHandle();
 
 		Display_ChannelValue(StartedChannelForDisplay);
+		
+		//测试
+		//Lcd_ChannelValue(3,25.5);
 		
     }
 	
@@ -275,6 +277,7 @@ void JlySecDeal(void)
     {	
 		JlyOffDeal();
     }
+	
 }
 #endif /* __BSPDATADEAL_C */
 

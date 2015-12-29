@@ -531,49 +531,31 @@ void DownFlash_HisData(void)
   * @param  无  		
   * @retval 无		
   *****************************************************************************/
+/*
 void SaveDataOnTimeDeal(void)
 {
-    
-//	if((JlyParam.NormalRecInterval > 0) && (JlyParam.NormalRecInterval < 60))//1s-60s内数据记录
-//	{
-//		Rtc.SCount++;
-//		if(Rtc.SCount >= 60)
-//		{
-//			Rtc.SCount = 0;
-//		}
-//		if(Rtc.SCount % JlyParam.NormalRecInterval ==0)
-//		{
-//			
-//			ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
-//			SaveHisDataToFlash();
-//		}
-//	}
-//	else
-//	{
+	read_time();
 	
-		read_time();
-    
-//		RtcBcdToD10(&Rtc);
-//		
-//		Rtc.TMPS=DateToSeconds(&Rtc);
-//		
-//		RtcD10ToBcd(&Rtc);
-		
-		
-		RtcBcdToD10(&Rtc);
-		Rtc.TMPS=RTC_Date_Time_To_Second(&Rtc);
-		
-		RTC_Second_To_Date_Time(Rtc.TMPS,&Rtc);
-		RtcD10ToBcd(&Rtc);
-		
-		if(Rtc.TMPS % JlyParam.NormalRecIntervalMin ==0)
-		{   
-			
-			ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
-			SaveHisDataToFlash();
-		}
-//	}
+	RtcBcdToD10(&Rtc);
+	Rtc.TMPS=RTC_Date_Time_To_Second(&Rtc);
 	
+	RTC_Second_To_Date_Time(Rtc.TMPS,&Rtc);
+	RtcD10ToBcd(&Rtc);
+	
+	if(Rtc.TMPS % JlyParam.NormalRecIntervalSec ==0)
+	{   
+		
+		ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
+		SaveHisDataToFlash();
+	}
+}
+*/
+void SaveDataOnTimeDeal(void)
+{
+	
+	ChannelDataDeal(JlyParam.ChannelNumOld,Clock_choose,Gps_choose);
+	SaveHisDataToFlash();
+
 }
 /******************************************************************************
   * @brief  Description 存储历史数据
@@ -584,6 +566,7 @@ void StorageHistoryData(void)
 {
 	if((Conf.Jly.WorkStatueIsOrNotStop >= 1)&&(JlyParam.ChannelNumActual >0))
 	{
+
 		if(Flag.StorageData ==1)
 		{
 			Flag.StorageData =0;

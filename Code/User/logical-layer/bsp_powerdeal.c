@@ -54,11 +54,12 @@
   * @param  无
   * @retval 无
   *****************************************************************************/
+  /*
 static void BatteryVoltage_ADC1config(void)
 {
-    unsigned char i=0,j=0;
-    unsigned int temp=0;
-    unsigned int sum=0,adc_temp[vtest_cnt];
+    uint8_t i=0,j=0;
+    uint16_t temp=0;
+    uint16_t sum=0,adc_temp[vtest_cnt];
     float temp2=0;
     
     BATTEST_POWER(ON);  //开启电池电压检测电源
@@ -66,8 +67,7 @@ static void BatteryVoltage_ADC1config(void)
 
     for(i=0;i<vtest_cnt;i++)
     { 
-		DMA_ClearFlag(DMA1_FLAG_TC1);
-        /* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
+        // 由于没有采用外部触发，所以使用软件触发ADC转换 
         ADC_SoftwareStartConv(ADC1);
 		while(DMA_GetFlagStatus(DMA1_FLAG_TC1) == RESET);//等待DMA 传输完adc采集的数据
         //while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC ));//End of conversion flag
@@ -97,9 +97,7 @@ static void BatteryVoltage_ADC1config(void)
     temp2=temp2/4095*3.3*2;
     temp =(uint16_t)(temp2*100);
 	PManage.BatVoltage = temp; //电池电压最新值
-    //voltage_zhengshu=temp/100;
-    //voltage_xiaoshu=temp-voltage_zhengshu*100;
-    //voltage_xiaoshu=((voltage_xiaoshu/10)<<4)+(voltage_xiaoshu%10);
+    
     
     if(Flag.ExPwOn==0)  //没外接电，电池电压检测
     {
@@ -116,31 +114,73 @@ static void BatteryVoltage_ADC1config(void)
 			
         LCD_UpdateDisplayRequest();
 			
-        if(temp<=285)  /*电压低于2.85V，置低电压标志*/
+        if(temp<=285)  //电压低于2.85V，置低电压标志
+            Flag.Low_Voltage = 1;
+        else 
+            Flag.Low_Voltage = 0;
+    }
+}
+*/
+/*******************************************************************************
+  * @brief  Description 电池电压采样数据处理
+						数据采集时打开AD采集
+						电池电压低于2.85V时，低电压
+  * @param  无
+  * @retval 无
+  *****************************************************************************/
+static void BatteryVoltageSampleDataDeal(uint16_t BatteryVoltageAdcValue)
+{
+	uint16_t BatteryVoltageU16;
+	float BatteryVoltageFt=0;
+	
+    BatteryVoltageFt = (float)BatteryVoltageAdcValue/4095*3.3*2;
+    BatteryVoltageU16 = (uint16_t)(BatteryVoltageFt*100);
+	PManage.BatVoltage = BatteryVoltageU16; //电池电压最新值
+    
+    
+    if(Flag.ExPwOn==0)  //没外接电，电池电压检测
+    {
+        while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
+		
+        if(BatteryVoltageU16>=405)
+			{showBATT;}
+        else if((BatteryVoltageU16>=350)&&(BatteryVoltageU16<405))//380
+            {showBATT2;}
+        else if((BatteryVoltageU16>=300)&&(BatteryVoltageU16<350))//350 380
+            {showBATT1;}
+        else if(BatteryVoltageU16<300)//350
+            {showBATT0;}
+			
+        LCD_UpdateDisplayRequest();
+			
+        if(BatteryVoltageU16 <= 285)  //电压低于2.85V，置低电压标志
             Flag.Low_Voltage = 1;
         else 
             Flag.Low_Voltage = 0;
     }
 }
 /*******************************************************************************
-  * @brief  Description 电池电压检测 
+  * @brief  Description 电池电压处理
 						在外接电断掉之后开启电池电压检测
   * @param  无
   * @retval 无
   *****************************************************************************/
-void BatteryVoltageDetection(void)
+void BatteryVoltageDeal(void)
 {
     #ifdef VOLTAGE
 	if(Flag.ExPwOn == 0)
 	{
-		PManage.BatVoltage_TestTime--;
-		if(PManage.BatVoltage_TestTime==0)
+		//PManage.BatVoltage_TestTime--;
+		if(PManage.BatVoltage_TestTime==0)	//别的地方已清零
 		{
+			BatteryVoltageSampleDataDeal(PManage.BatADCValue);
+			/*
 			BatteryVoltage_ADC1config();
 			if(Flag.Low_Voltage==0)
-				PManage.BatVoltage_TestTime=NormalVoltageTestTimeNum;/*电池未低电压 10分钟检测一次*/
+				PManage.BatVoltage_TestTime=NormalVoltageTestTimeNum;//电池未低电压 10分钟检测一次
 			else 	//=1 低电压标志
-				PManage.BatVoltage_TestTime=LowVoltageTestTimeNum;	/*电池低电压 5分钟检测一次*/
+				PManage.BatVoltage_TestTime=LowVoltageTestTimeNum;	//电池低电压 5分钟检测一次
+			*/
 		}
 		if(Flag.Low_Voltage == 1)//低压标志
 		{
@@ -174,13 +214,13 @@ void FirstCheckExternPower(void)
 {
 	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)
     {
-        Flag.ExPwOn = 1;	/*有外接电*/
-		PManage.BatVoltage_TestTime = 1; 
+        Flag.ExPwOn = 1;	//有外接电
+		PManage.BatVoltage_TestTime = 0; 
     }
     else
     {
         Flag.ExPwOn = 0;
-        PManage.BatVoltage_TestTime = 1;         
+        PManage.BatVoltage_TestTime = 0;         
     }
 }
 /*******************************************************************************
@@ -194,7 +234,7 @@ void FirstCheckExternPower(void)
 void ExternalPowerDetection(void)
 {
 	/*****************************************************************/
-    /*程序运行中 检测外接电接入 */
+    //程序运行中 检测外接电接入 
 	if(GPIO_ReadInputDataBit(Power_Deal_PORT,Power_ACtest_PIN) == 0)         
     {
 		/*
@@ -213,7 +253,7 @@ void ExternalPowerDetection(void)
         Flag.ExPwOn=0;
 		if(Flag.ExPwFirstDown == 0)
 		{
-			PManage.BatVoltage_TestTime=1;/*没有外接电立即开启电池电压检测*/
+			PManage.BatVoltage_TestTime=0;	//没有外接电立即开启电池电压检测
 			Flag.ExPwFirstDown = 1;
 		}
 		
@@ -235,19 +275,19 @@ void ExternalPowerDetection(void)
 				PManage.BatChargeFullCount=0;
 			}	
 			*/
-			Flag.BatChargeFull=1;/*接外接电，电池充满标志*/
-			Flag.BatCharging = 0;/*接外接电未接电池，电池未充电*/
+			Flag.BatChargeFull=1;	//接外接电，电池充满标志
+			Flag.BatCharging = 0;	//接外接电未接电池，电池未充电
 			
 		}else
 		{
 			Flag.BatChargeFull=0;
-			Flag.BatCharging = 1;/*接外接电，电池正在充电中*/
+			Flag.BatCharging = 1;	//接外接电，电池正在充电中
 		}
 		
 	}else
 	{
 		Flag.BatChargeFull=0;
-		Flag.BatCharging = 0;/*外接电未接*/
+		Flag.BatCharging = 0;	//外接电未接
 	}
     
     // ----------------------------------------------------
@@ -255,7 +295,7 @@ void ExternalPowerDetection(void)
     {
         
 		while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET);
-		if(Flag.BatChargeFull == 1)/*电池充满电*/
+		if(Flag.BatChargeFull == 1)	//电池充满电
 		{
 			if(Flag.ExPwShan==1)
 			{

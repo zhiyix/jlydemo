@@ -32,12 +32,6 @@
 /*============================ MACROS ========================================*/
 //! @{
 //! \brief 
-
-#define Power_Deal_PORT 	GPIOF
-/*指示 有效输入电源 ACOK*/
-#define Power_ACtest_PIN 	GPIO_Pin_4
-/*指示充电完成 CHGOK*/
-#define Power_CHGtest_PIN 	GPIO_Pin_5
 //! @}
 
 /*============================ TYPES =========================================*/
@@ -48,7 +42,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 /*============================ EXTERN FUNCTIONS ==============================*/
-void BatteryVoltageDetection(void);
+void BatteryVoltageDeal(void);
 void FirstCheckExternPower(void);
 void ExternalPowerDetection(void);
 //#ifdef __cplusplus

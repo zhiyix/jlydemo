@@ -185,21 +185,22 @@ void EXTI0_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line0) != RESET) //PA0唤醒引脚
 	{
-
-		if(JlyParam.NormalRecInterval >= 60)//记录间隔大于60s
+		
+		JlyParam.WakeUpSource = 0;
+		
+		if(JlyParam.NormalRecIntervalSec >= 60)//记录间隔大于60s
 		{
 			Flag.StorageData = 1;	//存储标志
 			Flag.StartSample = 1;	//采集标志
 			
-		}else if((JlyParam.NormalRecInterval >0) && (JlyParam.NormalRecInterval < 60))
+		}else if((JlyParam.NormalRecIntervalSec >0) && (JlyParam.NormalRecIntervalSec < 60))
 		{
 			JlyParam.RtcSecCount++;
-			if(JlyParam.RtcSecCount >= JlyParam.NormalRecInterval)//到秒记录间隔
+			if(JlyParam.RtcSecCount >= JlyParam.NormalRecIntervalSec)//到秒记录间隔
 			{
 				JlyParam.RtcSecCount = 0;
 				
 				Flag.StorageData = 1;	//存储标志
-				Flag.StartSample = 1;	//采集标志
 			}
 		}
 		
@@ -224,24 +225,23 @@ void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line13) != RESET) //机械按键key1
 	{
-		//SysClock_ReConfig();
+		SysClock_ReConfig();
 		printf("\r\n Sys Clock ReConfig Exit StopMode \r\n");
-		TOUCHKEY_POWER(ON);		  //开触摸按键电源
-		JlyParam.WakeUpSource = 2;//表示按键唤醒
+		//TOUCHKEY_POWER(ON);		  //开触摸按键电源
+		JlyParam.WakeUpSource = 1;//表示按键唤醒
         Flag.Key1AnXia = 1;
 		Flag.AlarmXiaoYin = 1;	//按键消音标志
 		Flag.LcdBackLightOn = 1; //Lcd背光点亮
 		LcdBackLight(ON);
 		BEEP(OFF);
 		// Toggle LED1 
-		LED1_TOGGLE;
 		/* Clear the EXTI line 13 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line13);
 	}
 	if(EXTI_GetITStatus(EXTI_Line14) != RESET) //触摸按键key2
 	{
-		AlarmLed2_TOGGLE;
 		Flag.TouchKey2DuanAn = 1;
+		JlyParam.WakeUpSource = 2;	//表示触摸按键唤醒
 		JlyParam.WakeUpCount = 0;
 		/* Clear the EXTI line 14 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line14);
@@ -249,7 +249,6 @@ void EXTI15_10_IRQHandler(void)
 	
 	if(EXTI_GetITStatus(EXTI_Line15) != RESET) //触摸按键key1
 	{
-		LED1_TOGGLE;
 		Flag.TouchKey1DuanAn = 1;
 		/* Clear the EXTI line 15 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line15);
@@ -267,18 +266,18 @@ void TIM2_IRQHandler(void)
 //        time++;
         Flag.Sec = 1;//1s定时时间到
 		
-		
-		if((--JlyParam.SampleTimeCount) <=0)//采样时间
+		//LED_TOGGLE;
+		//传感器稳定时间要 小于 采样时间
+		if((JlyParam.SampleTimeCount--) <=0)//采样时间
 		{
 			JlyParam.SampleTimeCount = JlyParam.SampleInterval;//采集时间 单位:s
 			Flag.StartSample = 1;
 		}
+		
 		if(JlySensor.SensorStableCount >0)//传感器稳定时间
 		{
 			JlySensor.SensorStableCount--;
 		}
-		
-		
 		
 		JlyParam.AlarmTimeDelayCount ++;
 		if(JlyParam.AlarmTimeDelayCount >= JlyParam.SoundLightAlarmTimeDelay)
@@ -287,7 +286,7 @@ void TIM2_IRQHandler(void)
 			Flag.AlarmTimeDelayIsOut = 1;//声光报警延时时间到
 		}
 		//控制进入低功耗
-		if(JlyParam.WakeUpSource == 2)
+		if(JlyParam.WakeUpSource != 0)
 		{
 			JlyParam.WakeUpCount ++;
 			if(JlyParam.WakeUpCount >= WakeUpTime)

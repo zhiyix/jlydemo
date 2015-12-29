@@ -98,6 +98,7 @@ bool AI2C_Read(uint8_t *pData, uint16_t addr, uint16_t count);
 bool RTC8025_Write(uint8_t *pData, uint16_t addr, uint16_t count);
 bool RTC8025_Read(uint8_t *pData, uint16_t addr, uint16_t count);
 bool RTC8025_Reset(bool need_reset);
+bool RTC8025_ClearDALE(bool need_reset);
 
 bool Fram_Write(uint8_t *pData, uint16_t addr, uint16_t count);
 bool Fram_Read(uint8_t *pData, uint16_t addr, uint16_t count);

@@ -34,44 +34,56 @@
   *****************************************************************************/
 static void EnterStopModePowerDeal(void)
 {
-	if((ReadRX8025Control2() & RX8025_Control2DAFG))//(ReadRX8025Control2() & RX8025_Control2CTFG)||
+	RTC8025_Reset(true);
+	if(JlySensor.bAdcComplete)
 	{
+//		if((ReadRX8025Control2() & RX8025_Control2DAFG))//(ReadRX8025Control2() & RX8025_Control2CTFG)||
+//		{
+//			
+//			printf("\r\n Exit StopMode \r\n");
+//		}
+		
 		RTC8025_Reset(true);
-	}
-//	read_time();
-//	if(Rtc.Second >= 0x30)
-//	{
-//	  
-//		/* Check and Clear the Wakeup flag */
-//		if (PWR_GetFlagStatus(PWR_FLAG_WU) != RESET)
-//		{
-//			PWR_ClearFlag(PWR_FLAG_WU);
-//		}
-//		{
+		// Check and Clear the Wakeup flag 
+		if (PWR_GetFlagStatus(PWR_FLAG_WU) != RESET)
+		{
+			PWR_ClearFlag(PWR_FLAG_WU);
+		}
+		{
+			
+			PowerCount++;
+			printf("\r\n PowerCount:%d \r\n",PowerCount);
+			printf("\r\n Enter StopMode \r\n");
+			Display_LOW();
+			OffPowerSupply();
+			
+			// Deselect the FLASH: Chip Select high 
+			//SPI_FLASH_CS_HIGH();
+//			SPI_Flash_PowerDown(); 
 //			
-//			printf("\r\n ... \r\n");
-//			printf("\r\n Enter StopMode \r\n");
-//			Display_LOW();
-//			OffPowerSupply();
-//			
-//			/* Deselect the FLASH: Chip Select high */
-//			SPI_FLASH_CS_HIGH();
+//			DMA_Cmd(DMA1_Channel1, DISABLE);
 //			ADC_Cmd(ADC1, DISABLE);	//关adc
-//			
-//			//关闭滴答定时器
-//			SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-//			//使能电源管理单元时钟
-//			RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-//			PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
-//		}
-//		if(JlyParam.WakeUpSource != 2)
-//		{
-//			SysClock_ReConfig();
-//		}
-//		Display_SN();//显示SN号
-//		//rtc_deel();
-//		printf("\r\n Exit StopMode \r\n");
-//	}
+			
+			//关闭滴答定时器
+			SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+			//使能电源管理单元时钟
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+			PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+		}
+		if(JlyParam.WakeUpSource == 0)
+		{
+			SysClock_ReConfig();
+		}
+		//RTC8025_ClearDALE(true);
+//		DMA_Cmd(DMA1_Channel1, ENABLE);
+//		ADC_DMACmd(ADC1, ENABLE);
+//		ADC_Cmd(ADC1, ENABLE);	//开启adc
+		
+			
+		//ADC1_Init();
+		
+		printf("\r\n Exit StopMode \r\n");
+	}
 }
 
 /******************************************************************************
@@ -82,7 +94,7 @@ static void EnterStopModePowerDeal(void)
 void  EnterLowPower(void)
 {
 	
-	if(JlyParam.WakeUpSource == 2)
+	if(JlyParam.WakeUpSource != 0)
 	{
 		if(Flag.WakeUpStopModeOnTime == 1)
 		{
@@ -91,7 +103,9 @@ void  EnterLowPower(void)
 			Flag.WakeUpStopModeOnTime = 0;
 			EnterStopModePowerDeal();
 		}
-	}else{
+		
+	}else
+	{
 		EnterStopModePowerDeal();
 	}
 }

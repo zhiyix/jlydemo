@@ -36,7 +36,7 @@ uint8_t  	   DataBuf[HIS_ONE_MAX_BYTES]={0}; //32通道
 
 //uint16_t	   MsCount; //系统滴答计数
 
-uint16_t       adc[32];
+uint16_t       adc[32];	//32个里面有一个存的是电池电压adc值
 uint16_t       adcCopy[32];
 
 __IO uint16_t  ADC_ConvertedValue[32];
@@ -44,8 +44,10 @@ __IO uint8_t   FlagSeniorErr[32];
 float          ChannelDataFloat[32];
 uint32_t       SYS_CLK;
 
+//测试 变量
 uint32_t 	   SysTickTestCount;
 uint32_t       temptest;
+uint32_t	   PowerCount;
 //测试表
 const uint32_t lcd_test[] = 
 {

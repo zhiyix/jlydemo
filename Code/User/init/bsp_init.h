@@ -9,52 +9,95 @@
   */
 #define ON  1
 #define OFF 0
-/**********************GPIOF*********************/
-/*液晶背光控制电源端口*/
-#define LcdVccCtrl_CLK	  RCC_AHBPeriph_GPIOF
-#define LcdVccCtrl_PORT   GPIOF	
-#define LcdVccCtrl_PIN    GPIO_Pin_2
-/*触摸按键控制电源端口*/
-#define TouchVccCtrl_PORT GPIOF
-#define TouchVccCtrl_PIN  GPIO_Pin_3
-/************************************************/
-/*机械按键 key PF13*/
-#define Key_CLK			  RCC_AHBPeriph_GPIOF
-#define Key_PORT		  GPIOF
-#define Key1_PIN		  GPIO_Pin_13
-/**********************GPIOC*********************/
-/*触摸按键*/
-#define TouchKey_CLK	  RCC_AHBPeriph_GPIOC
-#define TouchKey_PORT	  GPIOC
-#define TouchKey1_PIN	  GPIO_Pin_15
-#define TouchKey2_PIN	  GPIO_Pin_14
-#define TouchKey3_PIN	  GPIO_Pin_13
-//HAC电源控制
-#define HacVccCtrl_CLK	  RCC_AHBPeriph_GPIOD
-#define HacVccCtrl_PORT	  GPIOD
-#define HacVccCtrl_PIN	  GPIO_Pin_7
+//-----------------------------------------------
+//LED控制
+#define Led_CLK			  RCC_AHBPeriph_GPIOH
+#define Led_PORT   		  GPIOH	
+#define Led_PIN           GPIO_Pin_2
+//-----------------------------------------------
+//BEEP
+#define Beep_CLK		  RCC_AHBPeriph_GPIOE
+#define Beep_PORT		  GPIOE
+#define Beep_PIN		  GPIO_Pin_7
+
+//机械按键 key
+#define Key_CLK		  	  RCC_AHBPeriph_GPIOE
+#define Key_PORT		  GPIOE
+#define Key1_PIN		  GPIO_Pin_4
+//-----------------------------------------------
+//ADC电源控制
+#define CntlAvcc_CLK	  RCC_AHBPeriph_GPIOC
+#define CntlAvcc_PORT	  GPIOC
+#define CntlAvcc_PIN	  GPIO_Pin_14
+//-----------------------------------------------
+//电池电压检测控制
+#define CntlBatTest_CLK	  RCC_AHBPeriph_GPIOB
+#define CntlBatTest_PORT  GPIOB
+#define CntlBatTest_PIN	  GPIO_Pin_2
+//-----------------------------------------------
+//外接电
+#define Power_Deal_CLK	  RCC_AHBPeriph_GPIOD
+#define Power_Deal_PORT   GPIOD
+//指示 有效输入电源 ACOK
+#define Power_ACtest_PIN 	GPIO_Pin_0
+//指示充电完成 CHGOK
+#define Power_CHGtest_PIN 	GPIO_Pin_1
+
+//液晶背光控制电源端口
+#define LcdVccCtrl_CLK	  RCC_AHBPeriph_GPIOD
+#define LcdVccCtrl_PORT   GPIOD
+#define LcdVccCtrl_PIN    GPIO_Pin_7
+//-----------------------------------------------
+//看门狗 SYS_WDI
+#define SYS_WDI_CLK	  	  RCC_AHBPeriph_GPIOE
+#define SYS_WDI_PORT      GPIOE
+#define SYS_WDI_PIN       GPIO_Pin_5
+
+////触摸按键控制电源端口
+//#define TouchVccCtrl_PORT 
+//#define TouchVccCtrl_PIN  
+
+////触摸按键
+//#define TouchKey_CLK	  
+//#define TouchKey_PORT	  
+//#define TouchKey1_PIN	  
+//#define TouchKey2_PIN	  
+//#define TouchKey3_PIN	  
+////HAC电源控制
+//#define HacVccCtrl_CLK	  
+//#define HacVccCtrl_PORT	  
+//#define HacVccCtrl_PIN	  
+
 /***********************************************/
 /* 带参宏，可以像内联函数一样使用 */
-#define LED1(a)	if (a)	\
-					GPIO_SetBits(GPIOF,GPIO_Pin_12);\
+#define LED(a)	if (a)	\
+					GPIO_ResetBits(Led_PORT,Led_PIN);\
 					else		\
-					GPIO_ResetBits(GPIOF,GPIO_Pin_12)
-
-#define LED2(a)	if (a)	\
-					GPIO_SetBits(GPIOF,GPIO_Pin_11);\
+					GPIO_SetBits(Led_PORT,Led_PIN)
+// 蜂鸣器开关 
+#define BEEP(a)	if (a)	\
+					GPIO_SetBits(Beep_PORT,Beep_PIN);\
 					else		\
-					GPIO_ResetBits(GPIOF,GPIO_Pin_11)
-
+					GPIO_ResetBits(Beep_PORT,Beep_PIN)
 //传感器电源开关
 #define AVCC1_POWER(a)	if (a)	\
-					GPIO_ResetBits(GPIOE,GPIO_Pin_5);\
+					GPIO_ResetBits(CntlAvcc_PORT,CntlAvcc_PIN);\
 					else		\
-					GPIO_SetBits(GPIOE,GPIO_Pin_5)					
+					GPIO_SetBits(CntlAvcc_PORT,CntlAvcc_PIN)					
 //电池电压检测开关
 #define BATTEST_POWER(a)	if (a)	\
-					GPIO_SetBits(GPIOE,GPIO_Pin_4);\
+					GPIO_SetBits(CntlBatTest_PORT,CntlBatTest_PIN);\
 					else		\
-					GPIO_ResetBits(GPIOE,GPIO_Pin_4)
+					GPIO_ResetBits(CntlBatTest_PORT,CntlBatTest_PIN)
+//液晶背光控制开关
+#define LcdBackLight(a)	if (a)	\
+					GPIO_ResetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN);\
+					else		\
+					GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN)	
+					
+					
+					
+					
 //触摸按键电源开关 0打开 1关闭
 #define TOUCHKEY_POWER(a)	if (a)	\
 					GPIO_ResetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN);\
@@ -70,16 +113,7 @@
 					GPIO_SetBits(GPIOD,GPIO_Pin_0);\
 					else		\
 					GPIO_ResetBits(GPIOD,GPIO_Pin_0)					
-// 蜂鸣器开关 
-#define BEEP(a)	if (a)	\
-					GPIO_SetBits(GPIOF,GPIO_Pin_15);\
-					else		\
-					GPIO_ResetBits(GPIOF,GPIO_Pin_15)
-//液晶背光控制开关
-#define LcdBackLight(a)	if (a)	\
-					GPIO_ResetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN);\
-					else		\
-					GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN)				
+			
 					
 /* 直接操作寄存器的方法控制IO */
 #define	digitalHi(p,i)			{p->BSRRL=i;}			//设置为高电平		
@@ -88,13 +122,10 @@
 
 
 /* 定义控制IO的宏 */
-#define LED1_TOGGLE		digitalToggle(GPIOF,GPIO_Pin_12)
-#define LED1_ON			digitalHi(GPIOF,GPIO_Pin_12)
-#define LED1_OFF		digitalLo(GPIOF,GPIO_Pin_12)
+#define LED_TOGGLE		digitalToggle(Led_PORT,Led_PIN)
+#define LED_ON			digitalHi(Led_PORT,Led_PIN)
+#define LED_OFF			digitalLo(Led_PORT,Led_PIN)
 
-#define AlarmLed2_TOGGLE	digitalToggle(GPIOF,GPIO_Pin_11)
-#define AlarmLed2_ON		digitalHi(GPIOF,GPIO_Pin_11)
-#define AlarmLed2_OFF		digitalLo(GPIOF,GPIO_Pin_11)
 
 /* 蜂鸣器 */
 #define BELL            BEEP(ON);Delay_ms(20);BEEP(OFF)

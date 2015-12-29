@@ -58,15 +58,17 @@ static void ADC1_Mode_Config(void)
 	DMA_InitTypeDef DMA_InitStructure;
 	ADC_InitTypeDef ADC_InitStructure;
 	
+	//----------------------------------------------------------------------
 	/* Enable DMA1 clock */
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 	/* DMA channel1 configuration */
 	DMA_DeInit(DMA1_Channel1);
+	//DMA_StructInit(&DMA_InitStructure);
 	
 	DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;	 			    //DMA对应的ADC基地址
 	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&ADC_ConvertedValue[0];	//内存存储基地址
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;							//DMA转换模式为SRC模式，由外设搬移到内存
-	DMA_InitStructure.DMA_BufferSize = 6+1;										//DMA缓存大小(设置DMA在传输时缓冲区的长度)6个传感器通道，1电压采集
+	DMA_InitStructure.DMA_BufferSize = 7;										//DMA缓存大小(设置DMA在传输时缓冲区的长度)6个传感器通道，1电压采集
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;	        //外设地址固定
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;  				    //关闭接收一次数据后，目标内存地址后移(设置DMA的内存递增模式)
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;	//定义外设数据长度 半字--16位
@@ -77,7 +79,7 @@ static void ADC1_Mode_Config(void)
 	DMA_Init(DMA1_Channel1, &DMA_InitStructure);
 	/* Enable DMA channel1 */
 	DMA_Cmd(DMA1_Channel1, ENABLE);
-	DMA_ClearFlag(DMA1_FLAG_TC1);
+	//DMA_ClearFlag(DMA1_FLAG_TC1);
 	
 	//----------------------------------------------------------------------
     ADC_DeInit(ADC1); 															//复位ADC1，将外设ADC1的全部寄存器设为缺省值
@@ -92,7 +94,7 @@ static void ADC1_Mode_Config(void)
 	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;			                //关闭连续转换模式
 	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;	//转换由软件而不是外部触发启动
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right; 	                    //采集数据右对齐
-	ADC_InitStructure.ADC_NbrOfConversion = 6+1;	 							//要转换的通道数目
+	ADC_InitStructure.ADC_NbrOfConversion = 7;	 								//要转换的通道数目,6个传感器通道，1电压采集
 	
 //	ADC_ITConfig(ADC1,ADC_IT_EOC,DISABLE);
 //  ADC_ClearFlag(ADC1,ADC_FLAG_EOC);
@@ -106,21 +108,22 @@ static void ADC1_Mode_Config(void)
 	 */
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_24, 1, ADC_SampleTime_24Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_25, 2, ADC_SampleTime_24Cycles);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_27, 3, ADC_SampleTime_24Cycles);	//电池电压采集
+	
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_28, 4, ADC_SampleTime_4Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_29, 5, ADC_SampleTime_4Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_30, 6, ADC_SampleTime_4Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_31, 7, ADC_SampleTime_4Cycles);
 	
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_27, 3, ADC_SampleTime_24Cycles);	//电池电压采集
 	
 	//Enables or disables the EOC on each regular channel conversion
 //	ADC_EOCOnEachRegularChannelCmd(ADC1, ENABLE);	//ADC转换完成标志
 	
+	//----------------------------------------------------------------------
 	/* Enable the request after last transfer for DMA Circular mode */
 	ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
 	/* Enable ADC1 DMA */
 	ADC_DMACmd(ADC1, ENABLE);
-	
 	/* Enable ADC1 */
 	ADC_Cmd(ADC1, ENABLE);
 	
@@ -172,7 +175,6 @@ void  Dealing_Gather(unsigned char all_channel_code)
         {
             channel_cp = all_channel_code;
 			
-			DMA_ClearFlag(DMA1_FLAG_TC1);
 			// 由于没有采用外部触发，所以使用软件触发ADC转换 
 			ADC_SoftwareStartConv(ADC1);
 			while(DMA_GetFlagStatus(DMA1_FLAG_TC1) == RESET);//等待DMA 传输完adc采集的数据

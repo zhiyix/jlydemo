@@ -43,7 +43,7 @@ static void SysClock_Config(void)
 //	PWR_BackupAccessCmd(ENABLE);//允许修改RTC和后备寄存器
 //	BKP_TamperPinCmd(DISABLE);//关闭入检测功能，也就是PC13，也可以当普通IO使用
 //	PWR_BackupAccessCmd(DISABLE);//禁止修改后备寄存器
-//BKP_ITConfig(DISABLE);  
+//  BKP_ITConfig(DISABLE);  
 	
 	
 	/*关闭低速外部时钟信号功能后,PC13 PC14 PC15才可以当普通IO用*/
@@ -70,6 +70,7 @@ void SysClock_ReConfig(void)
 {  
 	RCC_ClocksTypeDef RCC_ClockFreq;
 	ErrorStatus HSEStartUpStatus;
+	
 	//使能 HSE
 	RCC_HSEConfig(RCC_HSE_ON);
 	HSEStartUpStatus = RCC_WaitForHSEStartUp();
@@ -85,6 +86,11 @@ void SysClock_ReConfig(void)
 		while(RCC_GetSYSCLKSource() != 0x0C){}
 	}
 	
+	//获取系统时钟类型（0x00: MSI used as system clock ；0x04: HSI used as system clock ；0x08: HSE used as system clock ；0x0C: PLL used as system clock ）
+	SYS_CLK = RCC_GetSYSCLKSource();
+	//获取系统各时钟频率值
+	RCC_GetClocksFreq(&RCC_ClockFreq);
+
 	/* 使能内部 HSI 注意时钟*/
 	RCC_HSICmd(ENABLE);	//ADC使用
 	/* Check that HSI oscillator is ready */
@@ -94,22 +100,18 @@ void SysClock_ReConfig(void)
 	DBGMCU_Config(DBGMCU_STOP,ENABLE);
 //	DBGMCU_Config(DBGMCU_STOP,DISABLE);
 	
-	//获取系统时钟类型（0x00: MSI used as system clock ；0x04: HSI used as system clock ；0x08: HSE used as system clock ；0x0C: PLL used as system clock ）
-	SYS_CLK = RCC_GetSYSCLKSource();
-	//获取系统各时钟频率值
-	RCC_GetClocksFreq(&RCC_ClockFreq);
-
 	/* Reset Backup Domain */
 //	RCC_RTCResetCmd(ENABLE);
 //	RCC_RTCResetCmd(DISABLE);
 //	PWR_BackupAccessCmd(ENABLE);//允许修改RTC和后备寄存器
 //	BKP_TamperPinCmd(DISABLE);//关闭入检测功能，也就是PC13，也可以当普通IO使用
 //	PWR_BackupAccessCmd(DISABLE);//禁止修改后备寄存器
-//BKP_ITConfig(DISABLE);  
+//  BKP_ITConfig(DISABLE);  
 	
 	
 	/*关闭低速外部时钟信号功能后,PC13 PC14 PC15才可以当普通IO用*/
     RCC_LSEConfig(RCC_LSE_OFF); 
+	
 	
 	/* Allow access to the RTC */
 	PWR_RTCAccessCmd(ENABLE);
@@ -119,10 +121,8 @@ void SysClock_ReConfig(void)
 	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
 	RCC_RTCCLKCmd(ENABLE); 
 	/* Wait for RTC APB registers synchronisation */
-	//RTC_WaitForSynchro();
+	RTC_WaitForSynchro();
 	
-	//重新开ADC
-	ADC_Cmd(ADC1, ENABLE);
 }
 
 /*****************************************************************************
@@ -245,14 +245,60 @@ static void WakeUp_GPIO_Config(void)
 static void General_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	/************************GPIOF***************************/
-	/*外接电接入，充电指示完成*/
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
+	//A B C D E (F G) H
+	
+	//LED PH2
+	RCC_AHBPeriphClockCmd(Led_CLK,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = Led_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(Led_PORT,&GPIO_InitStructure);
+	
+	GPIO_SetBits(Led_PORT,Led_PIN);//关闭LED电源 
+	
+	//BEEP PE7
+	RCC_AHBPeriphClockCmd(Beep_CLK,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = Beep_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(Beep_PORT,&GPIO_InitStructure);
+	
+	GPIO_ResetBits(Beep_PORT,Beep_PIN);
+	
+	//ADC电源开关 PC14
+	RCC_AHBPeriphClockCmd(CntlAvcc_CLK,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = CntlAvcc_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(CntlAvcc_PORT,&GPIO_InitStructure);
+	
+	GPIO_SetBits(CntlAvcc_PORT,GPIO_Pin_5);
+	
+	//电池电压检测开关 PB2
+    RCC_AHBPeriphClockCmd(CntlBatTest_CLK,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = CntlBatTest_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(CntlBatTest_PORT,&GPIO_InitStructure);
+    
+    GPIO_ResetBits(CntlBatTest_PORT,GPIO_Pin_4);   //关闭电池电源检测
+	
+	//外接电接入 PD0，充电指示完成 PD1
+	RCC_AHBPeriphClockCmd(Power_Deal_CLK,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = Power_ACtest_PIN | Power_CHGtest_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_Init(Power_Deal_PORT,&GPIO_InitStructure);
-	/*液晶背光 PF2*/
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
+	
+	//液晶背光 PD7
+	RCC_AHBPeriphClockCmd(LcdVccCtrl_CLK,ENABLE);
 	GPIO_InitStructure.GPIO_Pin = LcdVccCtrl_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -260,80 +306,13 @@ static void General_GPIO_Config(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(LcdVccCtrl_PORT,&GPIO_InitStructure);
 	
-	GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN); 
-	/*触摸按键控制电源 PF3*/
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
-	GPIO_InitStructure.GPIO_Pin = TouchVccCtrl_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(TouchVccCtrl_PORT,&GPIO_InitStructure);
+	GPIO_SetBits(LcdVccCtrl_PORT,LcdVccCtrl_PIN);
 	
-	GPIO_SetBits(TouchVccCtrl_PORT,TouchVccCtrl_PIN);//关闭触摸按键电源 
-	//LED和 蜂鸣器GPIO初始化 ，蜂鸣器GPIO_Pin_15
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_15;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOF,&GPIO_InitStructure);
-	
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-//	GPIO_Init(GPIOC,&GPIO_InitStructure);
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
-//	GPIO_Init(GPIOC,&GPIO_InitStructure);
-
-//	GPIO_SetBits(GPIOB,GPIO_Pin_0);
-	GPIO_ResetBits(GPIOF,GPIO_Pin_11|GPIO_Pin_12|GPIO_Pin_15);//关闭
-	
-	/************************GPIOE***************************/
-	//ADC电源开关
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE,ENABLE);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOE,&GPIO_InitStructure);
-	
-	GPIO_SetBits(GPIOE,GPIO_Pin_5);
-//	GPIO_ResetBits(GPIOE,GPIO_Pin_5);
-    
-    //外接电池电压检测开关
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE,ENABLE);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOE,&GPIO_InitStructure);
-    
-    GPIO_ResetBits(GPIOE,GPIO_Pin_4);   //关闭电池电源检测
-	
-	/************************GPIOD***************************/
-	//model 对外接口电源
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD,ENABLE);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOD,&GPIO_InitStructure);
-    
-    GPIO_ResetBits(GPIOD,GPIO_Pin_0);   //关闭model电源
-	
-	//HAC电源
-	RCC_AHBPeriphClockCmd(HacVccCtrl_CLK,ENABLE);
-	GPIO_InitStructure.GPIO_Pin = HacVccCtrl_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(HacVccCtrl_PORT,&GPIO_InitStructure);
-	
-	GPIO_SetBits(HacVccCtrl_PORT,HacVccCtrl_PIN);//关闭触摸按键电源 
+	//看门狗 SYS_WDI 
+	RCC_AHBPeriphClockCmd(SYS_WDI_CLK,ENABLE);
+	GPIO_InitStructure.GPIO_Pin = SYS_WDI_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_Init(SYS_WDI_PORT,&GPIO_InitStructure);
 }
 
 /******************************************************************************
@@ -390,8 +369,9 @@ static void SetJlyParamData(void)
 	WriteU32Pointer(FLASH_RecMaxSizeAddr,Conf.Basic.FlashRecMaxSize);//flash最大存储容量 4字节保存
 	/*------------------------------------------------------*/
 	JlyParam.delay_start_time = ReadDelayStartTime;			//读取延时启动时间
-	JlyParam.NormalRecInterval = ReadNormalRecIntervalTime;	//读取正常记录间隔 单位：s
-	JlyParam.NormalRecIntervalMin = JlyParam.NormalRecInterval;//正常记录间隔 单位：min
+	JlyParam.NormalRecIntervalSec = ReadNormalRecIntervalTime;	//读取正常记录间隔 转换为 s
+//	JlyParam.NormalRecIntervalMin = Conf.Jly.NormalRec_Min;	//正常记录间隔 单位：min
+//	JlyParam.NormalRecIntervalHour = Conf.Jly.NormalRec_Hour;	//正常记录间隔 单位：hour
 	
 	//采集时间间隔 这一版本不考虑ms；按协议中设计的 uint16_t 最大65535 s,
 	//JlyParam.SampleInterval = Conf.Jly.SampleInterval/1000 ;
@@ -478,7 +458,7 @@ static void TestFramIsOrNotOk(void)
 		}
 
 		//将Fram_Buf_Write中顺序递增的数据写入FRAM中 
-		Fram_Write( Fram_Buf_Write, FRAM_TestIsOkAddr, 256);
+		Fram_Write(Fram_Buf_Write, FRAM_TestIsOkAddr, 256);
 		
 		//将FRAM读出数据顺序存储到Fram_Buf_Read
 		Fram_Read(Fram_Buf_Read, FRAM_TestIsOkAddr, 256); 
@@ -488,14 +468,14 @@ static void TestFramIsOrNotOk(void)
 		{	
 			if(Fram_Buf_Read[i] != Fram_Buf_Write[i])
 			{
-				//printf("0x%02X ", Fram_Buf_Read[i]);
-				//printf("错误:I2C EEPROM写入与读出的数据不一致\r\n");
+				printf("0x%02X ", Fram_Buf_Read[i]);
+				printf("错误:I2C EEPROM写入与读出的数据不一致\r\n");
 				JlyParam.FramErrorCode = 1;
 				return;
 			}
-			//printf("0x%02X ", Fram_Buf_Read[i]);
-			//if(i%16 == 15)    
-			//	printf("\r\n");
+//			printf("0x%02X ", Fram_Buf_Read[i]);
+//			if(i%16 == 15)    
+//				printf("\r\n");
 		}
 	}
 }
@@ -518,11 +498,11 @@ void OffPowerSupply(void)
 	AVCC1_POWER(OFF);     //关传感器电源
     BATTEST_POWER(OFF);   //关电池电压检测电源
 	BEEP(OFF);
-	LED1(OFF);LED2(OFF);
+	LED(OFF);
 	LcdBackLight(OFF);
 	//MODEL_PWRCTRL(OFF);
 	//TOUCHKEY_POWER(OFF);
-	HAC_POWER(OFF);
+	//HAC_POWER(OFF);
 }
 /******************************************************************************
   * @brief  Description 外设初始化
@@ -537,13 +517,13 @@ void PeripheralInit(void)
 
 	SysTick_Init();
 	
-	WakeUp_GPIO_Config();
+//	WakeUp_GPIO_Config();
+	
+	General_GPIO_Config();	
+	I2C_GPIO_Config();
 	
 	KEY_GPIO_Config();
 	EXTI15_10_Config();
-
-	General_GPIO_Config();	
-	I2C_GPIO_Config();
 
 	LCD_GLASS_Init();
 
@@ -565,7 +545,7 @@ void PeripheralInit(void)
 void SysInit(void)
 {
     //关外设电源
-	OffPowerSupply();
+	//OffPowerSupply();
     
 	//检测Fram
 	TestFramIsOrNotOk();
@@ -585,18 +565,17 @@ void SysInit(void)
 		JudgingChannelNumberDisplay(JlyParam.ChannelNumActual);
 	}
 	
+	Flag.MucReset = 1;
 	RTC8025_Reset(true);
+	Flag.MucReset = 0;
 	
     TIM2_Configuration();	//开启定时器
 	
+	//--------------------------------------------------
+	//测试代码
 	
 	
-    Flag.MucReset = 1;
-	
-	MODEL_PWRCTRL(ON);	  //开对外接口电源
-	TOUCHKEY_POWER(ON);	  //开触摸按键电源
-	
-	BellNn(1); //这里开启系统滴答时钟对进低功耗有影响
+	BellNn(1); //这里开启系统滴答时钟对进低功耗有影响,进低功耗时把systick关闭
 		
 }
 

@@ -43,7 +43,6 @@
 #include "bsp_conf_infor.h"
 
 #include "bsp_exti_key.h"
-#include "bsp_lcd.h"
 #include "bsp_SysTick.h"
 #include "bsp_usart.h"
 #include "bsp_adc.h"
@@ -51,15 +50,16 @@
 #include "bsp_rtc.h"
 #include "bsp_spi_flash.h"
 #include "bsp_timer.h"
+#include "bsp_lcd.h"
 
 #include "bsp_datadeal.h"
 #include "bsp_bootstop.h"
 #include "bsp_alarmdeal.h"
 #include "bsp_powerdeal.h"
-#include "bsp_sensordeal.h"
 #include "bsp_serialdeal.h"
 #include "bsp_storagedata.h"
 #include "bsp_LowPowerDeal.h"
+#include "bsp_datasampledeal.h"
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/

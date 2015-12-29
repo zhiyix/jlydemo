@@ -12,13 +12,13 @@
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32L152ZD</Device>
+          <Device>STM32L152VD</Device>
           <Vendor>STMicroelectronics</Vendor>
           <Cpu>IRAM(0x20000000-0x2000BFFF) IROM(0x8000000-0x805FFFF) CLOCK(8000000) CPUTYPE("Cortex-M3")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"STARTUP\ST\STM32L1xx\startup_stm32l1xx_hd.s" ("STM32L1xx High density Startup Code")</StartupFile>
           <FlashDriverDll>ULP2CM3(-O207 -S8 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32L1xx_384 -FS08000000 -FL060000)</FlashDriverDll>
-          <DeviceId>6190</DeviceId>
+          <DeviceId>6189</DeviceId>
           <RegisterFile>stm32l1xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
@@ -634,11 +634,6 @@
               <FilePath>..\User\logical-layer\bsp_powerdeal.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_sensordeal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\logical-layer\bsp_sensordeal.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_serialdeal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\logical-layer\bsp_serialdeal.c</FilePath>
@@ -657,6 +652,11 @@
               <FileName>bsp_LowPowerDeal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\LowPowerConsumption\bsp_LowPowerDeal.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_datasampledeal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\logical-layer\bsp_datasampledeal.c</FilePath>
             </File>
           </Files>
         </Group>

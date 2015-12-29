@@ -31,15 +31,6 @@ void KEY_GPIO_Config(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	
 	GPIO_Init(Key_PORT,&GPIO_InitStructure);
 	
-	/************************GPIOC***************************/
-	/*´¥Ãþ°´¼ü*/
-	RCC_AHBPeriphClockCmd(TouchKey_CLK ,ENABLE);
-	/*´¥Ãþ°´¼ü touchkey1 ÅäÖÃ*/
-	GPIO_InitStructure.GPIO_Pin = TouchKey1_PIN | TouchKey2_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;	
-	GPIO_Init(TouchKey_PORT,&GPIO_InitStructure);
-	/********************************************************/
 }
 /******************************************************************************
   * @brief  Configure PF13 in interrupt mode

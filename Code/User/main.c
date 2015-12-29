@@ -60,12 +60,14 @@ int main(void)
 	PeripheralInit();
     SysInit();
 	
-	printf("\r\n this is a 32bits  demo \r\n");
-	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
-	printf("\r\n Conf.Sensor[0].SensorType:%d \r\n",Conf.Sensor[0].SensorType);
-	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
+	
+//	printf("\r\n this is a 32bits  demo \r\n");
+//	printf("\r\n struct SensorChanelConfDataStr size:%d \r\n",sizeof(struct SensorChanelConfDataStr));
+//	printf("\r\n Conf.Sensor[0].SensorType:%d \r\n",Conf.Sensor[0].SensorType);
+//	printf("\r\n Conf.Sensor[0].SensorAlarm_High.ft:%f \r\n",Conf.Sensor[0].SensorAlarm_High.ft);
   /* Add your application code here
      */
+	
 	freemodbus_init();
 	
 	
@@ -79,12 +81,11 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-
+	 
 	  JlySecDeal();
 	  
-	  KeyDeal();
+//	  KeyDeal();
 
-	//temptest = SysTickTestCount;		
 	  freemodbus_main();
 	  
 //	  if((SysTickTestCount-temptest)>=2)
@@ -94,7 +95,7 @@ int main(void)
 	  
 	  
 //µÍ¹¦ºÄ²âÊÔ
-	 EnterLowPower();
+	 //EnterLowPower();
 	
   }
 }

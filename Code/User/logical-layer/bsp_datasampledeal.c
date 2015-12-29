@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file              : bsp_sensordeal.c
+  * @file              : bsp_datasampledeal.c
   * @author            : 
   * @version           : 
   * @date              : 
@@ -16,8 +16,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __BSPSENSORDEAL_C
-#define __BSPSENSORDEAL_C
+#ifndef __BSPDATASAMPLEDEAL_C
+#define __BSPDATASAMPLEDEAL_C
 
 /*============================ INCLUDES ======================================*/
 /* Includes ------------------------------------------------------------------*/
@@ -46,23 +46,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
-
-/******************************************************************************
-  * @brief  Description  计算开启的通道
-  * @param  chanel_num   总的通道数量		
-  * @retval start_chanel 开启的通道		
-  *****************************************************************************/
-static uint32_t GetStartChanel(uint8_t chanel_num)
-{
-    uint8_t  i;
-    uint32_t start_chanel;
-   
-    for(i=0;i<chanel_num;i++)
-    {
-        start_chanel |= (0x01<<i);
-    }
-    return start_chanel;
-}
 
 /******************************************************************************
   * @brief  Description 计算通道原始温湿度数据
@@ -599,14 +582,13 @@ static void StartAdcSampleData(uint8_t all_channel_code)
 	uint8_t m;
 	if(!all_channel_code)
     {
-        for(m=0;m<JlyParam.ChannelNumOld;m++)
+        for(m=0;m < JlyParam.ChannelNumOld ;m++) 
 		{
 			adc[m] = 0;
 		}
         return;
     }
 	
-	DMA_ClearFlag(DMA1_FLAG_TC1);
 	/* 由于没有采用外部触发，所以使用软件触发ADC转换 */ 
 	ADC_SoftwareStartConv(ADC1);
 }
@@ -621,7 +603,7 @@ static void SamplingDataDealGather(uint8_t all_channel_code)
 	
 	channel_cp = all_channel_code;
 	
-	for(m = 0;m < JlyParam.ChannelNumOld;m++)//
+	for(m = 0;m < JlyParam.ChannelNumOld ;m++)	
 	{
 		if(channel_cp & 0x01)
 		{
@@ -633,6 +615,7 @@ static void SamplingDataDealGather(uint8_t all_channel_code)
 		}
 		channel_cp>>=1;
 	}
+	PManage.BatADCValueCopy += ADC_ConvertedValue[2];	//电池电压adc值相加
 }
 /*******************************************************************************
   * @brief  Description 采集到的数据求平均值
@@ -642,18 +625,20 @@ static void SamplingDataDealGather(uint8_t all_channel_code)
 static void SamplingDataAveraging(void)
 {
 	uint8_t m;
-	for(m = 0;m < JlyParam.ChannelNumOld;m++)//GatherMaxCt
+	for(m = 0;m < JlyParam.ChannelNumOld ;m++)	
 	{
 		adc[m] = adcCopy[m] / ADCSamplingNum;
 		adcCopy[m] = 0;
 	}
+	PManage.BatADCValue = PManage.BatADCValueCopy/ADCSamplingNum;	//电池电压求平均
+	PManage.BatADCValueCopy = 0;
 }
 /******************************************************************************
   * @brief  Description 传感器数据采集处理
   * @param  None
   * @retval 无		
   *****************************************************************************/
-bool SensorDataSampleAndDeal(void)
+bool SensorDataSampleDealAndBatteryVoltageDeal(void)
 {
 	static uint8_t s_FSM = 0; //有限状态机
 	static uint8_t SampleMaxCount = 0;//采样次数
@@ -663,14 +648,14 @@ bool SensorDataSampleAndDeal(void)
 	switch(s_FSM)
 	{
 		case 0:
-			/*判断传感器接口类型 模拟/数字*/
+			//判断传感器接口类型 模拟/数字
 			for(i=0;i<JlyParam.ChannelNumOld;i++)
 			{
-				if(Conf.Sensor[i].SensorInterfaceType==0x00)	/*模拟*/
+				if(Conf.Sensor[i].SensorInterfaceType==0x00)	//模拟
 				{
 					Flag.OpenAdcPower = 1;
 				}
-				else if(Conf.Sensor[i].SensorInterfaceType==0x01)/*数字*/
+				else if(Conf.Sensor[i].SensorInterfaceType==0x01)//数字
 				{
 					
 				}
@@ -678,28 +663,35 @@ bool SensorDataSampleAndDeal(void)
 			if(Flag.OpenAdcPower == 1 )
 			{
 				Flag.OpenAdcPower =0;
-				AVCC1_POWER(ON);	/*打开传感器电源*/
+				AVCC1_POWER(ON);	//打开传感器电源
 			}
+			BATTEST_POWER(ON);  //开启电池电压检测电源
 			JlySensor.SensorStableCount = SensorStableTimes;//传感器稳定计数等于设定值
+			
 			s_FSM++;
 			break;
 		case 1:
 			if(JlySensor.SensorStableCount ==0)
 			{
 				StartAdcSampleData(Started_Channel);//ADC采集开启转换
+				
 				s_FSM++;
 			}
 			break;
 		case 2:
 			if(DMA_GetFlagStatus(DMA1_FLAG_TC1) == SET)//DMA 传输完adc采集的数据
 			{
+				
 				if(SampleMaxCount++ == ADCSamplingNum)//采集完
 				{
-					SampleMaxCount = 0;	//采样次数清零
+					SampleMaxCount = 0;		//采样次数清零
 					
-					SamplingDataAveraging();//采集数据求平均
-					AVCC1_POWER(OFF);//关闭adc电源
-					DoGatherChannelDataFloat(Started_Channel);//数据转换
+					AVCC1_POWER(OFF);	//关闭adc电源
+					BATTEST_POWER(OFF);  //关闭电池电压检测电源
+					
+					SamplingDataAveraging();	//采集数据求平均
+					DoGatherChannelDataFloat(Started_Channel);	//传感器数据转换
+					BatteryVoltageDeal();	//电池电压处理
 					
 					s_FSM = 0;
 					bStatus = TRUE;
@@ -716,31 +708,7 @@ bool SensorDataSampleAndDeal(void)
 	
 	return bStatus;
 }
-/******************************************************************************
-  * @brief  Description  判断通道数量并显示
-  * @param  chanel_num   
-  * @retval start_chanel 
-  *****************************************************************************/
-void JudgingChannelNumberDisplay(uint8_t ChannelNum)
-{
-	if(JlyParam.FramErrorCode != 1)
-	{
-		if(ChannelNum <= 0)
-		{
-			/*!< Wait Until the last LCD RAM update finish */
-			while(LCD_GetFlagStatus(LCD_FLAG_UDR) != RESET); 
-			
-            Display_NUL();//配置的通道数为0,显示NUL
-			/*!< Requesy LCD RAM update */
-			LCD_UpdateDisplayRequest();  
-			
-		}else{
-			Started_Channel = GetStartChanel(ChannelNum); //通道数转换为 启动的通道
-			StartedChannelForDisplay = Started_Channel;
-		}
 
-	}
-}
-#endif /* __BSPSENSORDEAL_C */
+#endif /* __BSPDATASAMPLEDEAL_C */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

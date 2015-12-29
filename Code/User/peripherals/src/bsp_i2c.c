@@ -548,7 +548,7 @@ bool RTC8025_Reset(bool need_reset)
 	RTC8025_Ctrl_Typedef ctrl;
 	RTC8025_Alarm_Typedef RtcAlarm;
 	
-	RTC8025_Read((char*)&ctrl.Control, RX8025_Control1Addr, 2);
+	//RTC8025_Read(ctrl.Control, RX8025_Control1Addr, 2);
 	if (ctrl.STREG.PON)
 	{
 		//DebugOutPrintf(DEBUG_INF, "power-on reset was detected, ");
@@ -580,43 +580,131 @@ bool RTC8025_Reset(bool need_reset)
 	if (need_reset || need_clear)
 	{
 		/* 设置 RTC8025 固定周期中断功能 */
-		if(JlyParam.NormalRecInterval >= 60)//记录间隔大于60s
+		if(JlyParam.NormalRecIntervalSec >= 60)//记录间隔大于60s
 		{
-			ctrl.STREG.DALE = 0;
-			RTC8025_Write((char*)&ctrl.Control, RX8025_Control1Addr, 2);
+			//ctrl.STREG.DALE = 0;
+			ctrl.Control[0] = 0;
+			ctrl.Control[1] = 0;
+			RTC8025_Write(ctrl.Control, RX8025_Control1Addr, 2);
 			
-			ctrl.STREG.DALE = 1;	//开启RX8025闹钟功能，1分钟中断一次
-			ctrl.STREG.CT = 0;	
+			if(Flag.MucReset == 0)	//上电的时候不配置唤醒时间
+			{
+				ctrl.STREG.DALE = 1;	//开启RX8025闹钟功能
+				ctrl.STREG.CT = 0;	
+				
+				read_time();			
+				RtcBcdToD10(&Rtc);
+				Rtc.TMPS=RTC_Date_Time_To_Second(&Rtc);
+				Rtc.TCPS = Rtc.TMPS + JlyParam.NormalRecIntervalSec;
+				RTC_Second_To_Date_Time(Rtc.TCPS,&Rtc);
+				RtcD10ToBcd(&Rtc);
+				RtcAlarm.RX8025Alarm.Alarm_D_Minute = Rtc.Minute ;
+				RtcAlarm.RX8025Alarm.Alarm_D_Hour = Rtc.Hour ;
+				RTC_Second_To_Date_Time(Rtc.TMPS,&Rtc);
+				RtcD10ToBcd(&Rtc);
+				
+				RTC8025_Write(&RtcAlarm.Alarm[3], RX8025_Alarm_D_MinuteAddr, 2); //写入两个字节
+			}
 			
-			RtcAlarm.RX8025Alarm.Alarm_D_Minute = 0x32;
-			RtcAlarm.RX8025Alarm.Alarm_D_Hour = 0x15;
-		}else if((JlyParam.NormalRecInterval >0) && (JlyParam.NormalRecInterval < 60))
+		}else if((JlyParam.NormalRecIntervalSec >0) && (JlyParam.NormalRecIntervalSec < 60))
 		{
-			ctrl.STREG.DALE = 0;	//1s中断一次
-			ctrl.STREG.CT = 3;	
+			ctrl.STREG.DALE = 0;	
+			ctrl.STREG.CT = 3;	//1s中断一次
 			
-			RtcAlarm.RX8025Alarm.Alarm_D_Minute = 0x00;
-			RtcAlarm.RX8025Alarm.Alarm_D_Hour = 0x00;
 		}
 		
 		ctrl.STREG.PON = 0;
 		ctrl.STREG.VDET = 0;
 		ctrl.STREG.XST = 1;
-		ctrl.STREG.DAFG = 0;
+		ctrl.STREG.DAFG = 0;	//清除DAFG
+		ctrl.STREG.WAFG = 0;
+		ctrl.STREG.CTFG = 0;
+		ctrl.STREG.H12_24 = 1;
+		RTC8025_Write(ctrl.Control, RX8025_Control1Addr, 2);
+		RTC8025_Read(ctrl.Control, RX8025_Control1Addr, 2);
+		
+	}
+	
+	printf("\r\n Rtc.Minute,Alarm_D_Minute:0x%02X,0x%02X \r\n",Rtc.Minute,RtcAlarm.RX8025Alarm.Alarm_D_Minute);
+	printf("\r\n Rtc.Hour,Alarm_D_Hour:0x%02X,0x%02X \r\n",Rtc.Hour,RtcAlarm.RX8025Alarm.Alarm_D_Hour);
+	if (need_reset)
+	{
+		return false;
+	}
+	
+	return true;
+}
+/**
+  * @brief  Description "RTC8025状态位复位函数"
+  * @param  None
+  * @retval bool		RTC8025读函数是否成功
+  */
+bool RTC8025_ClearDALE(bool need_reset)
+{
+	bool need_clear = 0;
+	RTC8025_Ctrl_Typedef ctrl;
+	
+	//RTC8025_Read((char*)&ctrl.Control, RX8025_Control1Addr, 2);
+	if (ctrl.STREG.PON)
+	{
+		//DebugOutPrintf(DEBUG_INF, "power-on reset was detected, ");
+		//DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
+		need_reset = true;
+	}
+	if (ctrl.STREG.VDET)
+	{
+		//DebugOutPrintf(DEBUG_INF, "a power voltage drop was detected, ");
+		//DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
+		need_reset = true;
+	}
+	if (!ctrl.STREG.XST)
+	{
+		//DebugOutPrintf(DEBUG_INF, "Oscillation stop was detected,");
+		//DebugOutPrintf(DEBUG_INF, "you may have to readjust the clock.\r\n");
+		need_reset = true;
+	}
+	if (ctrl.STREG.DAFG | ctrl.STREG.WAFG)
+	{
+		//DebugOutPrintf(DEBUG_INF, "Alarm was detected.\r\n");
+		need_clear = true;
+	}
+	if (ctrl.STREG.CTFG)
+	{
+		//DebugOutPrintf(DEBUG_INF, "Periodic interrupt output OFF status.\r\n");
+		need_clear = true;
+	}
+	if (need_reset || need_clear)
+	{
+		/* 设置 RTC8025 固定周期中断功能 */
+		if(JlyParam.NormalRecIntervalSec >= 60)//记录间隔大于60s
+		{
+			ctrl.STREG.DALE = 1;	//开启RX8025闹钟功能
+			ctrl.STREG.CT = 0;	
+			
+		}else if((JlyParam.NormalRecIntervalSec >0) && (JlyParam.NormalRecIntervalSec < 60))
+		{
+			ctrl.STREG.DALE = 0;	
+			ctrl.STREG.CT = 3;	//1s中断一次
+		}
+		
+		ctrl.STREG.PON = 0;
+		ctrl.STREG.VDET = 0;
+		ctrl.STREG.XST = 1;
+		ctrl.STREG.DAFG = 0;	//清除DAFG
 		ctrl.STREG.WAFG = 0;
 		ctrl.STREG.CTFG = 0;
 		ctrl.STREG.H12_24 = 1;
 		RTC8025_Write((char*)&ctrl.Control, RX8025_Control1Addr, 2);
 		RTC8025_Read((char*)&ctrl.Control, RX8025_Control1Addr, 2);
-		RTC8025_Write((char*)&RtcAlarm.Alarm[3], RX8025_Alarm_D_MinuteAddr, 2);
 	}
+	
 	if (need_reset)
 	{
 		return false;
 	}
+	
 	return true;
 }
-
 
 #endif /* __BSPI2C_C */
 

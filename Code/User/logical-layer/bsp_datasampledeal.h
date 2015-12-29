@@ -16,8 +16,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __BSPSENSORDEAL_H
-#define __BSPSENSORDEAL_H
+#ifndef __BSPDATASAMPLEDEAL_H
+#define __BSPDATASAMPLEDEAL_H
 
 //#ifdef __cplusplus
 // extern "C" {
@@ -46,12 +46,12 @@
 // MCU:
 /*============================ EXTERN FUNCTIONS ==============================*/
 
-void JudgingChannelNumberDisplay(uint8_t ChannelNum);
-bool SensorDataSampleAndDeal(void);
+
+bool SensorDataSampleDealAndBatteryVoltageDeal(void);
 //#ifdef __cplusplus
 //}
 //#endif
 
-#endif /* __BSPSENSORDEAL_H */
+#endif /* __BSPDATASAMPLEDEAL_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
